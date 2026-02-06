@@ -62,11 +62,18 @@
     }
 
     .grid2{ display:grid; grid-template-columns: 1fr; gap: 12px; }
-    @media (min-width: 760px){ .grid2{ grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 820px){ .grid2{ grid-template-columns: 1.1fr 0.9fr; } }
 
     .row{ display:flex; gap: 10px; flex-wrap: wrap; align-items:center; }
 
-    .label{ font-weight: 700; font-size: 16px; margin-bottom: 8px; }
+    .label{
+      font-weight: 800;
+      font-size: 16px;
+      margin-bottom: 8px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
 
     input, select, button, textarea{
       font-size: 16px;
@@ -134,7 +141,7 @@
 
     .effects{ display:grid; gap: 10px; margin-top: 10px; }
 
-    .effect-line{ display:flex; gap: 10px; align-items:center; }
+    .effect-line{ display:flex; gap: 10px; align-items:stretch; }
 
     .effect-text{
       flex:1;
@@ -144,6 +151,8 @@
       background: rgba(255,255,255,0.6);
       box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset;
       min-height: 20px;
+      display:flex;
+      align-items:center;
     }
 
     .hidden{
@@ -152,11 +161,19 @@
       user-select: none;
     }
 
-    .ing-card{ display:flex; gap: 12px; align-items:flex-start; flex-wrap: wrap; }
+    .ing-card{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      align-items:start;
+    }
+    @media (min-width: 820px){
+      .ing-card{ grid-template-columns: 220px 1fr; }
+    }
 
     .img{
-      width: 190px;
-      max-width: 100%;
+      width: 100%;
+      max-width: 220px;
       border-radius: 16px;
       border: 1px solid rgba(217,200,170,0.95);
       background: rgba(255,255,255,0.6);
@@ -191,16 +208,6 @@
     }
     .toast.good{ border-color: rgba(31,122,58,0.40); }
     .toast.bad{ border-color: rgba(139,29,44,0.35); }
-
-    .mix-pics{ display:flex; gap: 10px; align-items:center; margin-top: 10px; }
-
-    .mix-result{
-      margin-top: 10px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(217,200,170,0.95);
-      background: rgba(255,255,255,0.65);
-    }
 
     .sigil{
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -251,7 +258,7 @@
     }
     .satchel-name{
       font-size: 16px;
-      font-weight: 700;
+      font-weight: 800;
       color: rgba(42,31,22,0.92);
       border: none;
       background: transparent;
@@ -269,7 +276,7 @@
     .qty .count{
       min-width: 34px;
       text-align:center;
-      font-weight: 700;
+      font-weight: 800;
       padding: 6px 10px;
       border-radius: 999px;
       border: 1px solid rgba(217,200,170,0.95);
@@ -278,7 +285,7 @@
     .qty button{
       padding: 8px 10px;
       border-radius: 12px;
-      font-weight: 700;
+      font-weight: 900;
       min-width: 42px;
     }
 
@@ -289,6 +296,91 @@
       background: rgba(255,255,255,0.45);
       padding: 10px 12px;
       margin-top: 10px;
+    }
+
+    /* Brewing diagram */
+    .brew-stage{
+      margin-top: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.55);
+      padding: 10px 12px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.07);
+    }
+    .brew-top{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+    .slot{
+      flex: 1 1 180px;
+      min-width: 180px;
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .slot-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 10px;
+    }
+    .slot-title{
+      font-weight: 800;
+      color: rgba(42,31,22,0.85);
+      display:flex;
+      align-items:center;
+      gap: 6px;
+    }
+    .slot select{
+      width: 100%;
+      min-width: 180px;
+    }
+
+    .diagram{
+      position: relative;
+      margin-top: 12px;
+      padding-top: 12px;
+    }
+
+    .cauldron-wrap{
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      justify-content:center;
+      margin-top: 6px;
+    }
+
+    .result-banner{
+      margin-top: 10px;
+    }
+
+    .icon{
+      width: 22px;
+      height: 22px;
+      display:inline-block;
+      vertical-align: middle;
+    }
+    .icon-lg{
+      width: 26px;
+      height: 26px;
+      display:inline-block;
+      vertical-align: middle;
+    }
+
+    /* Property rows now stack under the image by default */
+    .prop-area{
+      margin-top: 10px;
+    }
+    .effects{
+      max-width: 520px;
+    }
+    @media (min-width: 820px){
+      .effects{ max-width: unset; }
     }
   </style>
 </head>
@@ -305,7 +397,17 @@
     </div>
 
     <div class="card">
-      <div class="label">Add Ingredient</div>
+      <div class="label">
+        <span class="icon-lg" aria-hidden="true">
+          <!-- quill -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.85);">
+            <path d="M20 3c-5 1-9 5-10 10l-1 5 5-1c5-1 9-5 10-10-2 1-4 1-6 0-1-2-1-4 2-4z"/>
+            <path d="M9 13l2 2"/>
+            <path d="M4 20c2-2 4-3 7-3"/>
+          </svg>
+        </span>
+        Add Ingredient
+      </div>
       <div class="muted">Write the mark you were given, then press Add.</div>
       <div class="row" style="margin-top:10px;">
         <input id="markInput" inputmode="numeric" placeholder="Mark" aria-label="Mark" />
@@ -316,61 +418,163 @@
 
       <div class="divider"></div>
 
-      <div class="label">Satchel</div>
+      <div class="label">
+        <span class="icon-lg" aria-hidden="true">
+          <!-- satchel -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.85);">
+            <path d="M8 7c0-2 1.6-3 4-3s4 1 4 3"/>
+            <path d="M6 9h12l-1 11H7L6 9z"/>
+            <path d="M9 9c0 2 1.2 3 3 3s3-1 3-3"/>
+            <path d="M9 14h6"/>
+          </svg>
+        </span>
+        Satchel
+      </div>
       <div class="muted">What you have chosen to keep close at hand.</div>
       <div class="satchel-list" id="satchel"></div>
-
-      <div class="row" style="margin-top:10px;">
-        <button class="btn-danger small" id="clearSatchelBtn">Empty Satchel</button>
-      </div>
     </div>
 
     <div class="grid2">
       <div class="card">
-        <div class="label">Mortar and Pestle</div>
-        <div class="muted">Choose two, then Brew. If they share a nature, a concoction is born.</div>
-
-        <div class="row" style="margin-top:10px;">
-          <select id="mixA" style="min-width: 260px;"></select>
-          <select id="mixB" style="min-width: 260px;"></select>
-          <button class="btn-primary" id="brewBtn">Brew</button>
+        <div class="label">
+          <span class="icon-lg" aria-hidden="true">
+            <!-- mortar & pestle -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.85);">
+              <path d="M7 10h10l-1 7a4 4 0 0 1-4 3H12a4 4 0 0 1-4-3l-1-7z"/>
+              <path d="M6 10c-1.5 0-2.5-.8-2.5-2S4.5 6 6 6h12c1.5 0 2.5.8 2.5 2S19.5 10 18 10"/>
+              <path d="M13.5 5.5l4-2"/>
+              <path d="M14 7l4-2"/>
+            </svg>
+          </span>
+          Mortar and Pestle
         </div>
+        <div class="muted">Choose two, or optionally three, then Brew.</div>
 
-        <div class="optional">
-          <div class="row" style="justify-content:space-between; align-items:center;">
-            <div style="font-weight:700;">Optional third ingredient</div>
-            <label class="row" style="gap:8px;">
-              <input type="checkbox" id="useThird" />
-              <span class="muted">Include</span>
-            </label>
-          </div>
-          <div class="row" style="margin-top:10px;">
-            <select id="mixC" style="min-width: 260px;" disabled></select>
-          </div>
-          <div class="muted" style="margin-top:8px;">
-            If included, it must also be in your satchel with enough quantity.
-          </div>
-        </div>
+        <div class="brew-stage">
+          <div class="brew-top">
+            <div class="slot">
+              <div class="slot-head">
+                <div class="slot-title">
+                  <span class="icon" aria-hidden="true">
+                    <!-- leaf -->
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.75);">
+                      <path d="M20 4c-8 1-13 6-14 14 8-1 13-6 14-14z"/>
+                      <path d="M6 18c3-3 6-5 10-7"/>
+                    </svg>
+                  </span>
+                  First
+                </div>
+              </div>
+              <select id="mixA"></select>
+            </div>
 
-        <div class="mix-pics">
-          <img class="img-sm" id="mixImgA" alt="First ingredient" />
-          <img class="img-sm" id="mixImgB" alt="Second ingredient" />
-          <img class="img-sm" id="mixImgC" alt="Third ingredient" style="display:none;" />
-        </div>
+            <div class="slot">
+              <div class="slot-head">
+                <div class="slot-title">
+                  <span class="icon" aria-hidden="true">
+                    <!-- leaf -->
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.75);">
+                      <path d="M20 4c-8 1-13 6-14 14 8-1 13-6 14-14z"/>
+                      <path d="M6 18c3-3 6-5 10-7"/>
+                    </svg>
+                  </span>
+                  Second
+                </div>
+              </div>
+              <select id="mixB"></select>
+            </div>
 
-        <div class="mix-result" id="mixResult">
-          <div class="muted">No mixture yet.</div>
+            <div class="slot" id="thirdSlot" style="display:none;">
+              <div class="slot-head">
+                <div class="slot-title">
+                  <span class="icon" aria-hidden="true">
+                    <!-- leaf -->
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.75);">
+                      <path d="M20 4c-8 1-13 6-14 14 8-1 13-6 14-14z"/>
+                      <path d="M6 18c3-3 6-5 10-7"/>
+                    </svg>
+                  </span>
+                  Third
+                </div>
+              </div>
+              <select id="mixC"></select>
+            </div>
+          </div>
+
+          <div class="optional">
+            <div class="row" style="justify-content:space-between; align-items:center;">
+              <div style="font-weight:800;">Optional third ingredient</div>
+              <label class="row" style="gap:8px;">
+                <input type="checkbox" id="useThird" />
+                <span class="muted">Include</span>
+              </label>
+            </div>
+            <div class="muted" style="margin-top:8px;">If included, it must be available in the satchel.</div>
+          </div>
+
+          <div class="diagram">
+            <!-- connector lines -->
+            <svg viewBox="0 0 1000 240" preserveAspectRatio="none" width="100%" height="110" aria-hidden="true" style="position:absolute; left:0; top:0; pointer-events:none;">
+              <path id="lineA" d="M180 10 C220 60, 300 80, 500 200" fill="none" stroke="rgba(42,31,22,0.25)" stroke-width="3" stroke-linecap="round"/>
+              <path id="lineB" d="M500 10 C500 70, 500 90, 500 200" fill="none" stroke="rgba(42,31,22,0.25)" stroke-width="3" stroke-linecap="round"/>
+              <path id="lineC" d="M820 10 C780 60, 700 80, 500 200" fill="none" stroke="rgba(42,31,22,0.25)" stroke-width="3" stroke-linecap="round" style="display:none;"/>
+            </svg>
+
+            <div class="cauldron-wrap" style="padding-top: 70px;">
+              <img class="img-sm" id="mixImgA" alt="First ingredient" />
+              <img class="img-sm" id="mixImgB" alt="Second ingredient" />
+              <img class="img-sm" id="mixImgC" alt="Third ingredient" style="display:none;" />
+            </div>
+
+            <div class="cauldron-wrap" style="margin-top: 2px;">
+              <div style="display:flex; flex-direction:column; align-items:center;">
+                <span class="icon-lg" aria-hidden="true">
+                  <!-- cauldron -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.85);">
+                    <path d="M7 10h10"/>
+                    <path d="M6 10c0 6 2 10 6 10s6-4 6-10"/>
+                    <path d="M5 10c-1.2 0-2-.8-2-1.8S3.8 6.5 5 6.5h14c1.2 0 2 .8 2 1.7S20.2 10 19 10"/>
+                    <path d="M9 20l-1 2"/>
+                    <path d="M15 20l1 2"/>
+                    <path d="M10 6c0-1 .8-2 2-2s2 1 2 2"/>
+                    <path d="M9 13c1 1 2 1.5 3 1.5S14 14 15 13"/>
+                  </svg>
+                </span>
+                <button class="btn-primary" id="brewBtn" style="margin-top:8px;">Brew</button>
+              </div>
+            </div>
+
+            <div class="mix-result result-banner" id="mixResult">
+              <div class="muted">No mixture yet.</div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="card" id="ingredientCard" style="display:none;">
-        <div class="label">Ingredient</div>
+        <div class="label">
+          <span class="icon-lg" aria-hidden="true">
+            <!-- herb -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.85);">
+              <path d="M12 21V9"/>
+              <path d="M12 9c-4 0-6-2-6-5 3 0 6 1 6 5z"/>
+              <path d="M12 9c4 0 6-2 6-5-3 0-6 1-6 5z"/>
+              <path d="M8 14c-2 0-3-1-3-3 2 0 3 1 3 3z"/>
+              <path d="M16 14c2 0 3-1 3-3-2 0-3 1-3 3z"/>
+            </svg>
+          </span>
+          Ingredient
+        </div>
+
         <div class="ing-card">
-          <img class="img" id="ingImage" alt="Ingredient" />
-          <div style="flex:1; min-width: 240px;">
+          <div>
+            <img class="img" id="ingImage" alt="Ingredient" />
+          </div>
+
+          <div>
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:space-between;">
               <div>
-                <div style="font-size:20px; font-weight:700;" id="ingName"></div>
+                <div style="font-size:20px; font-weight:800;" id="ingName"></div>
                 <div style="margin-top:6px;">
                   <span class="pill" id="rarityPill">Unknown</span>
                 </div>
@@ -378,10 +582,13 @@
               <div class="row">
                 <button class="btn small" id="revealRandomBtn">Reveal a Property</button>
                 <button class="btn-danger small" id="resetRevealsBtn">Forget Properties</button>
+                <button class="btn small" id="closeIngredientBtn">Close</button>
               </div>
             </div>
 
-            <div class="effects" id="effectsList"></div>
+            <div class="prop-area">
+              <div class="effects" id="effectsList"></div>
+            </div>
 
             <details style="margin-top:10px;">
               <summary>Keep Safe</summary>
@@ -412,7 +619,6 @@
   <div class="toast" id="toast"></div>
 
 <script>
-  // Connection settings
   const SUPABASE_URL = "https://yjelzojkirlzdnwftupz.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqZWx6b2praXJsemRud2Z0dXB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzNTk0MTEsImV4cCI6MjA4NTkzNTQxMX0.5TCIyj5cAUlCAmNc2yBOIdpfNoN4NLqOOfcnBVbCzZA";
 
@@ -421,9 +627,7 @@
   const INGREDIENT_BY_MARK = (mark) => `${REST_BASE}/ingredients?select=id,name,effect_1,effect_2,effect_3,effect_4,image_path,rarity,notes&id=eq.${encodeURIComponent(mark)}&limit=1`;
   const PUBLIC_STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/`;
 
-  // Local notes
-  // satchel is a map { [id]: quantityNumber }, and entries remain even at 0
-  const LOCAL_KEY = "field_alchemy_notes_v5";
+  const LOCAL_KEY = "field_alchemy_notes_v6";
   function loadLocal() {
     const raw = localStorage.getItem(LOCAL_KEY);
     if (!raw) return { reveals: {}, satchel: {} };
@@ -443,23 +647,17 @@
       return { reveals: {}, satchel: {} };
     }
   }
-  function saveLocal() {
-    localStorage.setItem(LOCAL_KEY, JSON.stringify(LOCAL));
-  }
+  function saveLocal() { localStorage.setItem(LOCAL_KEY, JSON.stringify(LOCAL)); }
 
   let LOCAL = loadLocal();
-  let REVEALS = LOCAL.reveals;          // { [id]: [bool,bool,bool,bool] }
-  let SATCHEL = LOCAL.satchel;          // { [id]: qty }, qty can be 0
+  let REVEALS = LOCAL.reveals;
+  let SATCHEL = LOCAL.satchel;
 
-  // In-memory cache
-  let ING_BY_ID = {};                   // id -> row
+  let ING_BY_ID = {};
   const el = (id) => document.getElementById(id);
 
   function headers() {
-    return {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-    };
+    return { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
   }
 
   function toast(msg, kind) {
@@ -479,16 +677,9 @@
     if (v.includes("rare") || v.includes("uncommon") || v.includes("legend")) return "pill-rare";
     return "pill-common";
   }
+  function rarityLabel(r) { const v = String(r || "").trim(); return v ? v : "Unknown"; }
 
-  function rarityLabel(r) {
-    const v = String(r || "").trim();
-    return v ? v : "Unknown";
-  }
-
-  function getImageUrl(image_path) {
-    if (!image_path) return "";
-    return `${PUBLIC_STORAGE_BASE}${image_path}`;
-  }
+  function getImageUrl(image_path) { return image_path ? `${PUBLIC_STORAGE_BASE}${image_path}` : ""; }
 
   function placeholderImageDataUri(label) {
     const svg =
@@ -504,21 +695,17 @@
     el("statusText").textContent = "Turning pages...";
     try {
       const res = await fetch(INGREDIENTS_ENDPOINT, { headers: headers() });
-      if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(`HTTP ${res.status}: ${txt}`);
-      }
+      if (!res.ok) throw new Error(await res.text());
       const rows = await res.json();
 
       ING_BY_ID = {};
       for (const r of rows) {
         const idStr = String(r.id);
         ING_BY_ID[idStr] = r;
-        if (!REVEALS[idStr]) REVEALS[idStr] = [false, false, false, false];
+        if (!REVEALS[idStr]) REVEALS[idStr] = [false,false,false,false];
       }
       saveLocal();
 
-      // Remove satchel entries for missing ingredients, but keep 0 entries for valid ones
       for (const idStr of Object.keys(SATCHEL)) {
         if (!ING_BY_ID[idStr]) delete SATCHEL[idStr];
       }
@@ -538,10 +725,7 @@
 
   async function fetchOne(mark) {
     const res = await fetch(INGREDIENT_BY_MARK(mark), { headers: headers() });
-    if (!res.ok) {
-      const txt = await res.text();
-      throw new Error(`HTTP ${res.status}: ${txt}`);
-    }
+    if (!res.ok) throw new Error(await res.text());
     const rows = await res.json();
     return rows?.[0] || null;
   }
@@ -554,10 +738,7 @@
 
   function renderIngredient(idStr) {
     const row = ING_BY_ID[idStr];
-    if (!row) {
-      toast("That mark is not in your notes.", "bad");
-      return;
-    }
+    if (!row) { toast("That mark is not in your notes.", "bad"); return; }
 
     el("ingredientCard").style.display = "block";
     el("ingName").textContent = row.name || "Unknown Ingredient";
@@ -566,7 +747,7 @@
     const imgUrl = getImageUrl(row.image_path);
     el("ingImage").src = imgUrl || placeholderImageDataUri("No sketch");
 
-    const effects = [row.effect_1, row.effect_2, row.effect_3, row.effect_4].map(v => v || "");
+    const effects = [row.effect_1,row.effect_2,row.effect_3,row.effect_4].map(v => v || "");
     const revealed = REVEALS[idStr] || [false,false,false,false];
 
     const list = el("effectsList");
@@ -605,10 +786,7 @@
     el("revealRandomBtn").onclick = () => {
       const hidden = [];
       for (let i = 0; i < 4; i++) if (!REVEALS[idStr][i]) hidden.push(i);
-      if (hidden.length === 0) {
-        toast("Nothing more to learn here.", "good");
-        return;
-      }
+      if (hidden.length === 0) { toast("Nothing more to learn here.", "good"); return; }
       const pick = hidden[Math.floor(Math.random() * hidden.length)];
       REVEALS[idStr][pick] = true;
       saveLocal();
@@ -627,7 +805,7 @@
   function closeIngredient() { el("ingredientCard").style.display = "none"; }
 
   function satchelIdsAll() {
-    const ids = Object.keys(SATCHEL).filter(id => ING_BY_ID[id]); // include zeros
+    const ids = Object.keys(SATCHEL).filter(id => ING_BY_ID[id]);
     ids.sort((a,b) => Number(a) - Number(b));
     return ids;
   }
@@ -640,7 +818,7 @@
 
   function setQty(idStr, qty) {
     const q = Math.max(0, Math.floor(Number(qty) || 0));
-    SATCHEL[String(idStr)] = q; // keep even if 0
+    SATCHEL[String(idStr)] = q;
     LOCAL.satchel = SATCHEL;
     saveLocal();
   }
@@ -682,12 +860,11 @@
       minus.className = "btn small";
       minus.textContent = "-";
       minus.addEventListener("click", () => {
-        const next = qty - 1;
-        setQty(idStr, next);
+        setQty(idStr, qty - 1);
         renderSatchel();
         fillMixChoices();
         updateMixPictures();
-        toast("Noted.", next < qty ? "bad" : "good");
+        toast("Noted.", "bad");
       });
 
       const count = document.createElement("div");
@@ -719,25 +896,30 @@
     updateMixPictures();
   }
 
+  function setThirdVisibility(on) {
+    el("thirdSlot").style.display = on ? "block" : "none";
+    el("mixC").disabled = !on;
+    el("mixImgC").style.display = on ? "block" : "none";
+    el("lineC").style.display = on ? "block" : "none";
+  }
+
   function fillMixChoices() {
     const a = el("mixA");
     const b = el("mixB");
     const c = el("mixC");
 
-    const ids = satchelIdsAvailable(); // only >0 for brewing
-    const all = satchelIdsAll();       // for showing pictures when empty
+    const ids = satchelIdsAvailable();
+    const all = satchelIdsAll();
 
     if (ids.length < 2) {
       a.innerHTML = "";
       b.innerHTML = "";
       c.innerHTML = "";
       el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your satchel to brew.</div>`;
-      // Still set pictures to something reasonable
       const pick = all[0];
       const row = pick ? ING_BY_ID[pick] : null;
       el("mixImgA").src = getImageUrl(row?.image_path) || placeholderImageDataUri("?");
       el("mixImgB").src = placeholderImageDataUri("?");
-      el("mixImgC").style.display = el("useThird").checked ? "block" : "none";
       el("mixImgC").src = placeholderImageDataUri("?");
       return;
     }
@@ -759,16 +941,11 @@
     a.value = ids.includes(prevA) ? prevA : ids[0];
     b.value = ids.includes(prevB) ? prevB : ids[1];
 
-    if (a.value === b.value) {
-      b.value = ids.find(x => x !== a.value) || ids[1];
-    }
+    if (a.value === b.value) b.value = ids.find(x => x !== a.value) || ids[1];
 
     c.value = ids.includes(prevC) ? prevC : ids.find(x => x !== a.value && x !== b.value) || ids[0];
-
-    if (el("useThird").checked) {
-      if (c.value === a.value || c.value === b.value) {
-        c.value = ids.find(x => x !== a.value && x !== b.value) || c.value;
-      }
+    if (el("useThird").checked && (c.value === a.value || c.value === b.value)) {
+      c.value = ids.find(x => x !== a.value && x !== b.value) || c.value;
     }
 
     updateMixPictures();
@@ -786,18 +963,11 @@
 
     el("mixImgA").src = getImageUrl(aRow?.image_path) || placeholderImageDataUri("?");
     el("mixImgB").src = getImageUrl(bRow?.image_path) || placeholderImageDataUri("?");
-
-    const cEl = el("mixImgC");
-    if (useThird) {
-      cEl.style.display = "block";
-      cEl.src = getImageUrl(cRow?.image_path) || placeholderImageDataUri("?");
-      cEl.alt = cRow?.name || "Ingredient";
-    } else {
-      cEl.style.display = "none";
-    }
+    if (useThird) el("mixImgC").src = getImageUrl(cRow?.image_path) || placeholderImageDataUri("?");
 
     el("mixImgA").alt = aRow?.name || "Ingredient";
     el("mixImgB").alt = bRow?.name || "Ingredient";
+    el("mixImgC").alt = cRow?.name || "Ingredient";
   }
 
   function computeShared(ids) {
@@ -817,7 +987,7 @@
       const row = ING_BY_ID[idStr];
       if (!row) continue;
 
-      const effs = [row.effect_1, row.effect_2, row.effect_3, row.effect_4];
+      const effs = [row.effect_1,row.effect_2,row.effect_3,row.effect_4];
       if (!REVEALS[idStr]) REVEALS[idStr] = [false,false,false,false];
 
       for (let i = 0; i < 4; i++) {
@@ -828,10 +998,8 @@
   }
 
   function canSpend(ids) {
-    // Count how many of each id are needed
     const needed = {};
     for (const id of ids) needed[id] = (needed[id] || 0) + 1;
-
     for (const [id, n] of Object.entries(needed)) {
       const have = Number(SATCHEL[id]) || 0;
       if (have < n) return false;
@@ -853,13 +1021,12 @@
     const useThird = el("useThird").checked;
     const cId = useThird ? el("mixC").value : null;
 
-    const ids = [aId, bId].filter(Boolean);
+    const ids = [aId,bId].filter(Boolean);
     if (useThird && cId) ids.push(cId);
 
-    // Must all be distinct for three-ingredient brew, unless you want duplicates
     if (useThird && (aId === bId || aId === cId || bId === cId)) {
       el("mixResult").innerHTML = `
-        <div style="color:var(--warn); font-weight:700;">Choose different ingredients.</div>
+        <div style="color:var(--warn); font-weight:800;">Choose different ingredients.</div>
         <div class="muted" style="margin-top:6px;">The third ingredient should be different.</div>
       `;
       toast("Choose different ingredients.", "bad");
@@ -875,7 +1042,7 @@
 
     if (!canSpend(ids)) {
       el("mixResult").innerHTML = `
-        <div style="color:var(--warn); font-weight:700;">Not enough in the satchel.</div>
+        <div style="color:var(--warn); font-weight:800;">Not enough in the satchel.</div>
         <div class="muted" style="margin-top:6px;">One of the chosen ingredients is missing.</div>
       `;
       toast("Not enough in the satchel.", "bad");
@@ -884,7 +1051,6 @@
 
     const shared = computeShared(ids);
 
-    // Consume ingredients regardless of outcome (matches your earlier consumption behavior)
     spend(ids);
     renderSatchel();
     fillMixChoices();
@@ -892,7 +1058,7 @@
 
     if (shared.length === 0) {
       el("mixResult").innerHTML = `
-        <div style="color:var(--warn); font-weight:700;">The mixture fizzles.</div>
+        <div style="color:var(--warn); font-weight:800;">The mixture fizzles.</div>
         <div class="muted" style="margin-top:6px;">Nothing in common, nothing takes hold.</div>
       `;
       toast("The mixture fizzles.", "bad");
@@ -903,13 +1069,12 @@
 
     const effectText = shared.join(", ");
     el("mixResult").innerHTML = `
-      <div style="color:var(--good); font-weight:700;">Made Concoction of ${escapeHtml(effectText)}</div>
+      <div style="color:var(--good); font-weight:900;">Made Concoction of ${escapeHtml(effectText)}</div>
       <div class="muted" style="margin-top:6px;">The shared nature has been noted.</div>
     `;
     toast("A concoction is born.", "good");
   }
 
-  // Export / Import
   function exportNotes() {
     const payload = { reveals: REVEALS, satchel: SATCHEL };
     el("saveBox").value = JSON.stringify(payload, null, 2);
@@ -971,12 +1136,9 @@
     if (!ING_BY_ID[clean]) {
       try {
         const row = await fetchOne(clean);
-        if (!row) {
-          toast("That mark is unknown.", "bad");
-          return;
-        }
+        if (!row) { toast("That mark is unknown.", "bad"); return; }
         ING_BY_ID[clean] = row;
-        if (!REVEALS[clean]) REVEALS[clean] = [false, false, false, false];
+        if (!REVEALS[clean]) REVEALS[clean] = [false,false,false,false];
         saveLocal();
       } catch {
         toast("Could not read that mark.", "bad");
@@ -996,43 +1158,29 @@
     renderIngredient(clean);
   }
 
-  // Wire events
+  // Events
   el("refreshBtn").addEventListener("click", fetchAllIngredients);
 
   el("addBtn").addEventListener("click", () => addToSatchelFromMark(el("markInput").value));
   el("openBtn").addEventListener("click", () => {
     const mark = el("markInput").value.trim();
     if (!mark) return;
-    if (!ING_BY_ID[mark]) {
-      toast("Add it first.", "bad");
-      return;
-    }
+    if (!ING_BY_ID[mark]) { toast("Add it first.", "bad"); return; }
     renderIngredient(mark);
   });
   el("closeBtn").addEventListener("click", closeIngredient);
-
-  el("clearSatchelBtn").addEventListener("click", () => {
-    if (!confirm("Empty your satchel on this device?")) return;
-    SATCHEL = {};
-    LOCAL.satchel = SATCHEL;
-    saveLocal();
-    renderSatchel();
-    fillMixChoices();
-    updateMixPictures();
-    el("mixResult").innerHTML = `<div class="muted">No mixture yet.</div>`;
-    toast("Satchel emptied.", "bad");
-  });
+  el("closeIngredientBtn").addEventListener("click", closeIngredient);
 
   el("mixA").addEventListener("change", updateMixPictures);
   el("mixB").addEventListener("change", updateMixPictures);
+  el("mixC").addEventListener("change", updateMixPictures);
+
   el("useThird").addEventListener("change", () => {
     const on = el("useThird").checked;
-    el("mixC").disabled = !on;
-    el("mixImgC").style.display = on ? "block" : "none";
+    setThirdVisibility(on);
     fillMixChoices();
     updateMixPictures();
   });
-  el("mixC").addEventListener("change", updateMixPictures);
 
   el("brewBtn").addEventListener("click", brew);
 
@@ -1048,6 +1196,8 @@
   el("mixImgA").src = placeholderImageDataUri("?");
   el("mixImgB").src = placeholderImageDataUri("?");
   el("mixImgC").src = placeholderImageDataUri("?");
+  setThirdVisibility(false);
+
   fetchAllIngredients();
   renderSatchel();
   fillMixChoices();

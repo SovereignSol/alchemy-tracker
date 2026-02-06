@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DnD Alchemy Tracker</title>
+  <style>
+    :root { font-family: system-ui, Arial, sans-serif; }
+    body { margin: 0; padding: 16px; max-width: 980px; margin-inline: auto; }
+    h1 { font-size: 20px; margin: 0 0 12px; }
+    .muted { color: #666; font-size: 13px; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 12px; margin: 12px 0; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    input, select, button, textarea { font-size: 16px; padding: 10px; border-radius: 10px; border: 1px solid #ccc; }
+    button { cursor: pointer; }
+    .btn { background: #f5f5f5; }
+    .btn-primary { background: #1f6feb; border-color: #1f6feb; color: white; }
+    .btn-danger { background: #d73a49; border-color: #d73a49; color: white; }
+    .small { font-size: 13px; padding: 8px 10px; }
+    img { max-width: 180px; width: 100%; height: auto; border-radius: 12px; border: 1px solid #eee; }
+    .grid2 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 760px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+    .effects { display: grid; gap: 8px; margin-top: 10px; }
+    .effect-line { display: flex; gap: 8px; align-items: center; }
+    .pill { padding: 6px 10px; border-radius: 999px; border: 1px solid #ddd; background: #fafafa; white-space: nowrap; }
+    .effect-text { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #eee; background: #fff; }
+    .hidden { color: transparent; text-shadow: 0 0 10px rgba(0,0,0,0.6); user-select: none; }
+    .ok { color: #0a7a0a; font-weight: 700; }
+    .warn { color: #8a5a00; font-weight: 700; }
+    .err { color: #b00020; font-weight: 700; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  </style>
+</head>
+<body>
+  <h1>DnD Alchemy Tracker</h1>
+  <div class="muted">
+    Read-only app backed by Supabase. Reveals are stored locally on this device.
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <button class="btn-primary" id="refreshBtn">Refresh Ingredient List</button>
+      <span class="muted" id="statusText">Not loaded yet.</span>
+    </div>
+    <div class="muted" style="margin-top:8px;">
+      If you add ingredients in the Supabase dashboard, click Refresh to pull them in.
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div style="font-weight:700; margin-bottom:8px;">Lookup by ID</div>
+      <div class="row">
+        <input id="idInput" inputmode="numeric" placeholder="Enter Ingredient ID (e.g. 9000)" />
+        <button class="btn-primary" id="loadBtn">Load</button>
+        <button class="btn" id="clearBtn">Clear</button>
+      </div>
+      <div class="muted" style="margin-top:8px;">
+        Tip: you can also pick from the dropdown below.
+      </div>
+      <div class="row" style="margin-top:10px;">
+        <select id="pickSelect" style="min-width: 280px;"></select>
+        <button class="btn" id="loadFromPickBtn">Load Selected</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:700; margin-bottom:8px;">Mixing</div>
+      <div class="muted">
+        Pick two ingredients. “Check Shared” shows shared effects. If the table says the brew succeeded, click “Reveal Shared”.
+      </div>
+      <div class="row" style="margin-top:10px;">
+        <select id="mixA" style="min-width: 280px;"></select>
+        <select id="mixB" style="min-width: 280px;"></select>
+      </div>
+      <div class="row" style="margin-top:10px;">
+        <button class="btn-primary" id="checkSharedBtn">Check Shared</button>
+        <button class="btn" id="revealSharedBtn" disabled>Reveal Shared</button>
+      </div>
+      <div id="sharedResult" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <div class="card" id="ingredientCard" style="display:none;">
+    <div class="row" style="align-items:flex-start;">
+      <div>
+        <img id="ingImage" alt="Ingredient image" />
+      </div>
+      <div style="flex:1; min-width: 240px;">
+        <div class="row" style="justify-content:space-between;">
+          <div>
+            <div class="muted">Ingredient</div>
+            <div style="font-size:18px; font-weight:700;" id="ingName"></div>
+            <div class="muted">ID: <span id="ingId" class="mono"></span></div>
+            <div class="muted">Rarity: <span id="ingRarity"></span></div>
+          </div>
+          <div>
+            <button class="btn small" id="revealRandomBtn">Reveal Random Hidden</button>
+            <button class="btn-danger small" id="resetRevealsBtn">Reset Reveals</button>
+          </div>
+        </div>
+
+        <div class="effects" id="effectsList"></div>
+
+        <div class="muted" style="margin-top:10px;">
+          Bruised penalties and Medicine checks happen at the table. This app only tracks what you revealed.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-weight:700; margin-bottom:8px;">Backup (Export / Import reveals)</div>
+    <div class="muted">Reveals are stored on this device. Export lets you move them to another phone if needed.</div>
+    <div class="row" style="margin-top:10px;">
+      <button class="btn" id="exportBtn">Export</button>
+      <button class="btn" id="importBtn">Import</button>
+      <button class="btn-danger" id="wipeBtn">Wipe Reveals</button>
+    </div>
+    <textarea id="saveBox" rows="6" style="width:100%; margin-top:10px;" placeholder="Exported JSON appears here. Paste JSON here to import."></textarea>
+  </div>
+
+<script>
+  // Supabase config (your values)
+  const SUPABASE_URL = "https://yjelzojkirlzdnwftupz.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqZWx6b2praXJsemRud2Z0dXB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzNTk0MTEsImV4cCI6MjA4NTkzNTQxMX0.5TCIyj5cAUlCAmNc2yBOIdpfNoN4NLqOOfcnBVbCzZA";
+
+  // API endpoints
+  const REST_BASE = `${SUPABASE_URL}/rest/v1`;
+  const INGREDIENTS_ENDPOINT = `${REST_BASE}/ingredients?select=id,name,effect_1,effect_2,effect_3,effect_4,image_path,rarity,notes&order=id.asc`;
+  const PUBLIC_STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/`;
+
+  // local reveal state
+  const STORAGE_KEY = "alchemy_reveals_v1";
+  function loadReveals() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return {};
+    try { return JSON.parse(raw) || {}; } catch { return {}; }
+  }
+  function saveReveals() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(REVEALS));
+  }
+  let REVEALS = loadReveals();
+
+  // in-memory ingredient cache
+  let INGREDIENTS = []; // array of rows
+  let ING_BY_ID = {};   // id -> row
+
+  const el = (id) => document.getElementById(id);
+
+  async function fetchIngredients() {
+    el("statusText").textContent = "Loading from Supabase...";
+    try {
+      const res = await fetch(INGREDIENTS_ENDPOINT, {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        }
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`HTTP ${res.status}: ${txt}`);
+      }
+
+      const rows = await res.json();
+      INGREDIENTS = rows;
+      ING_BY_ID = {};
+      for (const r of rows) {
+        const idStr = String(r.id);
+        ING_BY_ID[idStr] = r;
+        if (!REVEALS[idStr]) REVEALS[idStr] = [false, false, false, false];
+      }
+      saveReveals();
+      fillDropdowns();
+      el("statusText").innerHTML = `<span class="ok">Loaded ${rows.length} ingredients.</span>`;
+    } catch (err) {
+      el("statusText").innerHTML = `<span class="err">Failed to load: ${escapeHtml(String(err.message || err))}</span>`;
+      console.error(err);
+    }
+  }
+
+  function fillDropdowns() {
+    const makeOpts = () => INGREDIENTS.map(r => {
+      const idStr = String(r.id);
+      return `<option value="${escapeHtml(idStr)}">${escapeHtml(idStr)} - ${escapeHtml(r.name || "")}</option>`;
+    }).join("");
+
+    const opts = makeOpts();
+    el("pickSelect").innerHTML = opts;
+    el("mixA").innerHTML = opts;
+    el("mixB").innerHTML = opts;
+
+    if (INGREDIENTS.length >= 2) el("mixB").value = String(INGREDIENTS[1].id);
+  }
+
+  function getImageUrl(image_path) {
+    if (!image_path) return "";
+    // image_path is stored like "ingredients/9000.webp"
+    return `${PUBLIC_STORAGE_BASE}${image_path}`;
+  }
+
+  function renderIngredient(idStr) {
+    const row = ING_BY_ID[idStr];
+    if (!row) {
+      alert("Unknown ID. Refresh list, or add it in Supabase.");
+      return;
+    }
+
+    el("ingredientCard").style.display = "block";
+    el("ingName").textContent = row.name || "";
+    el("ingId").textContent = idStr;
+    el("ingRarity").textContent = row.rarity || "Unknown";
+
+    const imgUrl = getImageUrl(row.image_path);
+    el("ingImage").src = imgUrl || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Crect width='100%25' height='100%25' fill='%23f2f2f2'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23666' font-size='22'%3ENo image%3C/text%3E%3C/svg%3E";
+
+    const effects = [row.effect_1, row.effect_2, row.effect_3, row.effect_4].map(v => v || "");
+    const revealed = REVEALS[idStr] || [false,false,false,false];
+
+    const list = el("effectsList");
+    list.innerHTML = "";
+
+    effects.forEach((eff, idx) => {
+      const line = document.createElement("div");
+      line.className = "effect-line";
+
+      const pill = document.createElement("div");
+      pill.className = "pill";
+      pill.textContent = `Effect ${idx+1}`;
+
+      const text = document.createElement("div");
+      text.className = "effect-text";
+      text.textContent = eff || "(empty)";
+      if (!revealed[idx]) text.classList.add("hidden");
+
+      const btn = document.createElement("button");
+      btn.className = "btn small";
+      btn.textContent = revealed[idx] ? "Revealed" : "Reveal";
+      btn.disabled = revealed[idx];
+      btn.addEventListener("click", () => {
+        REVEALS[idStr][idx] = true;
+        saveReveals();
+        renderIngredient(idStr);
+      });
+
+      line.appendChild(pill);
+      line.appendChild(text);
+      line.appendChild(btn);
+      list.appendChild(line);
+    });
+
+    el("revealRandomBtn").onclick = () => {
+      const hidden = [];
+      for (let i = 0; i < 4; i++) if (!REVEALS[idStr][i]) hidden.push(i);
+      if (hidden.length === 0) return;
+      const pick = hidden[Math.floor(Math.random() * hidden.length)];
+      REVEALS[idStr][pick] = true;
+      saveReveals();
+      renderIngredient(idStr);
+    };
+
+    el("resetRevealsBtn").onclick = () => {
+      REVEALS[idStr] = [false,false,false,false];
+      saveReveals();
+      renderIngredient(idStr);
+    };
+  }
+
+  function computeShared(aId, bId) {
+    const a = ING_BY_ID[aId];
+    const b = ING_BY_ID[bId];
+    if (!a || !b) return [];
+
+    const aEffects = [a.effect_1, a.effect_2, a.effect_3, a.effect_4].filter(Boolean);
+    const bEffects = new Set([b.effect_1, b.effect_2, b.effect_3, b.effect_4].filter(Boolean));
+
+    return aEffects.filter(e => bEffects.has(e));
+  }
+
+  function revealShared(aId, bId, shared) {
+    const a = ING_BY_ID[aId];
+    const b = ING_BY_ID[bId];
+    if (!a || !b) return;
+
+    const aEffects = [a.effect_1, a.effect_2, a.effect_3, a.effect_4];
+    const bEffects = [b.effect_1, b.effect_2, b.effect_3, b.effect_4];
+
+    for (let i = 0; i < 4; i++) {
+      if (shared.includes(aEffects[i])) REVEALS[aId][i] = true;
+      if (shared.includes(bEffects[i])) REVEALS[bId][i] = true;
+    }
+    saveReveals();
+  }
+
+  // Backup
+  function exportReveals() {
+    el("saveBox").value = JSON.stringify(REVEALS, null, 2);
+  }
+  function importReveals() {
+    try {
+      const parsed = JSON.parse(el("saveBox").value);
+      if (!parsed || typeof parsed !== "object") throw new Error("Not an object");
+      REVEALS = parsed;
+      saveReveals();
+      alert("Imported reveals.");
+    } catch (e) {
+      alert("Invalid JSON.");
+    }
+  }
+  function wipeReveals() {
+    if (!confirm("Wipe all reveals on this device?")) return;
+    REVEALS = {};
+    saveReveals();
+    alert("Wiped.");
+  }
+
+  function clearCard() {
+    el("ingredientCard").style.display = "none";
+    el("sharedResult").innerHTML = "";
+    el("revealSharedBtn").disabled = true;
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "\"": "&quot;",
+      "'": "&#39;"
+    }[c]));
+  }
+
+  // Events
+  el("refreshBtn").addEventListener("click", fetchIngredients);
+
+  el("loadBtn").addEventListener("click", () => {
+    const idStr = el("idInput").value.trim();
+    if (!idStr) return;
+    renderIngredient(idStr);
+  });
+
+  el("loadFromPickBtn").addEventListener("click", () => {
+    const idStr = el("pickSelect").value;
+    if (!idStr) return;
+    renderIngredient(idStr);
+  });
+
+  el("clearBtn").addEventListener("click", clearCard);
+
+  let lastMix = { a: null, b: null, shared: [] };
+
+  el("checkSharedBtn").addEventListener("click", () => {
+    const aId = el("mixA").value;
+    const bId = el("mixB").value;
+    if (!aId || !bId) return;
+
+    if (aId === bId) {
+      el("sharedResult").innerHTML = `<div class="warn">Choose two different ingredients.</div>`;
+      el("revealSharedBtn").disabled = true;
+      return;
+    }
+
+    const shared = computeShared(aId, bId);
+    lastMix = { a: aId, b: bId, shared };
+
+    if (shared.length === 0) {
+      el("sharedResult").innerHTML = `<div class="warn">No shared effects. This mix would fail (no potion).</div>`;
+      el("revealSharedBtn").disabled = true;
+      return;
+    }
+
+    el("sharedResult").innerHTML = `
+      <div class="ok">Shared effects found:</div>
+      <ul>${shared.map(s => `<li>${escapeHtml(s)}</li>`).join("")}</ul>
+    `;
+    el("revealSharedBtn").disabled = false;
+  });
+
+  el("revealSharedBtn").addEventListener("click", () => {
+    if (!lastMix.a || !lastMix.b) return;
+    revealShared(lastMix.a, lastMix.b, lastMix.shared);
+    el("sharedResult").innerHTML += `<div class="ok">Revealed shared effects on both ingredients.</div>`;
+  });
+
+  el("exportBtn").addEventListener("click", exportReveals);
+  el("importBtn").addEventListener("click", importReveals);
+  el("wipeBtn").addEventListener("click", wipeReveals);
+
+  // Init
+  fetchIngredients();
+</script>
+</body>
+</html>

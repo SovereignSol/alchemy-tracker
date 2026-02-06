@@ -29,12 +29,15 @@
     .warn { color: #8a5a00; font-weight: 700; }
     .err { color: #b00020; font-weight: 700; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .list-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .tag-btn { border: 1px solid #ddd; background: #fff; border-radius: 999px; padding: 8px 10px; }
+    .tag-btn:hover { background: #f7f7f7; }
   </style>
 </head>
 <body>
   <h1>DnD Alchemy Tracker</h1>
   <div class="muted">
-    Read-only app backed by Supabase. Reveals are stored locally on this device.
+    Read-only app backed by Supabase. Reveals and “My Ingredients” list are stored locally on this device.
   </div>
 
   <div class="card">
@@ -43,31 +46,35 @@
       <span class="muted" id="statusText">Not loaded yet.</span>
     </div>
     <div class="muted" style="margin-top:8px;">
-      If you add ingredients in the Supabase dashboard, click Refresh to pull them in.
+      You can add ingredients in Supabase, then click Refresh here to pull updates.
     </div>
   </div>
 
   <div class="grid2">
     <div class="card">
-      <div style="font-weight:700; margin-bottom:8px;">Lookup by ID</div>
+      <div style="font-weight:700; margin-bottom:8px;">Add by ID (no browsing)</div>
       <div class="row">
         <input id="idInput" inputmode="numeric" placeholder="Enter Ingredient ID (e.g. 9000)" />
-        <button class="btn-primary" id="loadBtn">Load</button>
+        <button class="btn-primary" id="addToListBtn">Add to My List</button>
+        <button class="btn" id="loadBtn">Load</button>
         <button class="btn" id="clearBtn">Clear</button>
       </div>
       <div class="muted" style="margin-top:8px;">
-        Tip: you can also pick from the dropdown below.
+        Add saves it to the local list. Load shows the card without saving.
       </div>
+
+      <div style="margin-top:14px; font-weight:700;">My Ingredients</div>
+      <div class="muted">Tap an ID to open it. This list is only what the player has added.</div>
+      <div class="list-wrap" id="myListWrap"></div>
       <div class="row" style="margin-top:10px;">
-        <select id="pickSelect" style="min-width: 280px;"></select>
-        <button class="btn" id="loadFromPickBtn">Load Selected</button>
+        <button class="btn-danger small" id="clearMyListBtn">Clear My List</button>
       </div>
     </div>
 
     <div class="card">
-      <div style="font-weight:700; margin-bottom:8px;">Mixing</div>
+      <div style="font-weight:700; margin-bottom:8px;">Mixing (from My List)</div>
       <div class="muted">
-        Pick two ingredients. “Check Shared” shows shared effects. If the table says the brew succeeded, click “Reveal Shared”.
+        Pick two from My Ingredients. “Check Shared” shows shared effects. If the table says the brew succeeded, click “Reveal Shared”.
       </div>
       <div class="row" style="margin-top:10px;">
         <select id="mixA" style="min-width: 280px;"></select>
@@ -110,12 +117,12 @@
   </div>
 
   <div class="card">
-    <div style="font-weight:700; margin-bottom:8px;">Backup (Export / Import reveals)</div>
-    <div class="muted">Reveals are stored on this device. Export lets you move them to another phone if needed.</div>
+    <div style="font-weight:700; margin-bottom:8px;">Backup (Export / Import reveals and My List)</div>
+    <div class="muted">Everything is stored on this device. Export lets you move progress to another phone if needed.</div>
     <div class="row" style="margin-top:10px;">
       <button class="btn" id="exportBtn">Export</button>
       <button class="btn" id="importBtn">Import</button>
-      <button class="btn-danger" id="wipeBtn">Wipe Reveals</button>
+      <button class="btn-danger" id="wipeBtn">Wipe All Local Data</button>
     </div>
     <textarea id="saveBox" rows="6" style="width:100%; margin-top:10px;" placeholder="Exported JSON appears here. Paste JSON here to import."></textarea>
   </div>
@@ -125,44 +132,55 @@
   const SUPABASE_URL = "https://yjelzojkirlzdnwftupz.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqZWx6b2praXJsemRud2Z0dXB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzNTk0MTEsImV4cCI6MjA4NTkzNTQxMX0.5TCIyj5cAUlCAmNc2yBOIdpfNoN4NLqOOfcnBVbCzZA";
 
-  // API endpoints
   const REST_BASE = `${SUPABASE_URL}/rest/v1`;
   const INGREDIENTS_ENDPOINT = `${REST_BASE}/ingredients?select=id,name,effect_1,effect_2,effect_3,effect_4,image_path,rarity,notes&order=id.asc`;
+  const INGREDIENT_BY_ID = (id) => `${REST_BASE}/ingredients?select=id,name,effect_1,effect_2,effect_3,effect_4,image_path,rarity,notes&id=eq.${encodeURIComponent(id)}&limit=1`;
   const PUBLIC_STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/`;
 
-  // local reveal state
-  const STORAGE_KEY = "alchemy_reveals_v1";
-  function loadReveals() {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return {};
-    try { return JSON.parse(raw) || {}; } catch { return {}; }
-  }
-  function saveReveals() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(REVEALS));
-  }
-  let REVEALS = loadReveals();
+  const LOCAL_KEY = "alchemy_local_v2"; // contains reveals + myList
 
-  // in-memory ingredient cache
-  let INGREDIENTS = []; // array of rows
+  function loadLocal() {
+    const raw = localStorage.getItem(LOCAL_KEY);
+    if (!raw) return { reveals: {}, myList: [] };
+    try {
+      const parsed = JSON.parse(raw);
+      return {
+        reveals: (parsed && typeof parsed.reveals === "object" && parsed.reveals) ? parsed.reveals : {},
+        myList: Array.isArray(parsed?.myList) ? parsed.myList.map(String) : []
+      };
+    } catch {
+      return { reveals: {}, myList: [] };
+    }
+  }
+
+  function saveLocal() {
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(LOCAL));
+  }
+
+  let LOCAL = loadLocal();
+  let REVEALS = LOCAL.reveals;
+  let MY_LIST = LOCAL.myList;
+
+  let INGREDIENTS = []; // all rows (for lookup by ID)
   let ING_BY_ID = {};   // id -> row
 
   const el = (id) => document.getElementById(id);
 
+  function headers() {
+    return {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    };
+  }
+
   async function fetchIngredients() {
     el("statusText").textContent = "Loading from Supabase...";
     try {
-      const res = await fetch(INGREDIENTS_ENDPOINT, {
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        }
-      });
-
+      const res = await fetch(INGREDIENTS_ENDPOINT, { headers: headers() });
       if (!res.ok) {
         const txt = await res.text();
         throw new Error(`HTTP ${res.status}: ${txt}`);
       }
-
       const rows = await res.json();
       INGREDIENTS = rows;
       ING_BY_ID = {};
@@ -171,8 +189,9 @@
         ING_BY_ID[idStr] = r;
         if (!REVEALS[idStr]) REVEALS[idStr] = [false, false, false, false];
       }
-      saveReveals();
-      fillDropdowns();
+      saveLocal();
+      renderMyList();
+      fillMixDropdownsFromMyList();
       el("statusText").innerHTML = `<span class="ok">Loaded ${rows.length} ingredients.</span>`;
     } catch (err) {
       el("statusText").innerHTML = `<span class="err">Failed to load: ${escapeHtml(String(err.message || err))}</span>`;
@@ -180,23 +199,18 @@
     }
   }
 
-  function fillDropdowns() {
-    const makeOpts = () => INGREDIENTS.map(r => {
-      const idStr = String(r.id);
-      return `<option value="${escapeHtml(idStr)}">${escapeHtml(idStr)} - ${escapeHtml(r.name || "")}</option>`;
-    }).join("");
-
-    const opts = makeOpts();
-    el("pickSelect").innerHTML = opts;
-    el("mixA").innerHTML = opts;
-    el("mixB").innerHTML = opts;
-
-    if (INGREDIENTS.length >= 2) el("mixB").value = String(INGREDIENTS[1].id);
+  async function fetchOneIngredient(idStr) {
+    const res = await fetch(INGREDIENT_BY_ID(idStr), { headers: headers() });
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(`HTTP ${res.status}: ${txt}`);
+    }
+    const rows = await res.json();
+    return rows?.[0] || null;
   }
 
   function getImageUrl(image_path) {
     if (!image_path) return "";
-    // image_path is stored like "ingredients/9000.webp"
     return `${PUBLIC_STORAGE_BASE}${image_path}`;
   }
 
@@ -240,7 +254,7 @@
       btn.disabled = revealed[idx];
       btn.addEventListener("click", () => {
         REVEALS[idStr][idx] = true;
-        saveReveals();
+        saveLocal();
         renderIngredient(idStr);
       });
 
@@ -256,15 +270,82 @@
       if (hidden.length === 0) return;
       const pick = hidden[Math.floor(Math.random() * hidden.length)];
       REVEALS[idStr][pick] = true;
-      saveReveals();
+      saveLocal();
       renderIngredient(idStr);
     };
 
     el("resetRevealsBtn").onclick = () => {
       REVEALS[idStr] = [false,false,false,false];
-      saveReveals();
+      saveLocal();
       renderIngredient(idStr);
     };
+  }
+
+  function clearCard() {
+    el("ingredientCard").style.display = "none";
+    el("sharedResult").innerHTML = "";
+    el("revealSharedBtn").disabled = true;
+  }
+
+  function renderMyList() {
+    const wrap = el("myListWrap");
+    wrap.innerHTML = "";
+
+    const unique = Array.from(new Set(MY_LIST.map(String)));
+    unique.sort((a,b) => Number(a) - Number(b));
+    MY_LIST = unique;
+    LOCAL.myList = MY_LIST;
+    saveLocal();
+
+    if (MY_LIST.length === 0) {
+      const span = document.createElement("div");
+      span.className = "muted";
+      span.textContent = "No ingredients added yet.";
+      wrap.appendChild(span);
+      return;
+    }
+
+    for (const idStr of MY_LIST) {
+      const btn = document.createElement("button");
+      btn.className = "tag-btn";
+      const name = ING_BY_ID[idStr]?.name;
+      btn.textContent = name ? `${idStr} - ${name}` : idStr;
+      btn.addEventListener("click", () => renderIngredient(idStr));
+
+      const remove = document.createElement("button");
+      remove.className = "tag-btn";
+      remove.textContent = `Remove ${idStr}`;
+      remove.addEventListener("click", () => {
+        MY_LIST = MY_LIST.filter(x => String(x) !== String(idStr));
+        LOCAL.myList = MY_LIST;
+        saveLocal();
+        renderMyList();
+        fillMixDropdownsFromMyList();
+      });
+
+      wrap.appendChild(btn);
+      wrap.appendChild(remove);
+    }
+  }
+
+  function fillMixDropdownsFromMyList() {
+    const a = el("mixA");
+    const b = el("mixB");
+    const ids = MY_LIST.slice();
+
+    const opts = ids.map(idStr => {
+      const name = ING_BY_ID[idStr]?.name || "";
+      const label = name ? `${idStr} - ${name}` : idStr;
+      return `<option value="${escapeHtml(idStr)}">${escapeHtml(label)}</option>`;
+    }).join("");
+
+    a.innerHTML = opts;
+    b.innerHTML = opts;
+
+    if (ids.length >= 2) {
+      a.value = ids[0];
+      b.value = ids[1];
+    }
   }
 
   function computeShared(aId, bId) {
@@ -274,7 +355,6 @@
 
     const aEffects = [a.effect_1, a.effect_2, a.effect_3, a.effect_4].filter(Boolean);
     const bEffects = new Set([b.effect_1, b.effect_2, b.effect_3, b.effect_4].filter(Boolean));
-
     return aEffects.filter(e => bEffects.has(e));
   }
 
@@ -286,43 +366,51 @@
     const aEffects = [a.effect_1, a.effect_2, a.effect_3, a.effect_4];
     const bEffects = [b.effect_1, b.effect_2, b.effect_3, b.effect_4];
 
+    if (!REVEALS[aId]) REVEALS[aId] = [false,false,false,false];
+    if (!REVEALS[bId]) REVEALS[bId] = [false,false,false,false];
+
     for (let i = 0; i < 4; i++) {
       if (shared.includes(aEffects[i])) REVEALS[aId][i] = true;
       if (shared.includes(bEffects[i])) REVEALS[bId][i] = true;
     }
-    saveReveals();
+    saveLocal();
   }
 
-  // Backup
-  function exportReveals() {
-    el("saveBox").value = JSON.stringify(REVEALS, null, 2);
+  function exportAll() {
+    const payload = { reveals: REVEALS, myList: MY_LIST };
+    el("saveBox").value = JSON.stringify(payload, null, 2);
   }
-  function importReveals() {
+
+  function importAll() {
     try {
       const parsed = JSON.parse(el("saveBox").value);
       if (!parsed || typeof parsed !== "object") throw new Error("Not an object");
-      REVEALS = parsed;
-      saveReveals();
-      alert("Imported reveals.");
-    } catch (e) {
+      REVEALS = (parsed.reveals && typeof parsed.reveals === "object") ? parsed.reveals : {};
+      MY_LIST = Array.isArray(parsed.myList) ? parsed.myList.map(String) : [];
+      LOCAL = { reveals: REVEALS, myList: MY_LIST };
+      saveLocal();
+      renderMyList();
+      fillMixDropdownsFromMyList();
+      alert("Imported.");
+    } catch {
       alert("Invalid JSON.");
     }
   }
-  function wipeReveals() {
-    if (!confirm("Wipe all reveals on this device?")) return;
-    REVEALS = {};
-    saveReveals();
+
+  function wipeAll() {
+    if (!confirm("Wipe all local reveals and My List on this device?")) return;
+    LOCAL = { reveals: {}, myList: [] };
+    REVEALS = LOCAL.reveals;
+    MY_LIST = LOCAL.myList;
+    saveLocal();
+    clearCard();
+    renderMyList();
+    fillMixDropdownsFromMyList();
     alert("Wiped.");
   }
 
-  function clearCard() {
-    el("ingredientCard").style.display = "none";
-    el("sharedResult").innerHTML = "";
-    el("revealSharedBtn").disabled = true;
-  }
-
   function escapeHtml(s) {
-    return s.replace(/[&<>"']/g, (c) => ({
+    return String(s).replace(/[&<>"']/g, (c) => ({
       "&": "&amp;",
       "<": "&lt;",
       ">": "&gt;",
@@ -340,20 +428,61 @@
     renderIngredient(idStr);
   });
 
-  el("loadFromPickBtn").addEventListener("click", () => {
-    const idStr = el("pickSelect").value;
+  el("addToListBtn").addEventListener("click", async () => {
+    const idStr = el("idInput").value.trim();
     if (!idStr) return;
+
+    // Prefer cache, but verify against Supabase if not loaded or missing.
+    if (!ING_BY_ID[idStr]) {
+      try {
+        const row = await fetchOneIngredient(idStr);
+        if (!row) {
+          alert("That ID does not exist in the database.");
+          return;
+        }
+        ING_BY_ID[idStr] = row;
+        // Keep reveals in sync
+        if (!REVEALS[idStr]) REVEALS[idStr] = [false,false,false,false];
+        saveLocal();
+      } catch (e) {
+        alert("Could not verify that ID. Try Refresh Ingredient List first.");
+        return;
+      }
+    }
+
+    if (!MY_LIST.includes(idStr)) {
+      MY_LIST.push(idStr);
+      LOCAL.myList = MY_LIST;
+      saveLocal();
+      renderMyList();
+      fillMixDropdownsFromMyList();
+    }
+
     renderIngredient(idStr);
   });
 
   el("clearBtn").addEventListener("click", clearCard);
+
+  el("clearMyListBtn").addEventListener("click", () => {
+    if (!confirm("Clear My Ingredients list on this device?")) return;
+    MY_LIST = [];
+    LOCAL.myList = MY_LIST;
+    saveLocal();
+    renderMyList();
+    fillMixDropdownsFromMyList();
+  });
 
   let lastMix = { a: null, b: null, shared: [] };
 
   el("checkSharedBtn").addEventListener("click", () => {
     const aId = el("mixA").value;
     const bId = el("mixB").value;
-    if (!aId || !bId) return;
+
+    if (!aId || !bId) {
+      el("sharedResult").innerHTML = `<div class="warn">Add at least two ingredients to My List first.</div>`;
+      el("revealSharedBtn").disabled = true;
+      return;
+    }
 
     if (aId === bId) {
       el("sharedResult").innerHTML = `<div class="warn">Choose two different ingredients.</div>`;
@@ -383,12 +512,14 @@
     el("sharedResult").innerHTML += `<div class="ok">Revealed shared effects on both ingredients.</div>`;
   });
 
-  el("exportBtn").addEventListener("click", exportReveals);
-  el("importBtn").addEventListener("click", importReveals);
-  el("wipeBtn").addEventListener("click", wipeReveals);
+  el("exportBtn").addEventListener("click", exportAll);
+  el("importBtn").addEventListener("click", importAll);
+  el("wipeBtn").addEventListener("click", wipeAll);
 
   // Init
   fetchIngredients();
+  renderMyList();
+  fillMixDropdownsFromMyList();
 </script>
 </body>
 </html>

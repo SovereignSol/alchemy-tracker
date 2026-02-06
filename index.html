@@ -32,11 +32,7 @@
       letter-spacing: 0.2px;
     }
 
-    .wrap{
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 16px;
-    }
+    .wrap{ max-width: 980px; margin: 0 auto; padding: 16px; }
 
     .title{
       display:flex;
@@ -53,11 +49,7 @@
       text-shadow: 0 1px 0 rgba(255,255,255,0.6);
     }
 
-    .sub{
-      margin-top:4px;
-      color:var(--ink2);
-      font-size:14px;
-    }
+    .sub{ margin-top:4px; color:var(--ink2); font-size:14px; }
 
     .card{
       background: rgba(255,255,255,0.55);
@@ -69,27 +61,12 @@
       backdrop-filter: blur(2px);
     }
 
-    .grid2{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    @media (min-width: 760px){
-      .grid2{ grid-template-columns: 1fr 1fr; }
-    }
+    .grid2{ display:grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 760px){ .grid2{ grid-template-columns: 1fr 1fr; } }
 
-    .row{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items:center;
-    }
+    .row{ display:flex; gap: 10px; flex-wrap: wrap; align-items:center; }
 
-    .label{
-      font-weight: 700;
-      font-size: 16px;
-      margin-bottom: 8px;
-    }
+    .label{ font-weight: 700; font-size: 16px; margin-bottom: 8px; }
 
     input, select, button, textarea{
       font-size: 16px;
@@ -110,12 +87,9 @@
       user-select:none;
       transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
     }
-
     button:active{ transform: translateY(1px); }
 
-    .btn{
-      background: rgba(255,255,255,0.8);
-    }
+    .btn{ background: rgba(255,255,255,0.8); }
 
     .btn-primary{
       background: linear-gradient(180deg, rgba(122,62,31,0.92), rgba(122,62,31,0.78));
@@ -123,10 +97,7 @@
       border-color: rgba(122,62,31,0.55);
       box-shadow: 0 10px 22px rgba(122,62,31,0.18);
     }
-
-    .btn-primary:hover{
-      box-shadow: 0 14px 28px rgba(122,62,31,0.22);
-    }
+    .btn-primary:hover{ box-shadow: 0 14px 28px rgba(122,62,31,0.22); }
 
     .btn-quiet{
       background: rgba(255,255,255,0.65);
@@ -139,11 +110,7 @@
       color: var(--bad);
     }
 
-    .small{
-      padding: 8px 10px;
-      font-size: 14px;
-      border-radius: 12px;
-    }
+    .small{ padding: 8px 10px; font-size: 14px; border-radius: 12px; }
 
     .pill{
       display:inline-flex;
@@ -161,28 +128,13 @@
     .pill-common{ border-color: rgba(122,62,31,0.35); background: rgba(122,62,31,0.06); }
     .pill-unknown{ border-color: rgba(42,31,22,0.25); background: rgba(42,31,22,0.05); }
 
-    .muted{
-      color: var(--ink2);
-      font-size: 13px;
-    }
+    .muted{ color: var(--ink2); font-size: 13px; }
 
-    .divider{
-      height:1px;
-      background: rgba(217,200,170,0.8);
-      margin: 12px 0;
-    }
+    .divider{ height:1px; background: rgba(217,200,170,0.8); margin: 12px 0; }
 
-    .effects{
-      display:grid;
-      gap: 10px;
-      margin-top: 10px;
-    }
+    .effects{ display:grid; gap: 10px; margin-top: 10px; }
 
-    .effect-line{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-    }
+    .effect-line{ display:flex; gap: 10px; align-items:center; }
 
     .effect-text{
       flex:1;
@@ -200,12 +152,7 @@
       user-select: none;
     }
 
-    .ing-card{
-      display:flex;
-      gap: 12px;
-      align-items:flex-start;
-      flex-wrap: wrap;
-    }
+    .ing-card{ display:flex; gap: 12px; align-items:flex-start; flex-wrap: wrap; }
 
     .img{
       width: 190px;
@@ -245,12 +192,7 @@
     .toast.good{ border-color: rgba(31,122,58,0.40); }
     .toast.bad{ border-color: rgba(139,29,44,0.35); }
 
-    .mix-pics{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      margin-top: 10px;
-    }
+    .mix-pics{ display:flex; gap: 10px; align-items:center; margin-top: 10px; }
 
     .mix-result{
       margin-top: 10px;
@@ -289,7 +231,7 @@
     }
     details summary::-webkit-details-marker{ display:none; }
 
-    /* Satchel as a simple list with +/- counter */
+    /* Satchel list with +/- counter, stays even at 0 */
     .satchel-list{
       display:flex;
       flex-direction: column;
@@ -325,7 +267,7 @@
       white-space: nowrap;
     }
     .qty .count{
-      min-width: 30px;
+      min-width: 34px;
       text-align:center;
       font-weight: 700;
       padding: 6px 10px;
@@ -338,6 +280,15 @@
       border-radius: 12px;
       font-weight: 700;
       min-width: 42px;
+    }
+
+    /* Optional third ingredient UI */
+    .optional{
+      border: 1px dashed rgba(217,200,170,0.95);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.45);
+      padding: 10px 12px;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -385,9 +336,26 @@
           <button class="btn-primary" id="brewBtn">Brew</button>
         </div>
 
+        <div class="optional">
+          <div class="row" style="justify-content:space-between; align-items:center;">
+            <div style="font-weight:700;">Optional third ingredient</div>
+            <label class="row" style="gap:8px;">
+              <input type="checkbox" id="useThird" />
+              <span class="muted">Include</span>
+            </label>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <select id="mixC" style="min-width: 260px;" disabled></select>
+          </div>
+          <div class="muted" style="margin-top:8px;">
+            If included, it must also be in your satchel with enough quantity.
+          </div>
+        </div>
+
         <div class="mix-pics">
           <img class="img-sm" id="mixImgA" alt="First ingredient" />
           <img class="img-sm" id="mixImgB" alt="Second ingredient" />
+          <img class="img-sm" id="mixImgC" alt="Third ingredient" style="display:none;" />
         </div>
 
         <div class="mix-result" id="mixResult">
@@ -454,8 +422,8 @@
   const PUBLIC_STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/`;
 
   // Local notes
-  // satchel is now a map { [id]: quantityNumber }
-  const LOCAL_KEY = "field_alchemy_notes_v4";
+  // satchel is a map { [id]: quantityNumber }, and entries remain even at 0
+  const LOCAL_KEY = "field_alchemy_notes_v5";
   function loadLocal() {
     const raw = localStorage.getItem(LOCAL_KEY);
     if (!raw) return { reveals: {}, satchel: {} };
@@ -465,7 +433,7 @@
       const cleanedSatchel = {};
       for (const [k,v] of Object.entries(sat)) {
         const n = Number(v);
-        if (Number.isFinite(n) && n > 0) cleanedSatchel[String(k)] = Math.floor(n);
+        if (Number.isFinite(n) && n >= 0) cleanedSatchel[String(k)] = Math.floor(n);
       }
       return {
         reveals: (parsed && typeof parsed.reveals === "object" && parsed.reveals) ? parsed.reveals : {},
@@ -481,7 +449,7 @@
 
   let LOCAL = loadLocal();
   let REVEALS = LOCAL.reveals;          // { [id]: [bool,bool,bool,bool] }
-  let SATCHEL = LOCAL.satchel;          // { [id]: qty }
+  let SATCHEL = LOCAL.satchel;          // { [id]: qty }, qty can be 0
 
   // In-memory cache
   let ING_BY_ID = {};                   // id -> row
@@ -550,7 +518,7 @@
       }
       saveLocal();
 
-      // Remove satchel entries for missing ingredients
+      // Remove satchel entries for missing ingredients, but keep 0 entries for valid ones
       for (const idStr of Object.keys(SATCHEL)) {
         if (!ING_BY_ID[idStr]) delete SATCHEL[idStr];
       }
@@ -656,23 +624,23 @@
     };
   }
 
-  function closeIngredient() {
-    el("ingredientCard").style.display = "none";
+  function closeIngredient() { el("ingredientCard").style.display = "none"; }
+
+  function satchelIdsAll() {
+    const ids = Object.keys(SATCHEL).filter(id => ING_BY_ID[id]); // include zeros
+    ids.sort((a,b) => Number(a) - Number(b));
+    return ids;
   }
 
-  function sortedSatchelIds() {
-    const ids = Object.keys(SATCHEL).filter(id => Number(SATCHEL[id]) > 0 && ING_BY_ID[id]);
+  function satchelIdsAvailable() {
+    const ids = Object.keys(SATCHEL).filter(id => ING_BY_ID[id] && (Number(SATCHEL[id]) || 0) > 0);
     ids.sort((a,b) => Number(a) - Number(b));
     return ids;
   }
 
   function setQty(idStr, qty) {
     const q = Math.max(0, Math.floor(Number(qty) || 0));
-    if (q <= 0) {
-      delete SATCHEL[idStr];
-    } else {
-      SATCHEL[idStr] = q;
-    }
+    SATCHEL[String(idStr)] = q; // keep even if 0
     LOCAL.satchel = SATCHEL;
     saveLocal();
   }
@@ -681,7 +649,7 @@
     const wrap = el("satchel");
     wrap.innerHTML = "";
 
-    const ids = sortedSatchelIds();
+    const ids = satchelIdsAll();
     if (ids.length === 0) {
       const d = document.createElement("div");
       d.className = "muted";
@@ -719,7 +687,7 @@
         renderSatchel();
         fillMixChoices();
         updateMixPictures();
-        toast(next <= 0 ? "Set aside." : "Noted.", "bad");
+        toast("Noted.", next < qty ? "bad" : "good");
       });
 
       const count = document.createElement("div");
@@ -754,12 +722,23 @@
   function fillMixChoices() {
     const a = el("mixA");
     const b = el("mixB");
+    const c = el("mixC");
 
-    const ids = sortedSatchelIds();
+    const ids = satchelIdsAvailable(); // only >0 for brewing
+    const all = satchelIdsAll();       // for showing pictures when empty
+
     if (ids.length < 2) {
       a.innerHTML = "";
       b.innerHTML = "";
+      c.innerHTML = "";
       el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your satchel to brew.</div>`;
+      // Still set pictures to something reasonable
+      const pick = all[0];
+      const row = pick ? ING_BY_ID[pick] : null;
+      el("mixImgA").src = getImageUrl(row?.image_path) || placeholderImageDataUri("?");
+      el("mixImgB").src = placeholderImageDataUri("?");
+      el("mixImgC").style.display = el("useThird").checked ? "block" : "none";
+      el("mixImgC").src = placeholderImageDataUri("?");
       return;
     }
 
@@ -771,115 +750,147 @@
 
     const prevA = a.value;
     const prevB = b.value;
+    const prevC = c.value;
 
     a.innerHTML = opts;
     b.innerHTML = opts;
+    c.innerHTML = opts;
 
-    // Try to preserve selection when possible
     a.value = ids.includes(prevA) ? prevA : ids[0];
     b.value = ids.includes(prevB) ? prevB : ids[1];
 
     if (a.value === b.value) {
       b.value = ids.find(x => x !== a.value) || ids[1];
     }
+
+    c.value = ids.includes(prevC) ? prevC : ids.find(x => x !== a.value && x !== b.value) || ids[0];
+
+    if (el("useThird").checked) {
+      if (c.value === a.value || c.value === b.value) {
+        c.value = ids.find(x => x !== a.value && x !== b.value) || c.value;
+      }
+    }
+
+    updateMixPictures();
   }
 
   function updateMixPictures() {
     const aId = el("mixA").value;
     const bId = el("mixB").value;
+    const useThird = el("useThird").checked;
+    const cId = useThird ? el("mixC").value : null;
 
     const aRow = ING_BY_ID[aId];
     const bRow = ING_BY_ID[bId];
+    const cRow = cId ? ING_BY_ID[cId] : null;
 
     el("mixImgA").src = getImageUrl(aRow?.image_path) || placeholderImageDataUri("?");
     el("mixImgB").src = getImageUrl(bRow?.image_path) || placeholderImageDataUri("?");
+
+    const cEl = el("mixImgC");
+    if (useThird) {
+      cEl.style.display = "block";
+      cEl.src = getImageUrl(cRow?.image_path) || placeholderImageDataUri("?");
+      cEl.alt = cRow?.name || "Ingredient";
+    } else {
+      cEl.style.display = "none";
+    }
+
     el("mixImgA").alt = aRow?.name || "Ingredient";
     el("mixImgB").alt = bRow?.name || "Ingredient";
   }
 
-  function computeShared(aId, bId) {
-    const a = ING_BY_ID[aId];
-    const b = ING_BY_ID[bId];
-    if (!a || !b) return [];
+  function computeShared(ids) {
+    const rows = ids.map(id => ING_BY_ID[id]).filter(Boolean);
+    if (rows.length < 2) return [];
 
-    const aEffects = [a.effect_1, a.effect_2, a.effect_3, a.effect_4].filter(Boolean);
-    const bEffects = new Set([b.effect_1, b.effect_2, b.effect_3, b.effect_4].filter(Boolean));
-    return aEffects.filter(e => bEffects.has(e));
+    const sets = rows.map(r => new Set([r.effect_1, r.effect_2, r.effect_3, r.effect_4].filter(Boolean)));
+    let shared = sets[0];
+    for (let i = 1; i < sets.length; i++) {
+      shared = new Set([...shared].filter(x => sets[i].has(x)));
+    }
+    return [...shared];
   }
 
-  function revealSharedAutomatically(aId, bId, shared) {
-    const a = ING_BY_ID[aId];
-    const b = ING_BY_ID[bId];
-    if (!a || !b) return;
+  function revealSharedAutomatically(ids, shared) {
+    for (const idStr of ids) {
+      const row = ING_BY_ID[idStr];
+      if (!row) continue;
 
-    const aEffects = [a.effect_1, a.effect_2, a.effect_3, a.effect_4];
-    const bEffects = [b.effect_1, b.effect_2, b.effect_3, b.effect_4];
+      const effs = [row.effect_1, row.effect_2, row.effect_3, row.effect_4];
+      if (!REVEALS[idStr]) REVEALS[idStr] = [false,false,false,false];
 
-    if (!REVEALS[aId]) REVEALS[aId] = [false,false,false,false];
-    if (!REVEALS[bId]) REVEALS[bId] = [false,false,false,false];
-
-    for (let i = 0; i < 4; i++) {
-      if (shared.includes(aEffects[i])) REVEALS[aId][i] = true;
-      if (shared.includes(bEffects[i])) REVEALS[bId][i] = true;
+      for (let i = 0; i < 4; i++) {
+        if (shared.includes(effs[i])) REVEALS[idStr][i] = true;
+      }
     }
     saveLocal();
   }
 
-  function canSpend(aId, bId) {
-    const aQty = Number(SATCHEL[aId]) || 0;
-    const bQty = Number(SATCHEL[bId]) || 0;
-    if (aId === bId) return aQty >= 2;
-    return aQty >= 1 && bQty >= 1;
+  function canSpend(ids) {
+    // Count how many of each id are needed
+    const needed = {};
+    for (const id of ids) needed[id] = (needed[id] || 0) + 1;
+
+    for (const [id, n] of Object.entries(needed)) {
+      const have = Number(SATCHEL[id]) || 0;
+      if (have < n) return false;
+    }
+    return true;
   }
 
-  function spend(aId, bId) {
-    if (aId === bId) {
-      setQty(aId, (Number(SATCHEL[aId]) || 0) - 2);
-    } else {
-      setQty(aId, (Number(SATCHEL[aId]) || 0) - 1);
-      setQty(bId, (Number(SATCHEL[bId]) || 0) - 1);
+  function spend(ids) {
+    const needed = {};
+    for (const id of ids) needed[id] = (needed[id] || 0) + 1;
+    for (const [id, n] of Object.entries(needed)) {
+      setQty(id, (Number(SATCHEL[id]) || 0) - n);
     }
   }
 
   function brew() {
     const aId = el("mixA").value;
     const bId = el("mixB").value;
+    const useThird = el("useThird").checked;
+    const cId = useThird ? el("mixC").value : null;
+
+    const ids = [aId, bId].filter(Boolean);
+    if (useThird && cId) ids.push(cId);
+
+    // Must all be distinct for three-ingredient brew, unless you want duplicates
+    if (useThird && (aId === bId || aId === cId || bId === cId)) {
+      el("mixResult").innerHTML = `
+        <div style="color:var(--warn); font-weight:700;">Choose different ingredients.</div>
+        <div class="muted" style="margin-top:6px;">The third ingredient should be different.</div>
+      `;
+      toast("Choose different ingredients.", "bad");
+      return;
+    }
 
     updateMixPictures();
 
-    if (!aId || !bId) {
+    if (ids.length < 2) {
       el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your satchel to brew.</div>`;
       return;
     }
 
-    if (aId === bId) {
-      // Allow brewing same ingredient only if they have at least 2
-      if (!canSpend(aId, bId)) {
-        el("mixResult").innerHTML = `
-          <div style="color:var(--warn); font-weight:700;">Not enough in the satchel.</div>
-          <div class="muted" style="margin-top:6px;">You would need two of the same ingredient.</div>
-        `;
-        toast("Not enough in the satchel.", "bad");
-        return;
-      }
-    } else {
-      if (!canSpend(aId, bId)) {
-        el("mixResult").innerHTML = `
-          <div style="color:var(--warn); font-weight:700;">Not enough in the satchel.</div>
-          <div class="muted" style="margin-top:6px;">One of the ingredients is missing.</div>
-        `;
-        toast("Not enough in the satchel.", "bad");
-        return;
-      }
+    if (!canSpend(ids)) {
+      el("mixResult").innerHTML = `
+        <div style="color:var(--warn); font-weight:700;">Not enough in the satchel.</div>
+        <div class="muted" style="margin-top:6px;">One of the chosen ingredients is missing.</div>
+      `;
+      toast("Not enough in the satchel.", "bad");
+      return;
     }
 
-    const shared = computeShared(aId, bId);
+    const shared = computeShared(ids);
+
+    // Consume ingredients regardless of outcome (matches your earlier consumption behavior)
+    spend(ids);
+    renderSatchel();
+    fillMixChoices();
+    updateMixPictures();
 
     if (shared.length === 0) {
-      // Deduct ingredients even on fizzles (your example implies brewing consumes)
-      spend(aId, bId);
-      renderSatchel();
-
       el("mixResult").innerHTML = `
         <div style="color:var(--warn); font-weight:700;">The mixture fizzles.</div>
         <div class="muted" style="margin-top:6px;">Nothing in common, nothing takes hold.</div>
@@ -888,12 +899,7 @@
       return;
     }
 
-    // Deduct ingredients on success
-    spend(aId, bId);
-    renderSatchel();
-
-    // Reveal shared properties automatically
-    revealSharedAutomatically(aId, bId, shared);
+    revealSharedAutomatically(ids, shared);
 
     const effectText = shared.join(", ");
     el("mixResult").innerHTML = `
@@ -919,7 +925,7 @@
       const cleaned = {};
       for (const [k,v] of Object.entries(sat)) {
         const n = Number(v);
-        if (Number.isFinite(n) && n > 0) cleaned[String(k)] = Math.floor(n);
+        if (Number.isFinite(n) && n >= 0) cleaned[String(k)] = Math.floor(n);
       }
       SATCHEL = cleaned;
 
@@ -962,7 +968,6 @@
     const clean = String(mark || "").trim();
     if (!clean) return;
 
-    // If not loaded, fetch it
     if (!ING_BY_ID[clean]) {
       try {
         const row = await fetchOne(clean);
@@ -979,9 +984,9 @@
       }
     }
 
-    // Add one to quantity
-    const current = Number(SATCHEL[clean]) || 0;
-    setQty(clean, current + 1);
+    const current = Number(SATCHEL[clean]);
+    const qty = Number.isFinite(current) ? current : 0;
+    setQty(clean, qty + 1);
 
     renderSatchel();
     fillMixChoices();
@@ -1020,13 +1025,21 @@
 
   el("mixA").addEventListener("change", updateMixPictures);
   el("mixB").addEventListener("change", updateMixPictures);
+  el("useThird").addEventListener("change", () => {
+    const on = el("useThird").checked;
+    el("mixC").disabled = !on;
+    el("mixImgC").style.display = on ? "block" : "none";
+    fillMixChoices();
+    updateMixPictures();
+  });
+  el("mixC").addEventListener("change", updateMixPictures);
+
   el("brewBtn").addEventListener("click", brew);
 
   el("exportBtn").addEventListener("click", exportNotes);
   el("importBtn").addEventListener("click", importNotes);
   el("wipeBtn").addEventListener("click", burnAll);
 
-  // Enter key convenience
   el("markInput").addEventListener("keydown", (e) => {
     if (e.key === "Enter") addToSatchelFromMark(el("markInput").value);
   });
@@ -1034,6 +1047,7 @@
   // Initial
   el("mixImgA").src = placeholderImageDataUri("?");
   el("mixImgB").src = placeholderImageDataUri("?");
+  el("mixImgC").src = placeholderImageDataUri("?");
   fetchAllIngredients();
   renderSatchel();
   fillMixChoices();

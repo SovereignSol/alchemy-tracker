@@ -226,45 +226,6 @@
       box-shadow: 0 10px 20px rgba(0,0,0,0.10);
     }
 
-    .satchel{
-      display:flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .tag{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      border: 1px solid rgba(217,200,170,0.95);
-      background: rgba(255,255,255,0.7);
-      border-radius: 999px;
-      padding: 8px 10px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.08);
-      transition: transform 120ms ease, box-shadow 120ms ease;
-    }
-    .tag:hover{
-      transform: translateY(-1px);
-      box-shadow: 0 12px 22px rgba(0,0,0,0.10);
-    }
-    .tag button{
-      border: none;
-      background: transparent;
-      padding: 0;
-      margin: 0;
-      font-size: 15px;
-      color: var(--ink);
-    }
-    .tag .x{
-      border: 1px solid rgba(139,29,44,0.25);
-      background: rgba(139,29,44,0.07);
-      color: var(--bad);
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 13px;
-    }
-
     .toast{
       position: fixed;
       left: 50%;
@@ -327,6 +288,57 @@
       list-style: none;
     }
     details summary::-webkit-details-marker{ display:none; }
+
+    /* Satchel as a simple list with +/- counter */
+    .satchel-list{
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .satchel-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.70);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.07);
+    }
+    .satchel-name{
+      font-size: 16px;
+      font-weight: 700;
+      color: rgba(42,31,22,0.92);
+      border: none;
+      background: transparent;
+      padding: 0;
+      text-align:left;
+      cursor:pointer;
+      font-family: inherit;
+    }
+    .qty{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .qty .count{
+      min-width: 30px;
+      text-align:center;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.75);
+    }
+    .qty button{
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-weight: 700;
+      min-width: 42px;
+    }
   </style>
 </head>
 <body>
@@ -355,7 +367,7 @@
 
       <div class="label">Satchel</div>
       <div class="muted">What you have chosen to keep close at hand.</div>
-      <div class="satchel" id="satchel"></div>
+      <div class="satchel-list" id="satchel"></div>
 
       <div class="row" style="margin-top:10px;">
         <button class="btn-danger small" id="clearSatchelBtn">Empty Satchel</button>
@@ -396,8 +408,8 @@
                 </div>
               </div>
               <div class="row">
-                <button class="btn small" id="revealRandomBtn">Reveal a Hint</button>
-                <button class="btn-danger small" id="resetRevealsBtn">Forget Hints</button>
+                <button class="btn small" id="revealRandomBtn">Reveal a Property</button>
+                <button class="btn-danger small" id="resetRevealsBtn">Forget Properties</button>
               </div>
             </div>
 
@@ -415,7 +427,7 @@
               </div>
               <textarea id="saveBox" rows="6" style="width:100%; margin-top:10px;" placeholder="Notes appear here for export or import."></textarea>
               <div class="muted sigil" style="margin-top:8px;">
-                This page never sends your hints anywhere. It stays in the device, unless you export it.
+                This page never sends your properties anywhere. It stays in the device, unless you export it.
               </div>
             </details>
 
@@ -442,18 +454,25 @@
   const PUBLIC_STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/`;
 
   // Local notes
-  const LOCAL_KEY = "field_alchemy_notes_v3"; // reveals + satchel
+  // satchel is now a map { [id]: quantityNumber }
+  const LOCAL_KEY = "field_alchemy_notes_v4";
   function loadLocal() {
     const raw = localStorage.getItem(LOCAL_KEY);
-    if (!raw) return { reveals: {}, satchel: [] };
+    if (!raw) return { reveals: {}, satchel: {} };
     try {
       const parsed = JSON.parse(raw);
+      const sat = (parsed && typeof parsed.satchel === "object" && parsed.satchel) ? parsed.satchel : {};
+      const cleanedSatchel = {};
+      for (const [k,v] of Object.entries(sat)) {
+        const n = Number(v);
+        if (Number.isFinite(n) && n > 0) cleanedSatchel[String(k)] = Math.floor(n);
+      }
       return {
         reveals: (parsed && typeof parsed.reveals === "object" && parsed.reveals) ? parsed.reveals : {},
-        satchel: Array.isArray(parsed?.satchel) ? parsed.satchel.map(String) : []
+        satchel: cleanedSatchel
       };
     } catch {
-      return { reveals: {}, satchel: [] };
+      return { reveals: {}, satchel: {} };
     }
   }
   function saveLocal() {
@@ -461,12 +480,11 @@
   }
 
   let LOCAL = loadLocal();
-  let REVEALS = LOCAL.reveals;     // { [id]: [bool,bool,bool,bool] }
-  let SATCHEL = LOCAL.satchel;     // [id...]
+  let REVEALS = LOCAL.reveals;          // { [id]: [bool,bool,bool,bool] }
+  let SATCHEL = LOCAL.satchel;          // { [id]: qty }
 
   // In-memory cache
-  let ING_BY_ID = {};              // id -> row
-  let ALL_IDS = [];                // for fast existence
+  let ING_BY_ID = {};                   // id -> row
   const el = (id) => document.getElementById(id);
 
   function headers() {
@@ -525,17 +543,17 @@
       const rows = await res.json();
 
       ING_BY_ID = {};
-      ALL_IDS = [];
       for (const r of rows) {
         const idStr = String(r.id);
         ING_BY_ID[idStr] = r;
-        ALL_IDS.push(idStr);
         if (!REVEALS[idStr]) REVEALS[idStr] = [false, false, false, false];
       }
       saveLocal();
 
-      // Keep satchel clean if something no longer exists
-      SATCHEL = SATCHEL.filter(id => ING_BY_ID[id]);
+      // Remove satchel entries for missing ingredients
+      for (const idStr of Object.keys(SATCHEL)) {
+        if (!ING_BY_ID[idStr]) delete SATCHEL[idStr];
+      }
       LOCAL.satchel = SATCHEL;
       saveLocal();
 
@@ -592,7 +610,7 @@
 
       const label = document.createElement("div");
       label.className = "pill";
-      label.textContent = `Hint ${idx + 1}`;
+      label.textContent = `Property ${idx + 1}`;
 
       const text = document.createElement("div");
       text.className = "effect-text";
@@ -607,7 +625,7 @@
         REVEALS[idStr][idx] = true;
         saveLocal();
         renderIngredient(idStr);
-        toast("A hint reveals itself.", "good");
+        toast("A property reveals itself.", "good");
       });
 
       line.appendChild(label);
@@ -627,14 +645,14 @@
       REVEALS[idStr][pick] = true;
       saveLocal();
       renderIngredient(idStr);
-      toast("A hint reveals itself.", "good");
+      toast("A property reveals itself.", "good");
     };
 
     el("resetRevealsBtn").onclick = () => {
       REVEALS[idStr] = [false,false,false,false];
       saveLocal();
       renderIngredient(idStr);
-      toast("Hints forgotten.", "bad");
+      toast("Properties forgotten.", "bad");
     };
   }
 
@@ -642,17 +660,29 @@
     el("ingredientCard").style.display = "none";
   }
 
+  function sortedSatchelIds() {
+    const ids = Object.keys(SATCHEL).filter(id => Number(SATCHEL[id]) > 0 && ING_BY_ID[id]);
+    ids.sort((a,b) => Number(a) - Number(b));
+    return ids;
+  }
+
+  function setQty(idStr, qty) {
+    const q = Math.max(0, Math.floor(Number(qty) || 0));
+    if (q <= 0) {
+      delete SATCHEL[idStr];
+    } else {
+      SATCHEL[idStr] = q;
+    }
+    LOCAL.satchel = SATCHEL;
+    saveLocal();
+  }
+
   function renderSatchel() {
     const wrap = el("satchel");
     wrap.innerHTML = "";
 
-    const unique = Array.from(new Set(SATCHEL.map(String)));
-    unique.sort((a,b) => Number(a) - Number(b));
-    SATCHEL = unique;
-    LOCAL.satchel = SATCHEL;
-    saveLocal();
-
-    if (SATCHEL.length === 0) {
+    const ids = sortedSatchelIds();
+    if (ids.length === 0) {
       const d = document.createElement("div");
       d.className = "muted";
       d.textContent = "Your satchel is empty.";
@@ -662,42 +692,59 @@
       return;
     }
 
-    for (const idStr of SATCHEL) {
+    for (const idStr of ids) {
       const row = ING_BY_ID[idStr];
       const name = row?.name || "Unknown";
-      const imgUrl = getImageUrl(row?.image_path);
+      const qty = Number(SATCHEL[idStr]) || 0;
 
-      const chip = document.createElement("div");
-      chip.className = "tag";
+      const line = document.createElement("div");
+      line.className = "satchel-row";
 
-      const thumb = document.createElement("img");
-      thumb.className = "img-sm";
-      thumb.alt = name;
-      thumb.src = imgUrl || placeholderImageDataUri("No sketch");
+      const nameBtn = document.createElement("button");
+      nameBtn.type = "button";
+      nameBtn.className = "satchel-name";
+      nameBtn.textContent = name;
+      nameBtn.addEventListener("click", () => renderIngredient(idStr));
 
-      const open = document.createElement("button");
-      open.type = "button";
-      open.textContent = name;
-      open.addEventListener("click", () => renderIngredient(idStr));
+      const qtyWrap = document.createElement("div");
+      qtyWrap.className = "qty";
 
-      const remove = document.createElement("button");
-      remove.type = "button";
-      remove.className = "x";
-      remove.textContent = "Remove";
-      remove.addEventListener("click", () => {
-        SATCHEL = SATCHEL.filter(x => String(x) !== String(idStr));
-        LOCAL.satchel = SATCHEL;
-        saveLocal();
+      const minus = document.createElement("button");
+      minus.type = "button";
+      minus.className = "btn small";
+      minus.textContent = "-";
+      minus.addEventListener("click", () => {
+        const next = qty - 1;
+        setQty(idStr, next);
         renderSatchel();
         fillMixChoices();
         updateMixPictures();
-        toast("Set aside.", "bad");
+        toast(next <= 0 ? "Set aside." : "Noted.", "bad");
       });
 
-      chip.appendChild(thumb);
-      chip.appendChild(open);
-      chip.appendChild(remove);
-      wrap.appendChild(chip);
+      const count = document.createElement("div");
+      count.className = "count";
+      count.textContent = String(qty);
+
+      const plus = document.createElement("button");
+      plus.type = "button";
+      plus.className = "btn small";
+      plus.textContent = "+";
+      plus.addEventListener("click", () => {
+        setQty(idStr, qty + 1);
+        renderSatchel();
+        fillMixChoices();
+        updateMixPictures();
+        toast("Noted.", "good");
+      });
+
+      qtyWrap.appendChild(minus);
+      qtyWrap.appendChild(count);
+      qtyWrap.appendChild(plus);
+
+      line.appendChild(nameBtn);
+      line.appendChild(qtyWrap);
+      wrap.appendChild(line);
     }
 
     fillMixChoices();
@@ -708,27 +755,32 @@
     const a = el("mixA");
     const b = el("mixB");
 
-    if (SATCHEL.length === 0) {
+    const ids = sortedSatchelIds();
+    if (ids.length < 2) {
       a.innerHTML = "";
       b.innerHTML = "";
-      el("mixResult").innerHTML = `<div class="muted">Add two ingredients to your satchel first.</div>`;
+      el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your satchel to brew.</div>`;
       return;
     }
 
-    const opts = SATCHEL.map(idStr => {
+    const opts = ids.map(idStr => {
       const name = ING_BY_ID[idStr]?.name || "Unknown";
-      return `<option value="${escapeHtml(idStr)}">${escapeHtml(name)}</option>`;
+      const qty = Number(SATCHEL[idStr]) || 0;
+      return `<option value="${escapeHtml(idStr)}">${escapeHtml(name)} (${qty})</option>`;
     }).join("");
+
+    const prevA = a.value;
+    const prevB = b.value;
 
     a.innerHTML = opts;
     b.innerHTML = opts;
 
-    if (SATCHEL.length >= 2) {
-      a.value = SATCHEL[0];
-      b.value = SATCHEL[1];
-    } else {
-      a.value = SATCHEL[0];
-      b.value = SATCHEL[0];
+    // Try to preserve selection when possible
+    a.value = ids.includes(prevA) ? prevA : ids[0];
+    b.value = ids.includes(prevB) ? prevB : ids[1];
+
+    if (a.value === b.value) {
+      b.value = ids.find(x => x !== a.value) || ids[1];
     }
   }
 
@@ -773,6 +825,22 @@
     saveLocal();
   }
 
+  function canSpend(aId, bId) {
+    const aQty = Number(SATCHEL[aId]) || 0;
+    const bQty = Number(SATCHEL[bId]) || 0;
+    if (aId === bId) return aQty >= 2;
+    return aQty >= 1 && bQty >= 1;
+  }
+
+  function spend(aId, bId) {
+    if (aId === bId) {
+      setQty(aId, (Number(SATCHEL[aId]) || 0) - 2);
+    } else {
+      setQty(aId, (Number(SATCHEL[aId]) || 0) - 1);
+      setQty(bId, (Number(SATCHEL[bId]) || 0) - 1);
+    }
+  }
+
   function brew() {
     const aId = el("mixA").value;
     const bId = el("mixB").value;
@@ -780,18 +848,38 @@
     updateMixPictures();
 
     if (!aId || !bId) {
-      el("mixResult").innerHTML = `<div class="muted">Add two ingredients to your satchel first.</div>`;
+      el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your satchel to brew.</div>`;
       return;
     }
 
     if (aId === bId) {
-      el("mixResult").innerHTML = `<div class="muted">Choose two different ingredients.</div>`;
-      return;
+      // Allow brewing same ingredient only if they have at least 2
+      if (!canSpend(aId, bId)) {
+        el("mixResult").innerHTML = `
+          <div style="color:var(--warn); font-weight:700;">Not enough in the satchel.</div>
+          <div class="muted" style="margin-top:6px;">You would need two of the same ingredient.</div>
+        `;
+        toast("Not enough in the satchel.", "bad");
+        return;
+      }
+    } else {
+      if (!canSpend(aId, bId)) {
+        el("mixResult").innerHTML = `
+          <div style="color:var(--warn); font-weight:700;">Not enough in the satchel.</div>
+          <div class="muted" style="margin-top:6px;">One of the ingredients is missing.</div>
+        `;
+        toast("Not enough in the satchel.", "bad");
+        return;
+      }
     }
 
     const shared = computeShared(aId, bId);
 
     if (shared.length === 0) {
+      // Deduct ingredients even on fizzles (your example implies brewing consumes)
+      spend(aId, bId);
+      renderSatchel();
+
       el("mixResult").innerHTML = `
         <div style="color:var(--warn); font-weight:700;">The mixture fizzles.</div>
         <div class="muted" style="margin-top:6px;">Nothing in common, nothing takes hold.</div>
@@ -800,13 +888,17 @@
       return;
     }
 
-    // Reveal shared effects automatically
+    // Deduct ingredients on success
+    spend(aId, bId);
+    renderSatchel();
+
+    // Reveal shared properties automatically
     revealSharedAutomatically(aId, bId, shared);
 
     const effectText = shared.join(", ");
     el("mixResult").innerHTML = `
       <div style="color:var(--good); font-weight:700;">Made Concoction of ${escapeHtml(effectText)}</div>
-      <div class="muted" style="margin-top:6px;">The shared nature has been noted on both ingredients.</div>
+      <div class="muted" style="margin-top:6px;">The shared nature has been noted.</div>
     `;
     toast("A concoction is born.", "good");
   }
@@ -823,7 +915,14 @@
       const parsed = JSON.parse(el("saveBox").value);
       if (!parsed || typeof parsed !== "object") throw new Error("Bad");
       REVEALS = (parsed.reveals && typeof parsed.reveals === "object") ? parsed.reveals : {};
-      SATCHEL = Array.isArray(parsed.satchel) ? parsed.satchel.map(String) : [];
+      const sat = (parsed && typeof parsed.satchel === "object" && parsed.satchel) ? parsed.satchel : {};
+      const cleaned = {};
+      for (const [k,v] of Object.entries(sat)) {
+        const n = Number(v);
+        if (Number.isFinite(n) && n > 0) cleaned[String(k)] = Math.floor(n);
+      }
+      SATCHEL = cleaned;
+
       LOCAL = { reveals: REVEALS, satchel: SATCHEL };
       saveLocal();
       renderSatchel();
@@ -837,7 +936,7 @@
 
   function burnAll() {
     if (!confirm("Burn all notes on this device?")) return;
-    LOCAL = { reveals: {}, satchel: [] };
+    LOCAL = { reveals: {}, satchel: {} };
     REVEALS = LOCAL.reveals;
     SATCHEL = LOCAL.satchel;
     saveLocal();
@@ -863,7 +962,7 @@
     const clean = String(mark || "").trim();
     if (!clean) return;
 
-    // Fast path if already loaded
+    // If not loaded, fetch it
     if (!ING_BY_ID[clean]) {
       try {
         const row = await fetchOne(clean);
@@ -872,7 +971,7 @@
           return;
         }
         ING_BY_ID[clean] = row;
-        if (!REVEALS[clean]) REVEALS[clean] = [false,false,false,false];
+        if (!REVEALS[clean]) REVEALS[clean] = [false, false, false, false];
         saveLocal();
       } catch {
         toast("Could not read that mark.", "bad");
@@ -880,19 +979,15 @@
       }
     }
 
-    if (!SATCHEL.includes(clean)) {
-      SATCHEL.push(clean);
-      LOCAL.satchel = SATCHEL;
-      saveLocal();
-      renderSatchel();
-      fillMixChoices();
-      updateMixPictures();
-      toast("Added to satchel.", "good");
-    } else {
-      toast("Already in the satchel.", "good");
-    }
+    // Add one to quantity
+    const current = Number(SATCHEL[clean]) || 0;
+    setQty(clean, current + 1);
 
-    // Open the ingredient after adding, but never show the mark
+    renderSatchel();
+    fillMixChoices();
+    updateMixPictures();
+    toast("Added to satchel.", "good");
+
     renderIngredient(clean);
   }
 
@@ -913,7 +1008,7 @@
 
   el("clearSatchelBtn").addEventListener("click", () => {
     if (!confirm("Empty your satchel on this device?")) return;
-    SATCHEL = [];
+    SATCHEL = {};
     LOCAL.satchel = SATCHEL;
     saveLocal();
     renderSatchel();

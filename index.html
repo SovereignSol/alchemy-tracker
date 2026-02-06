@@ -3,167 +3,470 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>DnD Alchemy Tracker</title>
+  <title>Field Alchemy Notes</title>
   <style>
-    :root { font-family: system-ui, Arial, sans-serif; }
-    body { margin: 0; padding: 16px; max-width: 980px; margin-inline: auto; }
-    h1 { font-size: 20px; margin: 0 0 12px; }
-    .muted { color: #666; font-size: 13px; }
-    .card { border: 1px solid #ddd; border-radius: 12px; padding: 12px; margin: 12px 0; }
-    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-    input, select, button, textarea { font-size: 16px; padding: 10px; border-radius: 10px; border: 1px solid #ccc; }
-    button { cursor: pointer; }
-    .btn { background: #f5f5f5; }
-    .btn-primary { background: #1f6feb; border-color: #1f6feb; color: white; }
-    .btn-danger { background: #d73a49; border-color: #d73a49; color: white; }
-    .small { font-size: 13px; padding: 8px 10px; }
-    img { max-width: 180px; width: 100%; height: auto; border-radius: 12px; border: 1px solid #eee; }
-    .grid2 { display: grid; grid-template-columns: 1fr; gap: 12px; }
-    @media (min-width: 760px) { .grid2 { grid-template-columns: 1fr 1fr; } }
-    .effects { display: grid; gap: 8px; margin-top: 10px; }
-    .effect-line { display: flex; gap: 8px; align-items: center; }
-    .pill { padding: 6px 10px; border-radius: 999px; border: 1px solid #ddd; background: #fafafa; white-space: nowrap; }
-    .effect-text { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #eee; background: #fff; }
-    .hidden { color: transparent; text-shadow: 0 0 10px rgba(0,0,0,0.6); user-select: none; }
-    .ok { color: #0a7a0a; font-weight: 700; }
-    .warn { color: #8a5a00; font-weight: 700; }
-    .err { color: #b00020; font-weight: 700; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    .list-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-    .tag-btn { border: 1px solid #ddd; background: #fff; border-radius: 999px; padding: 8px 10px; }
-    .tag-btn:hover { background: #f7f7f7; }
+    :root{
+      --ink:#2a1f16;
+      --ink2:rgba(42,31,22,0.72);
+      --paper:#f6f0e3;
+      --paper2:#efe5d3;
+      --edge:#d9c8aa;
+      --seal:#7a3e1f;
+      --good:#1f7a3a;
+      --warn:#8a5a00;
+      --bad:#8b1d2c;
+      --shadow: 0 16px 40px rgba(0,0,0,0.18);
+      --shadow2: 0 10px 24px rgba(0,0,0,0.14);
+      --radius: 16px;
+    }
+
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(122,62,31,0.08), transparent 60%),
+        radial-gradient(900px 520px at 90% 20%, rgba(31,122,58,0.06), transparent 60%),
+        linear-gradient(180deg, var(--paper), var(--paper2));
+      font-family: "Segoe Print","Bradley Hand","Comic Sans MS",cursive,system-ui;
+      letter-spacing: 0.2px;
+    }
+
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .title{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    h1{
+      margin:0;
+      font-size: 26px;
+      line-height:1.05;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+    }
+
+    .sub{
+      margin-top:4px;
+      color:var(--ink2);
+      font-size:14px;
+    }
+
+    .card{
+      background: rgba(255,255,255,0.55);
+      border: 1px solid var(--edge);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow2);
+      padding: 14px;
+      margin: 12px 0;
+      backdrop-filter: blur(2px);
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 760px){
+      .grid2{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .row{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+
+    .label{
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    input, select, button, textarea{
+      font-size: 16px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--edge);
+      background: rgba(255,255,255,0.75);
+      color: var(--ink);
+      outline: none;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.04) inset;
+      font-family: inherit;
+    }
+
+    input::placeholder{ color: rgba(42,31,22,0.45); }
+
+    button{
+      cursor:pointer;
+      user-select:none;
+      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+    }
+
+    button:active{ transform: translateY(1px); }
+
+    .btn{
+      background: rgba(255,255,255,0.8);
+    }
+
+    .btn-primary{
+      background: linear-gradient(180deg, rgba(122,62,31,0.92), rgba(122,62,31,0.78));
+      color: #fff7ee;
+      border-color: rgba(122,62,31,0.55);
+      box-shadow: 0 10px 22px rgba(122,62,31,0.18);
+    }
+
+    .btn-primary:hover{
+      box-shadow: 0 14px 28px rgba(122,62,31,0.22);
+    }
+
+    .btn-quiet{
+      background: rgba(255,255,255,0.65);
+      color: rgba(42,31,22,0.78);
+    }
+
+    .btn-danger{
+      background: rgba(139,29,44,0.10);
+      border-color: rgba(139,29,44,0.35);
+      color: var(--bad);
+    }
+
+    .small{
+      padding: 8px 10px;
+      font-size: 14px;
+      border-radius: 12px;
+    }
+
+    .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--edge);
+      background: rgba(255,255,255,0.68);
+      color: rgba(42,31,22,0.78);
+      font-size: 13px;
+    }
+
+    .pill-rare{ border-color: rgba(31,122,58,0.35); background: rgba(31,122,58,0.08); }
+    .pill-common{ border-color: rgba(122,62,31,0.35); background: rgba(122,62,31,0.06); }
+    .pill-unknown{ border-color: rgba(42,31,22,0.25); background: rgba(42,31,22,0.05); }
+
+    .muted{
+      color: var(--ink2);
+      font-size: 13px;
+    }
+
+    .divider{
+      height:1px;
+      background: rgba(217,200,170,0.8);
+      margin: 12px 0;
+    }
+
+    .effects{
+      display:grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .effect-line{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+    }
+
+    .effect-text{
+      flex:1;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px dashed rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.6);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset;
+      min-height: 20px;
+    }
+
+    .hidden{
+      color: transparent;
+      text-shadow: 0 0 11px rgba(42,31,22,0.55);
+      user-select: none;
+    }
+
+    .ing-card{
+      display:flex;
+      gap: 12px;
+      align-items:flex-start;
+      flex-wrap: wrap;
+    }
+
+    .img{
+      width: 190px;
+      max-width: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.6);
+      box-shadow: var(--shadow2);
+    }
+
+    .img-sm{
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      border: 1px solid rgba(217,200,170,0.95);
+      object-fit: cover;
+      background: rgba(255,255,255,0.6);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.10);
+    }
+
+    .satchel{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .tag{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.7);
+      border-radius: 999px;
+      padding: 8px 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+    .tag:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 12px 22px rgba(0,0,0,0.10);
+    }
+    .tag button{
+      border: none;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font-size: 15px;
+      color: var(--ink);
+    }
+    .tag .x{
+      border: 1px solid rgba(139,29,44,0.25);
+      background: rgba(139,29,44,0.07);
+      color: var(--bad);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 13px;
+    }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(217,200,170,0.95);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 10px 14px;
+      box-shadow: var(--shadow);
+      max-width: calc(100vw - 32px);
+      display:none;
+      z-index: 50;
+      font-size: 14px;
+    }
+    .toast.good{ border-color: rgba(31,122,58,0.40); }
+    .toast.bad{ border-color: rgba(139,29,44,0.35); }
+
+    .mix-pics{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      margin-top: 10px;
+    }
+
+    .mix-result{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.65);
+    }
+
+    .sigil{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      letter-spacing: 0.5px;
+      font-size: 12px;
+      color: rgba(42,31,22,0.55);
+    }
+
+    .hide-tools{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+
+    details{
+      border: 1px dashed rgba(217,200,170,0.95);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.45);
+      padding: 10px 12px;
+    }
+    details summary{
+      cursor: pointer;
+      font-weight: 700;
+      color: rgba(42,31,22,0.85);
+      list-style: none;
+    }
+    details summary::-webkit-details-marker{ display:none; }
   </style>
 </head>
 <body>
-  <h1>DnD Alchemy Tracker</h1>
-  <div class="muted">
-    Read-only app backed by Supabase. Reveals and “My Ingredients” list are stored locally on this device.
-  </div>
-
-  <div class="card">
-    <div class="row">
-      <button class="btn-primary" id="refreshBtn">Refresh Ingredient List</button>
-      <span class="muted" id="statusText">Not loaded yet.</span>
-    </div>
-    <div class="muted" style="margin-top:8px;">
-      You can add ingredients in Supabase, then click Refresh here to pull updates.
-    </div>
-  </div>
-
-  <div class="grid2">
-    <div class="card">
-      <div style="font-weight:700; margin-bottom:8px;">Add by ID (no browsing)</div>
-      <div class="row">
-        <input id="idInput" inputmode="numeric" placeholder="Enter Ingredient ID (e.g. 9000)" />
-        <button class="btn-primary" id="addToListBtn">Add to My List</button>
-        <button class="btn" id="loadBtn">Load</button>
-        <button class="btn" id="clearBtn">Clear</button>
-      </div>
-      <div class="muted" style="margin-top:8px;">
-        Add saves it to the local list. Load shows the card without saving.
-      </div>
-
-      <div style="margin-top:14px; font-weight:700;">My Ingredients</div>
-      <div class="muted">Tap an ID to open it. This list is only what the player has added.</div>
-      <div class="list-wrap" id="myListWrap"></div>
-      <div class="row" style="margin-top:10px;">
-        <button class="btn-danger small" id="clearMyListBtn">Clear My List</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div style="font-weight:700; margin-bottom:8px;">Mixing (from My List)</div>
-      <div class="muted">
-        Pick two from My Ingredients. “Check Shared” shows shared effects. If the table says the brew succeeded, click “Reveal Shared”.
-      </div>
-      <div class="row" style="margin-top:10px;">
-        <select id="mixA" style="min-width: 280px;"></select>
-        <select id="mixB" style="min-width: 280px;"></select>
-      </div>
-      <div class="row" style="margin-top:10px;">
-        <button class="btn-primary" id="checkSharedBtn">Check Shared</button>
-        <button class="btn" id="revealSharedBtn" disabled>Reveal Shared</button>
-      </div>
-      <div id="sharedResult" style="margin-top:10px;"></div>
-    </div>
-  </div>
-
-  <div class="card" id="ingredientCard" style="display:none;">
-    <div class="row" style="align-items:flex-start;">
+  <div class="wrap">
+    <div class="title">
       <div>
-        <img id="ingImage" alt="Ingredient image" />
+        <h1>Field Alchemy Notes</h1>
+        <div class="sub">A traveling page of tinctures, petals, powders, and strange little miracles.</div>
       </div>
-      <div style="flex:1; min-width: 240px;">
-        <div class="row" style="justify-content:space-between;">
-          <div>
-            <div class="muted">Ingredient</div>
-            <div style="font-size:18px; font-weight:700;" id="ingName"></div>
-            <div class="muted">ID: <span id="ingId" class="mono"></span></div>
-            <div class="muted">Rarity: <span id="ingRarity"></span></div>
-          </div>
-          <div>
-            <button class="btn small" id="revealRandomBtn">Reveal Random Hidden</button>
-            <button class="btn-danger small" id="resetRevealsBtn">Reset Reveals</button>
-          </div>
+      <div class="hide-tools">
+        <button class="btn-quiet small" id="refreshBtn" title="Pulls in anything new that was prepared ahead of time.">Update Notes</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label">Add Ingredient</div>
+      <div class="muted">Write the mark you were given, then press Add.</div>
+      <div class="row" style="margin-top:10px;">
+        <input id="markInput" inputmode="numeric" placeholder="Mark" aria-label="Mark" />
+        <button class="btn-primary" id="addBtn">Add</button>
+        <button class="btn" id="openBtn">Open</button>
+        <button class="btn-danger" id="closeBtn">Close Page</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="label">Satchel</div>
+      <div class="muted">What you have chosen to keep close at hand.</div>
+      <div class="satchel" id="satchel"></div>
+
+      <div class="row" style="margin-top:10px;">
+        <button class="btn-danger small" id="clearSatchelBtn">Empty Satchel</button>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="label">Mortar and Pestle</div>
+        <div class="muted">Choose two, then Brew. If they share a nature, a concoction is born.</div>
+
+        <div class="row" style="margin-top:10px;">
+          <select id="mixA" style="min-width: 260px;"></select>
+          <select id="mixB" style="min-width: 260px;"></select>
+          <button class="btn-primary" id="brewBtn">Brew</button>
         </div>
 
-        <div class="effects" id="effectsList"></div>
+        <div class="mix-pics">
+          <img class="img-sm" id="mixImgA" alt="First ingredient" />
+          <img class="img-sm" id="mixImgB" alt="Second ingredient" />
+        </div>
 
-        <div class="muted" style="margin-top:10px;">
-          Bruised penalties and Medicine checks happen at the table. This app only tracks what you revealed.
+        <div class="mix-result" id="mixResult">
+          <div class="muted">No mixture yet.</div>
+        </div>
+      </div>
+
+      <div class="card" id="ingredientCard" style="display:none;">
+        <div class="label">Ingredient</div>
+        <div class="ing-card">
+          <img class="img" id="ingImage" alt="Ingredient" />
+          <div style="flex:1; min-width: 240px;">
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:space-between;">
+              <div>
+                <div style="font-size:20px; font-weight:700;" id="ingName"></div>
+                <div style="margin-top:6px;">
+                  <span class="pill" id="rarityPill">Unknown</span>
+                </div>
+              </div>
+              <div class="row">
+                <button class="btn small" id="revealRandomBtn">Reveal a Hint</button>
+                <button class="btn-danger small" id="resetRevealsBtn">Forget Hints</button>
+              </div>
+            </div>
+
+            <div class="effects" id="effectsList"></div>
+
+            <details style="margin-top:10px;">
+              <summary>Keep Safe</summary>
+              <div class="muted" style="margin-top:8px;">
+                If you lose this device, export your notes and keep them somewhere safe.
+              </div>
+              <div class="row" style="margin-top:10px;">
+                <button class="btn small" id="exportBtn">Export Notes</button>
+                <button class="btn small" id="importBtn">Import Notes</button>
+                <button class="btn-danger small" id="wipeBtn">Burn All Notes</button>
+              </div>
+              <textarea id="saveBox" rows="6" style="width:100%; margin-top:10px;" placeholder="Notes appear here for export or import."></textarea>
+              <div class="muted sigil" style="margin-top:8px;">
+                This page never sends your hints anywhere. It stays in the device, unless you export it.
+              </div>
+            </details>
+
+          </div>
         </div>
       </div>
     </div>
+
+    <div class="card">
+      <div class="muted" id="statusText">Waiting for ink to dry.</div>
+    </div>
   </div>
 
-  <div class="card">
-    <div style="font-weight:700; margin-bottom:8px;">Backup (Export / Import reveals and My List)</div>
-    <div class="muted">Everything is stored on this device. Export lets you move progress to another phone if needed.</div>
-    <div class="row" style="margin-top:10px;">
-      <button class="btn" id="exportBtn">Export</button>
-      <button class="btn" id="importBtn">Import</button>
-      <button class="btn-danger" id="wipeBtn">Wipe All Local Data</button>
-    </div>
-    <textarea id="saveBox" rows="6" style="width:100%; margin-top:10px;" placeholder="Exported JSON appears here. Paste JSON here to import."></textarea>
-  </div>
+  <div class="toast" id="toast"></div>
 
 <script>
-  // Supabase config (your values)
+  // Connection settings
   const SUPABASE_URL = "https://yjelzojkirlzdnwftupz.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqZWx6b2praXJsemRud2Z0dXB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzNTk0MTEsImV4cCI6MjA4NTkzNTQxMX0.5TCIyj5cAUlCAmNc2yBOIdpfNoN4NLqOOfcnBVbCzZA";
 
   const REST_BASE = `${SUPABASE_URL}/rest/v1`;
   const INGREDIENTS_ENDPOINT = `${REST_BASE}/ingredients?select=id,name,effect_1,effect_2,effect_3,effect_4,image_path,rarity,notes&order=id.asc`;
-  const INGREDIENT_BY_ID = (id) => `${REST_BASE}/ingredients?select=id,name,effect_1,effect_2,effect_3,effect_4,image_path,rarity,notes&id=eq.${encodeURIComponent(id)}&limit=1`;
+  const INGREDIENT_BY_MARK = (mark) => `${REST_BASE}/ingredients?select=id,name,effect_1,effect_2,effect_3,effect_4,image_path,rarity,notes&id=eq.${encodeURIComponent(mark)}&limit=1`;
   const PUBLIC_STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/`;
 
-  const LOCAL_KEY = "alchemy_local_v2"; // contains reveals + myList
-
+  // Local notes
+  const LOCAL_KEY = "field_alchemy_notes_v3"; // reveals + satchel
   function loadLocal() {
     const raw = localStorage.getItem(LOCAL_KEY);
-    if (!raw) return { reveals: {}, myList: [] };
+    if (!raw) return { reveals: {}, satchel: [] };
     try {
       const parsed = JSON.parse(raw);
       return {
         reveals: (parsed && typeof parsed.reveals === "object" && parsed.reveals) ? parsed.reveals : {},
-        myList: Array.isArray(parsed?.myList) ? parsed.myList.map(String) : []
+        satchel: Array.isArray(parsed?.satchel) ? parsed.satchel.map(String) : []
       };
     } catch {
-      return { reveals: {}, myList: [] };
+      return { reveals: {}, satchel: [] };
     }
   }
-
   function saveLocal() {
     localStorage.setItem(LOCAL_KEY, JSON.stringify(LOCAL));
   }
 
   let LOCAL = loadLocal();
-  let REVEALS = LOCAL.reveals;
-  let MY_LIST = LOCAL.myList;
+  let REVEALS = LOCAL.reveals;     // { [id]: [bool,bool,bool,bool] }
+  let SATCHEL = LOCAL.satchel;     // [id...]
 
-  let INGREDIENTS = []; // all rows (for lookup by ID)
-  let ING_BY_ID = {};   // id -> row
-
+  // In-memory cache
+  let ING_BY_ID = {};              // id -> row
+  let ALL_IDS = [];                // for fast existence
   const el = (id) => document.getElementById(id);
 
   function headers() {
@@ -173,8 +476,46 @@
     };
   }
 
-  async function fetchIngredients() {
-    el("statusText").textContent = "Loading from Supabase...";
+  function toast(msg, kind) {
+    const t = el("toast");
+    t.className = "toast";
+    if (kind === "good") t.classList.add("good");
+    if (kind === "bad") t.classList.add("bad");
+    t.textContent = msg;
+    t.style.display = "block";
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => { t.style.display = "none"; }, 2200);
+  }
+
+  function rarityClass(r) {
+    const v = String(r || "").trim().toLowerCase();
+    if (!v) return "pill-unknown";
+    if (v.includes("rare") || v.includes("uncommon") || v.includes("legend")) return "pill-rare";
+    return "pill-common";
+  }
+
+  function rarityLabel(r) {
+    const v = String(r || "").trim();
+    return v ? v : "Unknown";
+  }
+
+  function getImageUrl(image_path) {
+    if (!image_path) return "";
+    return `${PUBLIC_STORAGE_BASE}${image_path}`;
+  }
+
+  function placeholderImageDataUri(label) {
+    const svg =
+      `<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'>` +
+      `<rect width='100%' height='100%' fill='%23ffffff'/>` +
+      `<rect x='10' y='10' width='236' height='236' rx='22' ry='22' fill='%23f6f0e3' stroke='%23d9c8aa' stroke-width='4'/>` +
+      `<text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%237a3e1f' font-size='18' font-family='Segoe Print,Bradley Hand,cursive'>${label}</text>` +
+      `</svg>`;
+    return "data:image/svg+xml," + encodeURIComponent(svg);
+  }
+
+  async function fetchAllIngredients() {
+    el("statusText").textContent = "Turning pages...";
     try {
       const res = await fetch(INGREDIENTS_ENDPOINT, { headers: headers() });
       if (!res.ok) {
@@ -182,25 +523,35 @@
         throw new Error(`HTTP ${res.status}: ${txt}`);
       }
       const rows = await res.json();
-      INGREDIENTS = rows;
+
       ING_BY_ID = {};
+      ALL_IDS = [];
       for (const r of rows) {
         const idStr = String(r.id);
         ING_BY_ID[idStr] = r;
+        ALL_IDS.push(idStr);
         if (!REVEALS[idStr]) REVEALS[idStr] = [false, false, false, false];
       }
       saveLocal();
-      renderMyList();
-      fillMixDropdownsFromMyList();
-      el("statusText").innerHTML = `<span class="ok">Loaded ${rows.length} ingredients.</span>`;
-    } catch (err) {
-      el("statusText").innerHTML = `<span class="err">Failed to load: ${escapeHtml(String(err.message || err))}</span>`;
-      console.error(err);
+
+      // Keep satchel clean if something no longer exists
+      SATCHEL = SATCHEL.filter(id => ING_BY_ID[id]);
+      LOCAL.satchel = SATCHEL;
+      saveLocal();
+
+      renderSatchel();
+      fillMixChoices();
+      updateMixPictures();
+      el("statusText").textContent = "Notes updated.";
+    } catch (e) {
+      el("statusText").textContent = "Could not update notes.";
+      toast("The ink smudged. Try again.", "bad");
+      console.error(e);
     }
   }
 
-  async function fetchOneIngredient(idStr) {
-    const res = await fetch(INGREDIENT_BY_ID(idStr), { headers: headers() });
+  async function fetchOne(mark) {
+    const res = await fetch(INGREDIENT_BY_MARK(mark), { headers: headers() });
     if (!res.ok) {
       const txt = await res.text();
       throw new Error(`HTTP ${res.status}: ${txt}`);
@@ -209,25 +560,25 @@
     return rows?.[0] || null;
   }
 
-  function getImageUrl(image_path) {
-    if (!image_path) return "";
-    return `${PUBLIC_STORAGE_BASE}${image_path}`;
+  function setRarityPill(row) {
+    const pill = el("rarityPill");
+    pill.className = "pill " + rarityClass(row?.rarity);
+    pill.textContent = rarityLabel(row?.rarity);
   }
 
   function renderIngredient(idStr) {
     const row = ING_BY_ID[idStr];
     if (!row) {
-      alert("Unknown ID. Refresh list, or add it in Supabase.");
+      toast("That mark is not in your notes.", "bad");
       return;
     }
 
     el("ingredientCard").style.display = "block";
-    el("ingName").textContent = row.name || "";
-    el("ingId").textContent = idStr;
-    el("ingRarity").textContent = row.rarity || "Unknown";
+    el("ingName").textContent = row.name || "Unknown Ingredient";
+    setRarityPill(row);
 
     const imgUrl = getImageUrl(row.image_path);
-    el("ingImage").src = imgUrl || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Crect width='100%25' height='100%25' fill='%23f2f2f2'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23666' font-size='22'%3ENo image%3C/text%3E%3C/svg%3E";
+    el("ingImage").src = imgUrl || placeholderImageDataUri("No sketch");
 
     const effects = [row.effect_1, row.effect_2, row.effect_3, row.effect_4].map(v => v || "");
     const revealed = REVEALS[idStr] || [false,false,false,false];
@@ -239,26 +590,27 @@
       const line = document.createElement("div");
       line.className = "effect-line";
 
-      const pill = document.createElement("div");
-      pill.className = "pill";
-      pill.textContent = `Effect ${idx+1}`;
+      const label = document.createElement("div");
+      label.className = "pill";
+      label.textContent = `Hint ${idx + 1}`;
 
       const text = document.createElement("div");
       text.className = "effect-text";
-      text.textContent = eff || "(empty)";
+      text.textContent = eff || "(blank)";
       if (!revealed[idx]) text.classList.add("hidden");
 
       const btn = document.createElement("button");
       btn.className = "btn small";
-      btn.textContent = revealed[idx] ? "Revealed" : "Reveal";
+      btn.textContent = revealed[idx] ? "Known" : "Reveal";
       btn.disabled = revealed[idx];
       btn.addEventListener("click", () => {
         REVEALS[idStr][idx] = true;
         saveLocal();
         renderIngredient(idStr);
+        toast("A hint reveals itself.", "good");
       });
 
-      line.appendChild(pill);
+      line.appendChild(label);
       line.appendChild(text);
       line.appendChild(btn);
       list.appendChild(line);
@@ -267,85 +619,130 @@
     el("revealRandomBtn").onclick = () => {
       const hidden = [];
       for (let i = 0; i < 4; i++) if (!REVEALS[idStr][i]) hidden.push(i);
-      if (hidden.length === 0) return;
+      if (hidden.length === 0) {
+        toast("Nothing more to learn here.", "good");
+        return;
+      }
       const pick = hidden[Math.floor(Math.random() * hidden.length)];
       REVEALS[idStr][pick] = true;
       saveLocal();
       renderIngredient(idStr);
+      toast("A hint reveals itself.", "good");
     };
 
     el("resetRevealsBtn").onclick = () => {
       REVEALS[idStr] = [false,false,false,false];
       saveLocal();
       renderIngredient(idStr);
+      toast("Hints forgotten.", "bad");
     };
   }
 
-  function clearCard() {
+  function closeIngredient() {
     el("ingredientCard").style.display = "none";
-    el("sharedResult").innerHTML = "";
-    el("revealSharedBtn").disabled = true;
   }
 
-  function renderMyList() {
-    const wrap = el("myListWrap");
+  function renderSatchel() {
+    const wrap = el("satchel");
     wrap.innerHTML = "";
 
-    const unique = Array.from(new Set(MY_LIST.map(String)));
+    const unique = Array.from(new Set(SATCHEL.map(String)));
     unique.sort((a,b) => Number(a) - Number(b));
-    MY_LIST = unique;
-    LOCAL.myList = MY_LIST;
+    SATCHEL = unique;
+    LOCAL.satchel = SATCHEL;
     saveLocal();
 
-    if (MY_LIST.length === 0) {
-      const span = document.createElement("div");
-      span.className = "muted";
-      span.textContent = "No ingredients added yet.";
-      wrap.appendChild(span);
+    if (SATCHEL.length === 0) {
+      const d = document.createElement("div");
+      d.className = "muted";
+      d.textContent = "Your satchel is empty.";
+      wrap.appendChild(d);
+      fillMixChoices();
+      updateMixPictures();
       return;
     }
 
-    for (const idStr of MY_LIST) {
-      const btn = document.createElement("button");
-      btn.className = "tag-btn";
-      const name = ING_BY_ID[idStr]?.name;
-      btn.textContent = name ? `${idStr} - ${name}` : idStr;
-      btn.addEventListener("click", () => renderIngredient(idStr));
+    for (const idStr of SATCHEL) {
+      const row = ING_BY_ID[idStr];
+      const name = row?.name || "Unknown";
+      const imgUrl = getImageUrl(row?.image_path);
+
+      const chip = document.createElement("div");
+      chip.className = "tag";
+
+      const thumb = document.createElement("img");
+      thumb.className = "img-sm";
+      thumb.alt = name;
+      thumb.src = imgUrl || placeholderImageDataUri("No sketch");
+
+      const open = document.createElement("button");
+      open.type = "button";
+      open.textContent = name;
+      open.addEventListener("click", () => renderIngredient(idStr));
 
       const remove = document.createElement("button");
-      remove.className = "tag-btn";
-      remove.textContent = `Remove ${idStr}`;
+      remove.type = "button";
+      remove.className = "x";
+      remove.textContent = "Remove";
       remove.addEventListener("click", () => {
-        MY_LIST = MY_LIST.filter(x => String(x) !== String(idStr));
-        LOCAL.myList = MY_LIST;
+        SATCHEL = SATCHEL.filter(x => String(x) !== String(idStr));
+        LOCAL.satchel = SATCHEL;
         saveLocal();
-        renderMyList();
-        fillMixDropdownsFromMyList();
+        renderSatchel();
+        fillMixChoices();
+        updateMixPictures();
+        toast("Set aside.", "bad");
       });
 
-      wrap.appendChild(btn);
-      wrap.appendChild(remove);
+      chip.appendChild(thumb);
+      chip.appendChild(open);
+      chip.appendChild(remove);
+      wrap.appendChild(chip);
     }
+
+    fillMixChoices();
+    updateMixPictures();
   }
 
-  function fillMixDropdownsFromMyList() {
+  function fillMixChoices() {
     const a = el("mixA");
     const b = el("mixB");
-    const ids = MY_LIST.slice();
 
-    const opts = ids.map(idStr => {
-      const name = ING_BY_ID[idStr]?.name || "";
-      const label = name ? `${idStr} - ${name}` : idStr;
-      return `<option value="${escapeHtml(idStr)}">${escapeHtml(label)}</option>`;
+    if (SATCHEL.length === 0) {
+      a.innerHTML = "";
+      b.innerHTML = "";
+      el("mixResult").innerHTML = `<div class="muted">Add two ingredients to your satchel first.</div>`;
+      return;
+    }
+
+    const opts = SATCHEL.map(idStr => {
+      const name = ING_BY_ID[idStr]?.name || "Unknown";
+      return `<option value="${escapeHtml(idStr)}">${escapeHtml(name)}</option>`;
     }).join("");
 
     a.innerHTML = opts;
     b.innerHTML = opts;
 
-    if (ids.length >= 2) {
-      a.value = ids[0];
-      b.value = ids[1];
+    if (SATCHEL.length >= 2) {
+      a.value = SATCHEL[0];
+      b.value = SATCHEL[1];
+    } else {
+      a.value = SATCHEL[0];
+      b.value = SATCHEL[0];
     }
+  }
+
+  function updateMixPictures() {
+    const aId = el("mixA").value;
+    const bId = el("mixB").value;
+
+    const aRow = ING_BY_ID[aId];
+    const bRow = ING_BY_ID[bId];
+
+    el("mixImgA").src = getImageUrl(aRow?.image_path) || placeholderImageDataUri("?");
+    el("mixImgB").src = getImageUrl(bRow?.image_path) || placeholderImageDataUri("?");
+    el("mixImgA").alt = aRow?.name || "Ingredient";
+    el("mixImgB").alt = bRow?.name || "Ingredient";
   }
 
   function computeShared(aId, bId) {
@@ -358,7 +755,7 @@
     return aEffects.filter(e => bEffects.has(e));
   }
 
-  function revealShared(aId, bId, shared) {
+  function revealSharedAutomatically(aId, bId, shared) {
     const a = ING_BY_ID[aId];
     const b = ING_BY_ID[bId];
     if (!a || !b) return;
@@ -376,37 +773,80 @@
     saveLocal();
   }
 
-  function exportAll() {
-    const payload = { reveals: REVEALS, myList: MY_LIST };
-    el("saveBox").value = JSON.stringify(payload, null, 2);
+  function brew() {
+    const aId = el("mixA").value;
+    const bId = el("mixB").value;
+
+    updateMixPictures();
+
+    if (!aId || !bId) {
+      el("mixResult").innerHTML = `<div class="muted">Add two ingredients to your satchel first.</div>`;
+      return;
+    }
+
+    if (aId === bId) {
+      el("mixResult").innerHTML = `<div class="muted">Choose two different ingredients.</div>`;
+      return;
+    }
+
+    const shared = computeShared(aId, bId);
+
+    if (shared.length === 0) {
+      el("mixResult").innerHTML = `
+        <div style="color:var(--warn); font-weight:700;">The mixture fizzles.</div>
+        <div class="muted" style="margin-top:6px;">Nothing in common, nothing takes hold.</div>
+      `;
+      toast("The mixture fizzles.", "bad");
+      return;
+    }
+
+    // Reveal shared effects automatically
+    revealSharedAutomatically(aId, bId, shared);
+
+    const effectText = shared.join(", ");
+    el("mixResult").innerHTML = `
+      <div style="color:var(--good); font-weight:700;">Made Concoction of ${escapeHtml(effectText)}</div>
+      <div class="muted" style="margin-top:6px;">The shared nature has been noted on both ingredients.</div>
+    `;
+    toast("A concoction is born.", "good");
   }
 
-  function importAll() {
+  // Export / Import
+  function exportNotes() {
+    const payload = { reveals: REVEALS, satchel: SATCHEL };
+    el("saveBox").value = JSON.stringify(payload, null, 2);
+    toast("Notes copied to the box.", "good");
+  }
+
+  function importNotes() {
     try {
       const parsed = JSON.parse(el("saveBox").value);
-      if (!parsed || typeof parsed !== "object") throw new Error("Not an object");
+      if (!parsed || typeof parsed !== "object") throw new Error("Bad");
       REVEALS = (parsed.reveals && typeof parsed.reveals === "object") ? parsed.reveals : {};
-      MY_LIST = Array.isArray(parsed.myList) ? parsed.myList.map(String) : [];
-      LOCAL = { reveals: REVEALS, myList: MY_LIST };
+      SATCHEL = Array.isArray(parsed.satchel) ? parsed.satchel.map(String) : [];
+      LOCAL = { reveals: REVEALS, satchel: SATCHEL };
       saveLocal();
-      renderMyList();
-      fillMixDropdownsFromMyList();
-      alert("Imported.");
+      renderSatchel();
+      fillMixChoices();
+      updateMixPictures();
+      toast("Notes restored.", "good");
     } catch {
-      alert("Invalid JSON.");
+      toast("Those notes do not make sense.", "bad");
     }
   }
 
-  function wipeAll() {
-    if (!confirm("Wipe all local reveals and My List on this device?")) return;
-    LOCAL = { reveals: {}, myList: [] };
+  function burnAll() {
+    if (!confirm("Burn all notes on this device?")) return;
+    LOCAL = { reveals: {}, satchel: [] };
     REVEALS = LOCAL.reveals;
-    MY_LIST = LOCAL.myList;
+    SATCHEL = LOCAL.satchel;
     saveLocal();
-    clearCard();
-    renderMyList();
-    fillMixDropdownsFromMyList();
-    alert("Wiped.");
+    closeIngredient();
+    renderSatchel();
+    fillMixChoices();
+    updateMixPictures();
+    el("mixResult").innerHTML = `<div class="muted">No mixture yet.</div>`;
+    toast("Ashes and silence.", "bad");
   }
 
   function escapeHtml(s) {
@@ -419,107 +859,90 @@
     }[c]));
   }
 
-  // Events
-  el("refreshBtn").addEventListener("click", fetchIngredients);
+  async function addToSatchelFromMark(mark) {
+    const clean = String(mark || "").trim();
+    if (!clean) return;
 
-  el("loadBtn").addEventListener("click", () => {
-    const idStr = el("idInput").value.trim();
-    if (!idStr) return;
-    renderIngredient(idStr);
-  });
-
-  el("addToListBtn").addEventListener("click", async () => {
-    const idStr = el("idInput").value.trim();
-    if (!idStr) return;
-
-    // Prefer cache, but verify against Supabase if not loaded or missing.
-    if (!ING_BY_ID[idStr]) {
+    // Fast path if already loaded
+    if (!ING_BY_ID[clean]) {
       try {
-        const row = await fetchOneIngredient(idStr);
+        const row = await fetchOne(clean);
         if (!row) {
-          alert("That ID does not exist in the database.");
+          toast("That mark is unknown.", "bad");
           return;
         }
-        ING_BY_ID[idStr] = row;
-        // Keep reveals in sync
-        if (!REVEALS[idStr]) REVEALS[idStr] = [false,false,false,false];
+        ING_BY_ID[clean] = row;
+        if (!REVEALS[clean]) REVEALS[clean] = [false,false,false,false];
         saveLocal();
-      } catch (e) {
-        alert("Could not verify that ID. Try Refresh Ingredient List first.");
+      } catch {
+        toast("Could not read that mark.", "bad");
         return;
       }
     }
 
-    if (!MY_LIST.includes(idStr)) {
-      MY_LIST.push(idStr);
-      LOCAL.myList = MY_LIST;
+    if (!SATCHEL.includes(clean)) {
+      SATCHEL.push(clean);
+      LOCAL.satchel = SATCHEL;
       saveLocal();
-      renderMyList();
-      fillMixDropdownsFromMyList();
+      renderSatchel();
+      fillMixChoices();
+      updateMixPictures();
+      toast("Added to satchel.", "good");
+    } else {
+      toast("Already in the satchel.", "good");
     }
 
-    renderIngredient(idStr);
+    // Open the ingredient after adding, but never show the mark
+    renderIngredient(clean);
+  }
+
+  // Wire events
+  el("refreshBtn").addEventListener("click", fetchAllIngredients);
+
+  el("addBtn").addEventListener("click", () => addToSatchelFromMark(el("markInput").value));
+  el("openBtn").addEventListener("click", () => {
+    const mark = el("markInput").value.trim();
+    if (!mark) return;
+    if (!ING_BY_ID[mark]) {
+      toast("Add it first.", "bad");
+      return;
+    }
+    renderIngredient(mark);
   });
+  el("closeBtn").addEventListener("click", closeIngredient);
 
-  el("clearBtn").addEventListener("click", clearCard);
-
-  el("clearMyListBtn").addEventListener("click", () => {
-    if (!confirm("Clear My Ingredients list on this device?")) return;
-    MY_LIST = [];
-    LOCAL.myList = MY_LIST;
+  el("clearSatchelBtn").addEventListener("click", () => {
+    if (!confirm("Empty your satchel on this device?")) return;
+    SATCHEL = [];
+    LOCAL.satchel = SATCHEL;
     saveLocal();
-    renderMyList();
-    fillMixDropdownsFromMyList();
+    renderSatchel();
+    fillMixChoices();
+    updateMixPictures();
+    el("mixResult").innerHTML = `<div class="muted">No mixture yet.</div>`;
+    toast("Satchel emptied.", "bad");
   });
 
-  let lastMix = { a: null, b: null, shared: [] };
+  el("mixA").addEventListener("change", updateMixPictures);
+  el("mixB").addEventListener("change", updateMixPictures);
+  el("brewBtn").addEventListener("click", brew);
 
-  el("checkSharedBtn").addEventListener("click", () => {
-    const aId = el("mixA").value;
-    const bId = el("mixB").value;
+  el("exportBtn").addEventListener("click", exportNotes);
+  el("importBtn").addEventListener("click", importNotes);
+  el("wipeBtn").addEventListener("click", burnAll);
 
-    if (!aId || !bId) {
-      el("sharedResult").innerHTML = `<div class="warn">Add at least two ingredients to My List first.</div>`;
-      el("revealSharedBtn").disabled = true;
-      return;
-    }
-
-    if (aId === bId) {
-      el("sharedResult").innerHTML = `<div class="warn">Choose two different ingredients.</div>`;
-      el("revealSharedBtn").disabled = true;
-      return;
-    }
-
-    const shared = computeShared(aId, bId);
-    lastMix = { a: aId, b: bId, shared };
-
-    if (shared.length === 0) {
-      el("sharedResult").innerHTML = `<div class="warn">No shared effects. This mix would fail (no potion).</div>`;
-      el("revealSharedBtn").disabled = true;
-      return;
-    }
-
-    el("sharedResult").innerHTML = `
-      <div class="ok">Shared effects found:</div>
-      <ul>${shared.map(s => `<li>${escapeHtml(s)}</li>`).join("")}</ul>
-    `;
-    el("revealSharedBtn").disabled = false;
+  // Enter key convenience
+  el("markInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") addToSatchelFromMark(el("markInput").value);
   });
 
-  el("revealSharedBtn").addEventListener("click", () => {
-    if (!lastMix.a || !lastMix.b) return;
-    revealShared(lastMix.a, lastMix.b, lastMix.shared);
-    el("sharedResult").innerHTML += `<div class="ok">Revealed shared effects on both ingredients.</div>`;
-  });
-
-  el("exportBtn").addEventListener("click", exportAll);
-  el("importBtn").addEventListener("click", importAll);
-  el("wipeBtn").addEventListener("click", wipeAll);
-
-  // Init
-  fetchIngredients();
-  renderMyList();
-  fillMixDropdownsFromMyList();
+  // Initial
+  el("mixImgA").src = placeholderImageDataUri("?");
+  el("mixImgB").src = placeholderImageDataUri("?");
+  fetchAllIngredients();
+  renderSatchel();
+  fillMixChoices();
+  updateMixPictures();
 </script>
 </body>
 </html>

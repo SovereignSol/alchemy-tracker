@@ -1,42 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Field Notes</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            display: grid;
-            gap: 20px;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            padding: 10px;
-        }
-        .note {
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="note">
-            <h2>Note 1</h2>
-            <p>Description of note 1 goes here.</p>
-        </div>
-        <div class="note">
-            <h2>Note 2</h2>
-            <p>Description of note 2 goes here.</p>
-        </div>
-        <!-- Additional notes would be added here -->
-    </div>
-</body>
-</html>
+.bookWrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: clamp(1rem, 5vw, 2rem);
+}
+
+.bookPages {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: clamp(0.5rem, 2vw, 1rem);
+    padding: clamp(1rem, 3vw, 2rem);
+}

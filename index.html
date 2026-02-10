@@ -7,7 +7,7 @@
 
   <style>
     :root{
-      --ink:#2a1f16;
+      --ink:#000000;
       --paper:#f6f0e3;
       --paper2:#efe5d3;
       --edge:#d9c8aa;
@@ -24,7 +24,7 @@
       /* Book UI scale */
       --book-ui: 0.84;
 
-      /* Move book UI further LEFT, and keep it within parchment */
+      /* Book UI placement */
       --book-top: 12%;
       --book-bottom: 10%;
       --book-left: 2.2%;
@@ -33,10 +33,8 @@
       --book-gap: 2.4%;
       --book-pad: 8px;
 
-      /* Shorten content width even more */
+      /* Content width */
       --page-content-width: 78%;
-
-      /* Shorter divider lines */
       --line-width: 78%;
 
       --brew-maxw: 980px;
@@ -45,7 +43,7 @@
     html,body{ height:100%; }
     body{
       margin:0;
-      color:var(--ink);
+      color: var(--ink);
       background:
         radial-gradient(1200px 700px at 20% 0%, rgba(122,62,31,0.08), transparent 60%),
         radial-gradient(900px 520px at 90% 20%, rgba(31,122,58,0.06), transparent 60%),
@@ -145,11 +143,13 @@
       width:100%;
       height:100%;
     }
+    /* IMPORTANT: show full images (no crop) */
     .panel img.coverArt{
       width:100%;
       height:100%;
-      object-fit: cover;
+      object-fit: contain;
       display:block;
+      background: rgba(255,255,255,0.20);
       filter: saturate(1.02);
     }
     .panel .hint{
@@ -203,19 +203,21 @@
     .bookWrap{
       position: relative;
       width:100%;
-      height: min(78vh, 700px);
-      min-height: 520px;
+      height: min(86vh, 780px); /* bigger so the book image is not cut off */
+      min-height: 560px;
       background: rgba(255,255,255,0.25);
     }
+    /* IMPORTANT: show full book art (no crop) */
     .bookBg{
       position:absolute;
       inset:0;
       width:100%;
       height:100%;
-      object-fit: cover;
+      object-fit: contain;
       opacity: 0.98;
       pointer-events:none;
       user-select:none;
+      background: rgba(255,255,255,0.15);
     }
 
     .bookPages{
@@ -239,10 +241,11 @@
       color: #000;
     }
 
-    /* Force ALL book text black (including “muted”) */
+    /* Force ALL book text pure black */
     .bookPages, .bookPages *{
       color:#000 !important;
     }
+    .bookPages .muted{ color:#000 !important; opacity: 0.75; }
 
     @media (max-width: 760px){
       :root{
@@ -257,7 +260,7 @@
       }
       .bookWrap{
         height: auto;
-        min-height: 860px;
+        min-height: 920px;
       }
       .bookPages{
         grid-template-columns: 1fr;
@@ -283,6 +286,14 @@
       max-width: var(--page-content-width);
       margin-left: 0;
       margin-right: auto;
+    }
+
+    /* Right page content: nudge LEFT (away from the outer edge) */
+    .pageRight .pageInner{
+      width: calc(var(--page-content-width) - 8%);
+      max-width: calc(var(--page-content-width) - 8%);
+      margin-left: 10px;
+      padding-right: 16px;
     }
 
     .page h2{
@@ -345,6 +356,7 @@
       font-weight: 950;
       padding: 2px 3px;
       font-size: 12.5px;
+      color:#000;
     }
 
     .inventoryBox{
@@ -364,6 +376,7 @@
       border: 1px solid rgba(0,0,0,0.22);
       background: rgba(255,255,255,0.00);
       font-size: 11.5px;
+      color:#000;
     }
 
     .qtyBtn{
@@ -375,6 +388,7 @@
       box-shadow:none;
       border: 1px solid rgba(0,0,0,0.22);
       font-size: 11.5px;
+      color:#000;
     }
 
     .noteBox{
@@ -386,6 +400,7 @@
       line-height: 1.2;
       white-space: pre-wrap;
       width: var(--line-width);
+      color:#000;
     }
 
     .plantImg{
@@ -409,6 +424,7 @@
       font-size: 11.5px;
       font-weight: 950;
       box-shadow:none;
+      color:#000;
     }
     .pill-rare{ border-color: rgba(31,122,58,0.40); }
     .pill-common{ border-color: rgba(122,62,31,0.40); }
@@ -428,6 +444,7 @@
       align-items:center;
       font-size: 12px;
       line-height: 1.15;
+      color:#000;
     }
     .effect-hidden{
       color: transparent !important;
@@ -442,6 +459,7 @@
       background: rgba(255,255,255,0.00);
       box-shadow:none;
       border: 1px solid rgba(0,0,0,0.22);
+      color:#000;
     }
 
     /* Brew UI below image */
@@ -460,13 +478,16 @@
       background: rgba(255,255,255,0.45);
       box-shadow: var(--shadow2);
     }
+    /* IMPORTANT: show full brew scene art (no crop) */
     .brewBgImg{
       width:100%;
       height: min(52vh, 520px);
       min-height: 300px;
-      object-fit: cover;
+      object-fit: contain;
+      background: rgba(255,255,255,0.20);
       display:block;
     }
+
     .brewControls{
       border-radius: 18px;
       border: 1px solid rgba(217,200,170,0.95);
@@ -520,7 +541,7 @@
       padding: 5px 9px;
       background: rgba(255,255,255,0.72);
       font-weight: 950;
-      color: rgba(0,0,0,0.82);
+      color: #000;
       font-size: var(--small);
     }
     .resultBox{
@@ -531,6 +552,7 @@
       padding: 9px 10px;
       font-size: var(--small);
       line-height: 1.2;
+      color:#000;
     }
 
     .toast{
@@ -560,19 +582,21 @@
       padding: 9px 10px;
       margin-top: 10px;
       width: var(--line-width);
+      color:#000;
     }
     details summary{
       cursor: pointer;
       font-weight: 950;
       list-style: none;
       font-size: var(--small);
+      color:#000;
     }
     details summary::-webkit-details-marker{ display:none; }
     .sigil{
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       letter-spacing: 0.4px;
       font-size: 11px;
-      color: rgba(0,0,0,0.55);
+      color: rgba(0,0,0,0.70);
     }
   </style>
 </head>
@@ -663,7 +687,7 @@
             </div>
           </div>
 
-          <div class="page">
+          <div class="page pageRight">
             <div class="pageInner">
               <h2>How to Make Concoctions</h2>
               <div class="noteBox">
@@ -717,7 +741,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
             </div>
           </div>
 
-          <div class="page">
+          <div class="page pageRight">
             <div class="pageInner">
               <h2>Known Recipes</h2>
               <div class="muted">What you have learned so far.</div>

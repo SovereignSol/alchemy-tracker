@@ -8,7 +8,6 @@
   <style>
     :root{
       --ink:#2a1f16;
-      --ink2:rgba(42,31,22,0.70);
       --paper:#f6f0e3;
       --paper2:#efe5d3;
       --edge:#d9c8aa;
@@ -25,21 +24,20 @@
       /* Book UI scale */
       --book-ui: 0.84;
 
-      /* Book safe area (adjusted per your notes):
-         - move UI slightly DOWN: top increased
-         - move UI LEFT closer to page edge: left decreased
-         - reduce overall width: right increased
-      */
+      /* Move book UI further LEFT, and keep it within parchment */
       --book-top: 12%;
       --book-bottom: 10%;
-      --book-left: 4.5%;
-      --book-right: 14%;
+      --book-left: 2.2%;
+      --book-right: 15.5%;
 
       --book-gap: 2.4%;
       --book-pad: 8px;
 
-      /* Max content width inside each page to shorten rows/lines */
-      --page-content-width: 86%;
+      /* Shorten content width even more */
+      --page-content-width: 78%;
+
+      /* Shorter divider lines */
+      --line-width: 78%;
 
       --brew-maxw: 980px;
     }
@@ -66,7 +64,6 @@
     }
     .hidden{ display:none !important; }
 
-    /* Default inputs remain visually “typeable” (allowed to have filled background) */
     button, input, select, textarea{
       font-size: var(--base);
       padding: 8px 9px;
@@ -95,13 +92,15 @@
       font-weight: 900;
     }
     .btn-primary:hover{ box-shadow: 0 14px 28px rgba(122,62,31,0.22); }
+
     .btn-quiet{
       background: rgba(255,255,255,0.65);
-      color: rgba(0,0,0,0.85);
+      color: #000;
       font-weight: 900;
     }
 
     .muted{ color: rgba(0,0,0,0.70); font-size: var(--small); }
+
     .title{
       display:flex;
       align-items:flex-end;
@@ -163,7 +162,7 @@
       background: rgba(255,255,255,0.78);
       box-shadow: 0 10px 20px rgba(0,0,0,0.12);
       font-weight: 900;
-      color: rgba(0,0,0,0.82);
+      color: #000;
       font-size: var(--small);
       pointer-events: none;
     }
@@ -195,7 +194,7 @@
       background: rgba(255,255,255,0.72);
       box-shadow: 0 8px 16px rgba(0,0,0,0.10);
       font-weight: 900;
-      color: rgba(0,0,0,0.88);
+      color: #000;
       font-size: var(--small);
     }
     .backBtn img{ width: 16px; height: 16px; opacity: 0.9; }
@@ -218,6 +217,7 @@
       pointer-events:none;
       user-select:none;
     }
+
     .bookPages{
       position:absolute;
       top: var(--book-top);
@@ -236,18 +236,24 @@
       width: calc(100% / var(--book-ui));
       height: calc(100% / var(--book-ui));
 
-      /* Ensure text reads clearly on the parchment */
       color: #000;
     }
+
+    /* Force ALL book text black (including “muted”) */
+    .bookPages, .bookPages *{
+      color:#000 !important;
+    }
+
     @media (max-width: 760px){
       :root{
         --book-top: 13%;
         --book-bottom: 12%;
-        --book-left: 6%;
+        --book-left: 3.5%;
         --book-right: 10%;
         --book-gap: 10px;
         --book-ui: 0.88;
-        --page-content-width: 92%;
+        --page-content-width: 90%;
+        --line-width: 90%;
       }
       .bookWrap{
         height: auto;
@@ -273,7 +279,6 @@
       overflow:auto;
       padding-right: 4px;
 
-      /* Shorten everything left-to-right and push it left */
       width: var(--page-content-width);
       max-width: var(--page-content-width);
       margin-left: 0;
@@ -284,34 +289,27 @@
       margin: 0 0 6px 0;
       font-size: 13.5px;
       font-weight: 950;
-      color: #000;
     }
     .page h3{
       margin: 10px 0 6px 0;
       font-size: 12px;
       font-weight: 950;
-      color: #000;
     }
 
-    /* Shorter divider lines */
     .hr{
       height:1px;
-      background: rgba(0,0,0,0.28);
+      background: rgba(0,0,0,0.35);
       margin: 9px 0;
-      width: 100%;
+      width: var(--line-width);
     }
 
-    /* Smaller controls inside the book */
     .bookPages button, .bookPages input, .bookPages select, .bookPages textarea{
       font-size: 12px;
       padding: 7px 8px;
       border-radius: 12px;
-      color: #000;
     }
 
-    /* IMPORTANT: remove dark overlays on non-typeable UI.
-       We do that by making “row boxes” and “pills” mostly transparent.
-       Inputs remain filled to signal typing. */
+    /* Remove dark overlays on non-typeable UI */
     .bookPages .btn-quiet,
     .bookPages button.backBtn,
     .bookPages button.smallBtn,
@@ -322,31 +320,33 @@
       box-shadow: none;
     }
 
-    /* Index list rows (no dark fill, shorter width comes from pageInner) */
+    /* Index rows */
     .indexRow{
       display:grid;
-      grid-template-columns: 1fr 148px;
+      grid-template-columns: 1fr 120px;
       gap: 8px;
       align-items:center;
       padding: 7px 8px;
       border-radius: 12px;
-      border: 1px solid rgba(0,0,0,0.20);
-      background: rgba(255,255,255,0.00);   /* removed fill */
-      box-shadow: none;                      /* removed overlay look */
+      border: 1px solid rgba(0,0,0,0.22);
+      background: rgba(255,255,255,0.00);
+      box-shadow: none;
       margin-bottom: 6px;
+      width: var(--line-width);
     }
     @media (max-width: 420px){
-      .indexRow{ grid-template-columns: 1fr; }
+      .indexRow{ grid-template-columns: 1fr; width: 100%; }
       .inventoryBox{ justify-content:flex-start; }
     }
+
     .ingNameBtn{
       all: unset;
       cursor:pointer;
       font-weight: 950;
-      color: #000;
       padding: 2px 3px;
       font-size: 12.5px;
     }
+
     .inventoryBox{
       display:flex;
       align-items:center;
@@ -354,52 +354,45 @@
       gap: 6px;
       flex-wrap: nowrap;
     }
-    .invLabel{
-      font-weight: 950;
-      color: rgba(0,0,0,0.80);
-      font-size: 11.5px;
-    }
+
     .count{
       min-width: 24px;
       text-align:center;
       font-weight: 950;
       padding: 4px 8px;
       border-radius: 999px;
-      border: 1px solid rgba(0,0,0,0.20);
-      background: rgba(255,255,255,0.00); /* removed fill */
+      border: 1px solid rgba(0,0,0,0.22);
+      background: rgba(255,255,255,0.00);
       font-size: 11.5px;
-      color:#000;
     }
+
     .qtyBtn{
       padding: 5px 8px;
       border-radius: 10px;
       font-weight: 950;
       min-width: 32px;
-      background: rgba(255,255,255,0.00); /* removed fill */
+      background: rgba(255,255,255,0.00);
       box-shadow:none;
-      border: 1px solid rgba(0,0,0,0.20);
+      border: 1px solid rgba(0,0,0,0.22);
       font-size: 11.5px;
-      color:#000;
     }
 
-    /* Note boxes are readable, but not dark */
     .noteBox{
       border-radius: 12px;
-      border: 1px dashed rgba(0,0,0,0.25);
+      border: 1px dashed rgba(0,0,0,0.28);
       background: rgba(255,255,255,0.18);
       padding: 8px 9px;
       font-size: 12px;
       line-height: 1.2;
       white-space: pre-wrap;
-      color:#000;
+      width: var(--line-width);
     }
 
-    /* Ingredient pages */
     .plantImg{
       width:100%;
       max-width: 250px;
       border-radius: 12px;
-      border: 1px solid rgba(0,0,0,0.20);
+      border: 1px solid rgba(0,0,0,0.22);
       background: rgba(255,255,255,0.12);
       box-shadow: none;
       display:block;
@@ -411,35 +404,33 @@
       align-items:center;
       padding: 4px 9px;
       border-radius: 999px;
-      border: 1px solid rgba(0,0,0,0.20);
-      background: rgba(255,255,255,0.00); /* removed fill */
-      color: rgba(0,0,0,0.85);
+      border: 1px solid rgba(0,0,0,0.22);
+      background: rgba(255,255,255,0.00);
       font-size: 11.5px;
       font-weight: 950;
       box-shadow:none;
     }
     .pill-rare{ border-color: rgba(31,122,58,0.40); }
     .pill-common{ border-color: rgba(122,62,31,0.40); }
-    .pill-unknown{ border-color: rgba(0,0,0,0.20); }
+    .pill-unknown{ border-color: rgba(0,0,0,0.22); }
 
-    .effects{ display:grid; gap: 7px; margin-top: 9px; }
+    .effects{ display:grid; gap: 7px; margin-top: 9px; width: var(--line-width); }
     .effect-line{ display:flex; gap: 7px; align-items:stretch; }
     .effect-text{
       flex:1;
       padding: 7px 8px;
       border-radius: 12px;
-      border: 1px dashed rgba(0,0,0,0.25);
-      background: rgba(255,255,255,0.18); /* not dark */
+      border: 1px dashed rgba(0,0,0,0.28);
+      background: rgba(255,255,255,0.18);
       box-shadow: none;
       min-height: 16px;
       display:flex;
       align-items:center;
       font-size: 12px;
       line-height: 1.15;
-      color:#000;
     }
     .effect-hidden{
-      color: transparent;
+      color: transparent !important;
       text-shadow: 0 0 10px rgba(0,0,0,0.55);
       user-select: none;
     }
@@ -448,13 +439,12 @@
       font-size: 11.5px;
       border-radius: 10px;
       font-weight: 950;
-      background: rgba(255,255,255,0.00); /* removed fill */
+      background: rgba(255,255,255,0.00);
       box-shadow:none;
-      border: 1px solid rgba(0,0,0,0.20);
-      color:#000;
+      border: 1px solid rgba(0,0,0,0.22);
     }
 
-    /* Brew (image on top, UI below) */
+    /* Brew UI below image */
     .brewPage{
       max-width: var(--brew-maxw);
       margin: 0 auto;
@@ -502,7 +492,7 @@
       background: rgba(255,255,255,0.72);
       box-shadow: 0 8px 16px rgba(0,0,0,0.10);
       font-weight: 950;
-      color: rgba(0,0,0,0.88);
+      color: #000;
       font-size: var(--small);
     }
     .themeBtn img{ width: 16px; height: 16px; opacity: 0.92; }
@@ -515,7 +505,7 @@
     @media (min-width: 860px){
       .brewGrid{ grid-template-columns: 1fr 1fr; }
     }
-    .slotTitle{ font-weight: 950; color: rgba(0,0,0,0.90); margin-bottom: 6px; font-size: var(--small); }
+    .slotTitle{ font-weight: 950; margin-bottom: 6px; font-size: var(--small); color:#000; }
     .slotBox{ border-radius: 14px; border: 1px dashed rgba(217,200,170,0.95); background: rgba(255,255,255,0.55); padding: 10px; }
 
     .discoveredList{
@@ -569,12 +559,11 @@
       background: rgba(255,255,255,0.12);
       padding: 9px 10px;
       margin-top: 10px;
-      color:#000;
+      width: var(--line-width);
     }
     details summary{
       cursor: pointer;
       font-weight: 950;
-      color: rgba(0,0,0,0.85);
       list-style: none;
       font-size: var(--small);
     }
@@ -646,7 +635,7 @@
 
               <h3>Record Ingredient</h3>
               <div class="muted">Write the mark you were given.</div>
-              <div style="display:flex; gap:9px; flex-wrap:wrap; margin-top:8px;">
+              <div style="display:flex; gap:9px; flex-wrap:wrap; margin-top:8px; width:var(--line-width);">
                 <input id="markInput" inputmode="numeric" placeholder="Mark" aria-label="Mark" />
                 <button class="btn-primary" id="recordBtn" type="button">Record</button>
               </div>
@@ -698,28 +687,28 @@ Use the rules your table follows. Write the DC here as a quick reminder.
         <div class="bookPages hidden" id="spreadIngredient">
           <div class="page">
             <div class="pageInner">
-              <div style="display:flex; align-items:center; justify-content:space-between; gap:9px; flex-wrap:wrap;">
-                <h2 id="ingName" style="margin:0; color:#000;">Ingredient</h2>
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:9px; flex-wrap:wrap; width:var(--line-width);">
+                <h2 id="ingName" style="margin:0;">Ingredient</h2>
                 <button class="backBtn" id="backToIndexBtn" type="button" aria-label="Back to Index">
                   <img src="assets/icons/arrow_back.webp" alt="" />
                   Index
                 </button>
               </div>
 
-              <div style="margin-top:8px;">
+              <div style="margin-top:8px; width:var(--line-width);">
                 <span class="pill" id="rarityPill">Unknown</span>
               </div>
 
-              <div style="margin-top:8px;">
+              <div style="margin-top:8px; width:var(--line-width);">
                 <img class="plantImg" id="ingImage" alt="Ingredient" />
               </div>
 
               <div style="margin-top:9px;">
-                <h3 style="margin:0 0 7px 0; color:#000;">Description</h3>
+                <h3 style="margin:0 0 7px 0;">Description</h3>
                 <div class="noteBox" id="ingNotes"></div>
               </div>
 
-              <div style="margin-top:9px; display:flex; gap:9px; flex-wrap:wrap;">
+              <div style="margin-top:9px; display:flex; gap:9px; flex-wrap:wrap; width:var(--line-width);">
                 <button id="revealRandomBtn" type="button">Reveal a Property</button>
                 <button id="resetRevealsBtn" type="button" class="btn-quiet">Forget Properties</button>
               </div>
@@ -1024,10 +1013,6 @@ Use the rules your table follows. Write the DC here as a quick reminder.
       const right = document.createElement("div");
       right.className = "inventoryBox";
 
-      const invLabel = document.createElement("div");
-      invLabel.className = "invLabel";
-      invLabel.textContent = "Inventory";
-
       const minus = document.createElement("button");
       minus.type = "button";
       minus.className = "qtyBtn";
@@ -1054,7 +1039,6 @@ Use the rules your table follows. Write the DC here as a quick reminder.
         renderBrewDiscovered();
       });
 
-      right.appendChild(invLabel);
       right.appendChild(minus);
       right.appendChild(count);
       right.appendChild(plus);

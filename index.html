@@ -24,16 +24,18 @@
       /* Book UI scale */
       --book-ui: 0.84;
 
-      /* Book UI placement */
-      --book-top: 12%;
+      /* Adjusted per your last note:
+         - move UI DOWN about "two inventory lines"
+         - move UI RIGHT about "three letters"
+      */
+      --book-top: 16.2%;
       --book-bottom: 10%;
-      --book-left: 2.2%;
+      --book-left: 3.6%;
       --book-right: 15.5%;
 
       --book-gap: 2.4%;
       --book-pad: 8px;
 
-      /* Content width */
       --page-content-width: 78%;
       --line-width: 78%;
 
@@ -143,7 +145,6 @@
       width:100%;
       height:100%;
     }
-    /* IMPORTANT: show full images (no crop) */
     .panel img.coverArt{
       width:100%;
       height:100%;
@@ -203,11 +204,10 @@
     .bookWrap{
       position: relative;
       width:100%;
-      height: min(86vh, 780px); /* bigger so the book image is not cut off */
+      height: min(86vh, 780px);
       min-height: 560px;
       background: rgba(255,255,255,0.25);
     }
-    /* IMPORTANT: show full book art (no crop) */
     .bookBg{
       position:absolute;
       inset:0;
@@ -237,21 +237,24 @@
       transform-origin: top left;
       width: calc(100% / var(--book-ui));
       height: calc(100% / var(--book-ui));
-
-      color: #000;
     }
 
-    /* Force ALL book text pure black */
+    /* Hard force ALL book text pure black (not gray, not muted) */
     .bookPages, .bookPages *{
       color:#000 !important;
+      -webkit-text-fill-color:#000 !important;
     }
-    .bookPages .muted{ color:#000 !important; opacity: 0.75; }
+    .bookPages .muted{
+      opacity: 1 !important;
+      color:#000 !important;
+      -webkit-text-fill-color:#000 !important;
+    }
 
     @media (max-width: 760px){
       :root{
-        --book-top: 13%;
+        --book-top: 17.5%;
         --book-bottom: 12%;
-        --book-left: 3.5%;
+        --book-left: 4.5%;
         --book-right: 10%;
         --book-gap: 10px;
         --book-ui: 0.88;
@@ -288,7 +291,7 @@
       margin-right: auto;
     }
 
-    /* Right page content: nudge LEFT (away from the outer edge) */
+    /* Right page content: pull LEFT away from edge */
     .pageRight .pageInner{
       width: calc(var(--page-content-width) - 8%);
       max-width: calc(var(--page-content-width) - 8%);
@@ -318,6 +321,14 @@
       font-size: 12px;
       padding: 7px 8px;
       border-radius: 12px;
+      color:#000 !important;
+      -webkit-text-fill-color:#000 !important;
+    }
+    .bookPages textarea::placeholder,
+    .bookPages input::placeholder{
+      color:#000 !important;
+      opacity: 0.55 !important;
+      -webkit-text-fill-color: rgba(0,0,0,0.55) !important;
     }
 
     /* Remove dark overlays on non-typeable UI */
@@ -331,7 +342,6 @@
       box-shadow: none;
     }
 
-    /* Index rows */
     .indexRow{
       display:grid;
       grid-template-columns: 1fr 120px;
@@ -356,7 +366,8 @@
       font-weight: 950;
       padding: 2px 3px;
       font-size: 12.5px;
-      color:#000;
+      color:#000 !important;
+      -webkit-text-fill-color:#000 !important;
     }
 
     .inventoryBox{
@@ -376,7 +387,8 @@
       border: 1px solid rgba(0,0,0,0.22);
       background: rgba(255,255,255,0.00);
       font-size: 11.5px;
-      color:#000;
+      color:#000 !important;
+      -webkit-text-fill-color:#000 !important;
     }
 
     .qtyBtn{
@@ -388,7 +400,8 @@
       box-shadow:none;
       border: 1px solid rgba(0,0,0,0.22);
       font-size: 11.5px;
-      color:#000;
+      color:#000 !important;
+      -webkit-text-fill-color:#000 !important;
     }
 
     .noteBox{
@@ -400,7 +413,8 @@
       line-height: 1.2;
       white-space: pre-wrap;
       width: var(--line-width);
-      color:#000;
+      color:#000 !important;
+      -webkit-text-fill-color:#000 !important;
     }
 
     .plantImg{
@@ -424,7 +438,8 @@
       font-size: 11.5px;
       font-weight: 950;
       box-shadow:none;
-      color:#000;
+      color:#000 !important;
+      -webkit-text-fill-color:#000 !important;
     }
     .pill-rare{ border-color: rgba(31,122,58,0.40); }
     .pill-common{ border-color: rgba(122,62,31,0.40); }
@@ -444,10 +459,12 @@
       align-items:center;
       font-size: 12px;
       line-height: 1.15;
-      color:#000;
+      color:#000 !important;
+      -webkit-text-fill-color:#000 !important;
     }
     .effect-hidden{
       color: transparent !important;
+      -webkit-text-fill-color: transparent !important;
       text-shadow: 0 0 10px rgba(0,0,0,0.55);
       user-select: none;
     }
@@ -459,7 +476,8 @@
       background: rgba(255,255,255,0.00);
       box-shadow:none;
       border: 1px solid rgba(0,0,0,0.22);
-      color:#000;
+      color:#000 !important;
+      -webkit-text-fill-color:#000 !important;
     }
 
     /* Brew UI below image */
@@ -478,7 +496,6 @@
       background: rgba(255,255,255,0.45);
       box-shadow: var(--shadow2);
     }
-    /* IMPORTANT: show full brew scene art (no crop) */
     .brewBgImg{
       width:100%;
       height: min(52vh, 520px);
@@ -494,6 +511,7 @@
       background: rgba(255,255,255,0.72);
       box-shadow: var(--shadow);
       padding: 12px;
+      color:#000;
     }
     .brewTopRow{
       display:flex;
@@ -582,21 +600,25 @@
       padding: 9px 10px;
       margin-top: 10px;
       width: var(--line-width);
-      color:#000;
+      color:#000 !important;
+      -webkit-text-fill-color:#000 !important;
     }
     details summary{
       cursor: pointer;
       font-weight: 950;
       list-style: none;
       font-size: var(--small);
-      color:#000;
+      color:#000 !important;
+      -webkit-text-fill-color:#000 !important;
     }
     details summary::-webkit-details-marker{ display:none; }
     .sigil{
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       letter-spacing: 0.4px;
       font-size: 11px;
-      color: rgba(0,0,0,0.70);
+      color:#000 !important;
+      -webkit-text-fill-color:#000 !important;
+      opacity: 0.7;
     }
   </style>
 </head>
@@ -630,7 +652,7 @@
           </button>
         </div>
       </div>
-      <div class="muted" style="margin-top:10px;">
+      <div class="muted" style="margin-top:10px; color:#000;">
         Your discoveries stay on this device.
       </div>
     </section>

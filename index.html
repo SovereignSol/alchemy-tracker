@@ -18,25 +18,29 @@
       --shadow: 0 16px 40px rgba(0,0,0,0.18);
       --shadow2: 0 10px 24px rgba(0,0,0,0.14);
 
-      /* Global type */
       --base: 13px;
       --small: 12px;
       --h1: 18px;
-      --h2: 14px;
-      --h3: 12.5px;
 
-      /* Book: make everything smaller */
-      --book-ui: 0.84;        /* overall scale for book page UI */
-      --book-pad: 8px;        /* page padding */
-      --book-gap: 2.4%;
+      /* Book UI scale */
+      --book-ui: 0.84;
 
-      /* Book safe area, tighten to keep inside the paper */
-      --book-top: 10%;
+      /* Book safe area (adjusted per your notes):
+         - move UI slightly DOWN: top increased
+         - move UI LEFT closer to page edge: left decreased
+         - reduce overall width: right increased
+      */
+      --book-top: 12%;
       --book-bottom: 10%;
-      --book-left: 7.5%;
-      --book-right: 7.5%;
+      --book-left: 4.5%;
+      --book-right: 14%;
 
-      /* Brew */
+      --book-gap: 2.4%;
+      --book-pad: 8px;
+
+      /* Max content width inside each page to shorten rows/lines */
+      --page-content-width: 86%;
+
       --brew-maxw: 980px;
     }
 
@@ -62,19 +66,20 @@
     }
     .hidden{ display:none !important; }
 
+    /* Default inputs remain visually “typeable” (allowed to have filled background) */
     button, input, select, textarea{
       font-size: var(--base);
       padding: 8px 9px;
       border-radius: 14px;
       border: 1px solid rgba(217,200,170,0.95);
       background: rgba(255,255,255,0.75);
-      color: var(--ink);
+      color: #000;
       outline: none;
       box-shadow: 0 2px 0 rgba(0,0,0,0.04) inset;
       font-family: inherit;
       line-height: 1.1;
     }
-    input::placeholder{ color: rgba(42,31,22,0.45); }
+    input::placeholder{ color: rgba(0,0,0,0.45); }
     button{
       cursor:pointer;
       user-select:none;
@@ -92,11 +97,11 @@
     .btn-primary:hover{ box-shadow: 0 14px 28px rgba(122,62,31,0.22); }
     .btn-quiet{
       background: rgba(255,255,255,0.65);
-      color: rgba(42,31,22,0.78);
+      color: rgba(0,0,0,0.85);
       font-weight: 900;
     }
 
-    .muted{ color: var(--ink2); font-size: var(--small); }
+    .muted{ color: rgba(0,0,0,0.70); font-size: var(--small); }
     .title{
       display:flex;
       align-items:flex-end;
@@ -111,8 +116,9 @@
       line-height:1.05;
       text-shadow: 0 1px 0 rgba(255,255,255,0.6);
       font-weight: 900;
+      color: #000;
     }
-    .sub{ margin-top:4px; color:var(--ink2); font-size: var(--small); }
+    .sub{ margin-top:4px; color: rgba(0,0,0,0.70); font-size: var(--small); }
 
     /* Main screen */
     .main-grid{
@@ -157,7 +163,7 @@
       background: rgba(255,255,255,0.78);
       box-shadow: 0 10px 20px rgba(0,0,0,0.12);
       font-weight: 900;
-      color: rgba(42,31,22,0.82);
+      color: rgba(0,0,0,0.82);
       font-size: var(--small);
       pointer-events: none;
     }
@@ -189,7 +195,7 @@
       background: rgba(255,255,255,0.72);
       box-shadow: 0 8px 16px rgba(0,0,0,0.10);
       font-weight: 900;
-      color: rgba(42,31,22,0.88);
+      color: rgba(0,0,0,0.88);
       font-size: var(--small);
     }
     .backBtn img{ width: 16px; height: 16px; opacity: 0.9; }
@@ -229,15 +235,19 @@
       transform-origin: top left;
       width: calc(100% / var(--book-ui));
       height: calc(100% / var(--book-ui));
+
+      /* Ensure text reads clearly on the parchment */
+      color: #000;
     }
     @media (max-width: 760px){
       :root{
-        --book-top: 12%;
+        --book-top: 13%;
         --book-bottom: 12%;
-        --book-left: 9%;
-        --book-right: 9%;
+        --book-left: 6%;
+        --book-right: 10%;
         --book-gap: 10px;
         --book-ui: 0.88;
+        --page-content-width: 92%;
       }
       .bookWrap{
         height: auto;
@@ -252,40 +262,67 @@
     .page{
       border-radius: 14px;
       padding: var(--book-pad);
-      background: rgba(255,255,255,0.02);
+      background: rgba(255,255,255,0.00);
       overflow: hidden;
       min-height: 0;
+      display:flex;
+      justify-content:flex-start;
     }
     .pageInner{
       height: 100%;
       overflow:auto;
       padding-right: 4px;
+
+      /* Shorten everything left-to-right and push it left */
+      width: var(--page-content-width);
+      max-width: var(--page-content-width);
+      margin-left: 0;
+      margin-right: auto;
     }
 
     .page h2{
       margin: 0 0 6px 0;
       font-size: 13.5px;
       font-weight: 950;
-      color: rgba(42,31,22,0.92);
+      color: #000;
     }
     .page h3{
       margin: 10px 0 6px 0;
       font-size: 12px;
       font-weight: 950;
-      color: rgba(42,31,22,0.90);
+      color: #000;
     }
 
-    .hr{ height:1px; background: rgba(217,200,170,0.8); margin: 9px 0; }
+    /* Shorter divider lines */
+    .hr{
+      height:1px;
+      background: rgba(0,0,0,0.28);
+      margin: 9px 0;
+      width: 100%;
+    }
 
     /* Smaller controls inside the book */
     .bookPages button, .bookPages input, .bookPages select, .bookPages textarea{
       font-size: 12px;
       padding: 7px 8px;
       border-radius: 12px;
+      color: #000;
     }
-    .bookPages .btn-primary{ font-weight: 950; }
 
-    /* Index list */
+    /* IMPORTANT: remove dark overlays on non-typeable UI.
+       We do that by making “row boxes” and “pills” mostly transparent.
+       Inputs remain filled to signal typing. */
+    .bookPages .btn-quiet,
+    .bookPages button.backBtn,
+    .bookPages button.smallBtn,
+    .bookPages button.qtyBtn,
+    .bookPages button#revealRandomBtn,
+    .bookPages button#resetRevealsBtn{
+      background: rgba(255,255,255,0.20);
+      box-shadow: none;
+    }
+
+    /* Index list rows (no dark fill, shorter width comes from pageInner) */
     .indexRow{
       display:grid;
       grid-template-columns: 1fr 148px;
@@ -293,9 +330,9 @@
       align-items:center;
       padding: 7px 8px;
       border-radius: 12px;
-      border: 1px solid rgba(217,200,170,0.95);
-      background: rgba(255,255,255,0.65);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.07);
+      border: 1px solid rgba(0,0,0,0.20);
+      background: rgba(255,255,255,0.00);   /* removed fill */
+      box-shadow: none;                      /* removed overlay look */
       margin-bottom: 6px;
     }
     @media (max-width: 420px){
@@ -306,7 +343,7 @@
       all: unset;
       cursor:pointer;
       font-weight: 950;
-      color: rgba(42,31,22,0.92);
+      color: #000;
       padding: 2px 3px;
       font-size: 12.5px;
     }
@@ -319,7 +356,7 @@
     }
     .invLabel{
       font-weight: 950;
-      color: rgba(42,31,22,0.78);
+      color: rgba(0,0,0,0.80);
       font-size: 11.5px;
     }
     .count{
@@ -328,27 +365,33 @@
       font-weight: 950;
       padding: 4px 8px;
       border-radius: 999px;
-      border: 1px solid rgba(217,200,170,0.95);
-      background: rgba(255,255,255,0.75);
+      border: 1px solid rgba(0,0,0,0.20);
+      background: rgba(255,255,255,0.00); /* removed fill */
       font-size: 11.5px;
+      color:#000;
     }
     .qtyBtn{
       padding: 5px 8px;
       border-radius: 10px;
       font-weight: 950;
       min-width: 32px;
-      background: rgba(255,255,255,0.78);
+      background: rgba(255,255,255,0.00); /* removed fill */
+      box-shadow:none;
+      border: 1px solid rgba(0,0,0,0.20);
       font-size: 11.5px;
+      color:#000;
     }
 
+    /* Note boxes are readable, but not dark */
     .noteBox{
       border-radius: 12px;
-      border: 1px dashed rgba(217,200,170,0.95);
-      background: rgba(255,255,255,0.45);
+      border: 1px dashed rgba(0,0,0,0.25);
+      background: rgba(255,255,255,0.18);
       padding: 8px 9px;
       font-size: 12px;
       line-height: 1.2;
       white-space: pre-wrap;
+      color:#000;
     }
 
     /* Ingredient pages */
@@ -356,9 +399,9 @@
       width:100%;
       max-width: 250px;
       border-radius: 12px;
-      border: 1px solid rgba(217,200,170,0.95);
-      background: rgba(255,255,255,0.6);
-      box-shadow: var(--shadow2);
+      border: 1px solid rgba(0,0,0,0.20);
+      background: rgba(255,255,255,0.12);
+      box-shadow: none;
       display:block;
     }
 
@@ -368,15 +411,16 @@
       align-items:center;
       padding: 4px 9px;
       border-radius: 999px;
-      border: 1px solid rgba(217,200,170,0.95);
-      background: rgba(255,255,255,0.68);
-      color: rgba(42,31,22,0.78);
+      border: 1px solid rgba(0,0,0,0.20);
+      background: rgba(255,255,255,0.00); /* removed fill */
+      color: rgba(0,0,0,0.85);
       font-size: 11.5px;
       font-weight: 950;
+      box-shadow:none;
     }
-    .pill-rare{ border-color: rgba(31,122,58,0.35); background: rgba(31,122,58,0.08); }
-    .pill-common{ border-color: rgba(122,62,31,0.35); background: rgba(122,62,31,0.06); }
-    .pill-unknown{ border-color: rgba(42,31,22,0.25); background: rgba(42,31,22,0.05); }
+    .pill-rare{ border-color: rgba(31,122,58,0.40); }
+    .pill-common{ border-color: rgba(122,62,31,0.40); }
+    .pill-unknown{ border-color: rgba(0,0,0,0.20); }
 
     .effects{ display:grid; gap: 7px; margin-top: 9px; }
     .effect-line{ display:flex; gap: 7px; align-items:stretch; }
@@ -384,23 +428,33 @@
       flex:1;
       padding: 7px 8px;
       border-radius: 12px;
-      border: 1px dashed rgba(217,200,170,0.95);
-      background: rgba(255,255,255,0.6);
-      box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset;
+      border: 1px dashed rgba(0,0,0,0.25);
+      background: rgba(255,255,255,0.18); /* not dark */
+      box-shadow: none;
       min-height: 16px;
       display:flex;
       align-items:center;
       font-size: 12px;
       line-height: 1.15;
+      color:#000;
     }
     .effect-hidden{
       color: transparent;
-      text-shadow: 0 0 10px rgba(42,31,22,0.55);
+      text-shadow: 0 0 10px rgba(0,0,0,0.55);
       user-select: none;
     }
-    .smallBtn{ padding: 6px 8px; font-size: 11.5px; border-radius: 10px; font-weight: 950; }
+    .smallBtn{
+      padding: 6px 8px;
+      font-size: 11.5px;
+      border-radius: 10px;
+      font-weight: 950;
+      background: rgba(255,255,255,0.00); /* removed fill */
+      box-shadow:none;
+      border: 1px solid rgba(0,0,0,0.20);
+      color:#000;
+    }
 
-    /* Brew (changed: image on top, UI below) */
+    /* Brew (image on top, UI below) */
     .brewPage{
       max-width: var(--brew-maxw);
       margin: 0 auto;
@@ -448,7 +502,7 @@
       background: rgba(255,255,255,0.72);
       box-shadow: 0 8px 16px rgba(0,0,0,0.10);
       font-weight: 950;
-      color: rgba(42,31,22,0.88);
+      color: rgba(0,0,0,0.88);
       font-size: var(--small);
     }
     .themeBtn img{ width: 16px; height: 16px; opacity: 0.92; }
@@ -461,7 +515,7 @@
     @media (min-width: 860px){
       .brewGrid{ grid-template-columns: 1fr 1fr; }
     }
-    .slotTitle{ font-weight: 950; color: rgba(42,31,22,0.9); margin-bottom: 6px; font-size: var(--small); }
+    .slotTitle{ font-weight: 950; color: rgba(0,0,0,0.90); margin-bottom: 6px; font-size: var(--small); }
     .slotBox{ border-radius: 14px; border: 1px dashed rgba(217,200,170,0.95); background: rgba(255,255,255,0.55); padding: 10px; }
 
     .discoveredList{
@@ -476,7 +530,7 @@
       padding: 5px 9px;
       background: rgba(255,255,255,0.72);
       font-weight: 950;
-      color: rgba(42,31,22,0.82);
+      color: rgba(0,0,0,0.82);
       font-size: var(--small);
     }
     .resultBox{
@@ -496,7 +550,7 @@
       transform: translateX(-50%);
       background: rgba(255,255,255,0.92);
       border: 1px solid rgba(217,200,170,0.95);
-      color: var(--ink);
+      color: #000;
       border-radius: 999px;
       padding: 9px 12px;
       box-shadow: var(--shadow);
@@ -510,16 +564,17 @@
     .toast.bad{ border-color: rgba(139,29,44,0.35); }
 
     details{
-      border: 1px dashed rgba(217,200,170,0.95);
+      border: 1px dashed rgba(0,0,0,0.25);
       border-radius: 14px;
-      background: rgba(255,255,255,0.45);
+      background: rgba(255,255,255,0.12);
       padding: 9px 10px;
       margin-top: 10px;
+      color:#000;
     }
     details summary{
       cursor: pointer;
       font-weight: 950;
-      color: rgba(42,31,22,0.85);
+      color: rgba(0,0,0,0.85);
       list-style: none;
       font-size: var(--small);
     }
@@ -528,7 +583,7 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       letter-spacing: 0.4px;
       font-size: 11px;
-      color: rgba(42,31,22,0.55);
+      color: rgba(0,0,0,0.55);
     }
   </style>
 </head>
@@ -644,7 +699,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
           <div class="page">
             <div class="pageInner">
               <div style="display:flex; align-items:center; justify-content:space-between; gap:9px; flex-wrap:wrap;">
-                <h2 id="ingName" style="margin:0;">Ingredient</h2>
+                <h2 id="ingName" style="margin:0; color:#000;">Ingredient</h2>
                 <button class="backBtn" id="backToIndexBtn" type="button" aria-label="Back to Index">
                   <img src="assets/icons/arrow_back.webp" alt="" />
                   Index
@@ -660,7 +715,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
               </div>
 
               <div style="margin-top:9px;">
-                <h3 style="margin:0 0 7px 0;">Description</h3>
+                <h3 style="margin:0 0 7px 0; color:#000;">Description</h3>
                 <div class="noteBox" id="ingNotes"></div>
               </div>
 
@@ -707,7 +762,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
               <span id="themeLabel">Wilderness</span>
             </button>
 
-            <label style="display:flex; align-items:center; gap:7px; font-weight:950; color:rgba(42,31,22,0.85); font-size:var(--small);">
+            <label style="display:flex; align-items:center; gap:7px; font-weight:950; color:#000; font-size:var(--small);">
               <input type="checkbox" id="useThird" />
               Third ingredient (optional)
             </label>
@@ -866,7 +921,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
       `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='800'>` +
       `<rect width='100%' height='100%' fill='%23ffffff'/>` +
       `<rect x='20' y='20' width='760' height='760' rx='38' ry='38' fill='%23f6f0e3' stroke='%23d9c8aa' stroke-width='6'/>` +
-      `<text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%237a3e1f' font-size='42' font-family='Segoe Print,Bradley Hand,cursive'>${escapeHtml(label)}</text>` +
+      `<text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%23000' font-size='42' font-family='Segoe Print,Bradley Hand,cursive'>${escapeHtml(label)}</text>` +
       `</svg>`;
     return "data:image/svg+xml," + encodeURIComponent(svg);
   }
@@ -1190,12 +1245,10 @@ Use the rules your table follows. Write the DC here as a quick reminder.
     b.innerHTML = opts;
     c.innerHTML = opts;
 
-    // Ensure A and B are never the same
     a.value = ids.includes(prevA) ? prevA : ids[0];
     const bCandidate = ids.includes(prevB) ? prevB : ids.find(x => x !== a.value);
     b.value = (bCandidate && bCandidate !== a.value) ? bCandidate : (ids.find(x => x !== a.value) || ids[0]);
 
-    // Ensure C is distinct from A and B if used
     const cDefault = ids.find(x => x !== a.value && x !== b.value) || ids[0];
     c.value = ids.includes(prevC) ? prevC : cDefault;
     if (el("useThird").checked && (c.value === a.value || c.value === b.value)) {
@@ -1209,24 +1262,20 @@ Use the rules your table follows. Write the DC here as a quick reminder.
     const a = el("mixA"), b = el("mixB"), c = el("mixC");
     const ids = availableForBrewIds();
 
-    // If A == B, push B to a different option
     if (a.value && b.value && a.value === b.value) {
       const next = ids.find(x => x !== a.value);
       if (next) b.value = next;
     }
 
     if (el("useThird").checked) {
-      // If C matches A or B, push C to a different option
       if (c.value === a.value || c.value === b.value) {
         const nextC = ids.find(x => x !== a.value && x !== b.value);
         if (nextC) c.value = nextC;
       }
-      // Also if A matches C, adjust A
       if (a.value === c.value) {
         const nextA = ids.find(x => x !== c.value && x !== b.value);
         if (nextA) a.value = nextA;
       }
-      // If B matches C, adjust B
       if (b.value === c.value) {
         const nextB = ids.find(x => x !== c.value && x !== a.value);
         if (nextB) b.value = nextB;
@@ -1334,7 +1383,6 @@ Use the rules your table follows. Write the DC here as a quick reminder.
     const useThird = el("useThird").checked;
     const cId = useThird ? el("mixC").value : "";
 
-    // Hard block same ingredient mixing
     if (aId && bId && aId === bId) {
       toast("Choose two different ingredients.", "bad");
       el("mixResult").innerHTML = `<div style="color:var(--warn); font-weight:950;">Choose two different ingredients.</div>`;

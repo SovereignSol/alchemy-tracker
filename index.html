@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Field Alchemy Notes</title>
+  <title>Field Notes</title>
   <style>
     :root{
       --ink:#2a1f16;
@@ -11,7 +11,6 @@
       --paper:#f6f0e3;
       --paper2:#efe5d3;
       --edge:#d9c8aa;
-      --seal:#7a3e1f;
       --good:#1f7a3a;
       --warn:#8a5a00;
       --bad:#8b1d2c;
@@ -32,71 +31,23 @@
       letter-spacing: 0.2px;
     }
 
-    .wrap{ max-width: 980px; margin: 0 auto; padding: 16px; }
+    .wrap{ max-width: 1100px; margin: 0 auto; padding: 16px; }
 
-    .title{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:12px;
-    }
+    .hidden{ display:none !important; }
 
-    h1{
-      margin:0;
-      font-size: 26px;
-      line-height:1.05;
-      text-shadow: 0 1px 0 rgba(255,255,255,0.6);
-    }
-
-    .sub{ margin-top:4px; color:var(--ink2); font-size:14px; }
-
-    .card{
-      background: rgba(255,255,255,0.55);
-      border: 1px solid var(--edge);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow2);
-      padding: 14px;
-      margin: 12px 0;
-      backdrop-filter: blur(2px);
-    }
-
-    .grid2{ display:grid; grid-template-columns: 1fr; gap: 12px; }
-    @media (min-width: 820px){ .grid2{ grid-template-columns: 1.1fr 0.9fr; } }
-
-    .row{ display:flex; gap: 10px; flex-wrap: wrap; align-items:center; }
-
-    .label{
-      font-weight: 800;
-      font-size: 16px;
-      margin-bottom: 8px;
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-
-    input, select, button, textarea{
+    button, input, select, textarea{
       font-size: 16px;
       padding: 10px 12px;
       border-radius: 14px;
-      border: 1px solid var(--edge);
+      border: 1px solid rgba(217,200,170,0.95);
       background: rgba(255,255,255,0.75);
       color: var(--ink);
       outline: none;
       box-shadow: 0 2px 0 rgba(0,0,0,0.04) inset;
       font-family: inherit;
     }
-
-    input::placeholder{ color: rgba(42,31,22,0.45); }
-
-    button{
-      cursor:pointer;
-      user-select:none;
-      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
-    }
+    button{ cursor:pointer; user-select:none; transition: transform 120ms ease, box-shadow 120ms ease; }
     button:active{ transform: translateY(1px); }
-
-    .btn{ background: rgba(255,255,255,0.8); }
 
     .btn-primary{
       background: linear-gradient(180deg, rgba(122,62,31,0.92), rgba(122,62,31,0.78));
@@ -104,20 +55,217 @@
       border-color: rgba(122,62,31,0.55);
       box-shadow: 0 10px 22px rgba(122,62,31,0.18);
     }
-    .btn-primary:hover{ box-shadow: 0 14px 28px rgba(122,62,31,0.22); }
-
     .btn-quiet{
       background: rgba(255,255,255,0.65);
       color: rgba(42,31,22,0.78);
     }
 
-    .btn-danger{
-      background: rgba(139,29,44,0.10);
-      border-color: rgba(139,29,44,0.35);
-      color: var(--bad);
+    .muted{ color: var(--ink2); font-size: 13px; }
+    .title{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    h1{ margin:0; font-size: 26px; line-height:1.05; text-shadow: 0 1px 0 rgba(255,255,255,0.6); }
+    .sub{ margin-top:4px; color:var(--ink2); font-size:14px; }
+
+    /* Main screen */
+    .main-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    @media (min-width: 900px){
+      .main-grid{ grid-template-columns: 1fr 1fr; }
+    }
+    .panel{
+      border-radius: 18px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.55);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+      min-height: 340px;
+      position: relative;
+    }
+    .panel button.overlayBtn{
+      all: unset;
+      cursor: pointer;
+      display:block;
+      width:100%;
+      height:100%;
+    }
+    .panel img.coverArt{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+      filter: saturate(1.02);
+    }
+    .panel .hint{
+      position:absolute;
+      left: 12px;
+      bottom: 12px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.75);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+      font-weight: 700;
+      color: rgba(42,31,22,0.82);
     }
 
-    .small{ padding: 8px 10px; font-size: 14px; border-radius: 12px; }
+    /* Book scene */
+    .scene{
+      border-radius: 18px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.55);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+      position: relative;
+    }
+    .sceneTopBar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(217,200,170,0.75);
+      background: rgba(255,255,255,0.35);
+    }
+    .backBtn{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.72);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.10);
+      font-weight: 800;
+      color: rgba(42,31,22,0.88);
+    }
+    .backBtn img{ width: 18px; height: 18px; opacity: 0.9; }
+
+    .bookWrap{
+      position: relative;
+      width:100%;
+      height: min(78vh, 720px);
+      min-height: 520px;
+      background: rgba(255,255,255,0.25);
+    }
+    .bookBg{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      opacity: 0.98;
+      pointer-events:none;
+      user-select:none;
+    }
+    .bookPages{
+      position:absolute;
+      inset: 0;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      padding: 5.5% 6.5%;
+    }
+    @media (max-width: 720px){
+      .bookWrap{ height: auto; min-height: 720px; }
+      .bookPages{
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 10% 8%;
+      }
+    }
+
+    .page{
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(255,255,255,0.02);
+      overflow:auto;
+    }
+    .page h2{
+      margin: 0 0 8px 0;
+      font-size: 20px;
+      font-weight: 900;
+      color: rgba(42,31,22,0.92);
+    }
+    .page h3{
+      margin: 14px 0 8px 0;
+      font-size: 16px;
+      font-weight: 900;
+      color: rgba(42,31,22,0.90);
+    }
+
+    /* Index list */
+    .indexRow{
+      display:grid;
+      grid-template-columns: 1fr 140px;
+      gap: 10px;
+      align-items:center;
+      padding: 10px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.65);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.07);
+      margin-bottom: 8px;
+    }
+    .ingNameBtn{
+      all: unset;
+      cursor:pointer;
+      font-weight: 900;
+      color: rgba(42,31,22,0.92);
+      padding: 2px 4px;
+    }
+    .inventoryBox{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap: 8px;
+    }
+    .invLabel{
+      font-weight: 900;
+      color: rgba(42,31,22,0.78);
+      font-size: 13px;
+    }
+    .count{
+      min-width: 30px;
+      text-align:center;
+      font-weight: 900;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.75);
+    }
+    .qtyBtn{
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-weight: 900;
+      min-width: 40px;
+      background: rgba(255,255,255,0.78);
+    }
+
+    .noteBox{
+      border-radius: 14px;
+      border: 1px dashed rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.45);
+      padding: 10px 12px;
+    }
+
+    /* Ingredient pages */
+    .plantImg{
+      width:100%;
+      max-width: 360px;
+      border-radius: 16px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.6);
+      box-shadow: var(--shadow2);
+      display:block;
+    }
 
     .pill{
       display:inline-flex;
@@ -125,24 +273,18 @@
       align-items:center;
       padding: 6px 10px;
       border-radius: 999px;
-      border: 1px solid var(--edge);
+      border: 1px solid rgba(217,200,170,0.95);
       background: rgba(255,255,255,0.68);
       color: rgba(42,31,22,0.78);
       font-size: 13px;
+      font-weight: 800;
     }
-
     .pill-rare{ border-color: rgba(31,122,58,0.35); background: rgba(31,122,58,0.08); }
     .pill-common{ border-color: rgba(122,62,31,0.35); background: rgba(122,62,31,0.06); }
     .pill-unknown{ border-color: rgba(42,31,22,0.25); background: rgba(42,31,22,0.05); }
 
-    .muted{ color: var(--ink2); font-size: 13px; }
-
-    .divider{ height:1px; background: rgba(217,200,170,0.8); margin: 12px 0; }
-
     .effects{ display:grid; gap: 10px; margin-top: 10px; }
-
     .effect-line{ display:flex; gap: 10px; align-items:stretch; }
-
     .effect-text{
       flex:1;
       padding: 10px 12px;
@@ -154,40 +296,101 @@
       display:flex;
       align-items:center;
     }
-
-    .hidden{
+    .effect-hidden{
       color: transparent;
       text-shadow: 0 0 11px rgba(42,31,22,0.55);
       user-select: none;
     }
+    .small{ padding: 8px 10px; font-size: 14px; border-radius: 12px; }
 
-    .ing-card{
+    /* Brew scene */
+    .brewCanvas{
+      position: relative;
+      width:100%;
+      height: min(78vh, 720px);
+      min-height: 520px;
+      border-radius: 18px;
+      overflow:hidden;
+    }
+    .brewBg{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      opacity: 1;
+      pointer-events:none;
+      user-select:none;
+    }
+    .brewOverlay{
+      position:absolute;
+      inset:0;
+      display:flex;
+      flex-direction: column;
+      padding: 14px;
+      gap: 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
+    }
+    .brewTopRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .themeBtn{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.72);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.10);
+      font-weight: 900;
+      color: rgba(42,31,22,0.88);
+    }
+    .themeBtn img{ width: 18px; height: 18px; opacity: 0.92; }
+
+    .brewPanel{
+      margin-top: auto;
+      border-radius: 18px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.70);
+      box-shadow: var(--shadow);
+      padding: 12px;
+    }
+    .brewGrid{
       display:grid;
       grid-template-columns: 1fr;
-      gap: 12px;
-      align-items:start;
+      gap: 10px;
     }
-    @media (min-width: 820px){
-      .ing-card{ grid-template-columns: 220px 1fr; }
+    @media (min-width: 860px){
+      .brewGrid{ grid-template-columns: 1fr 1fr; }
     }
-
-    .img{
-      width: 100%;
-      max-width: 220px;
-      border-radius: 16px;
+    .slotTitle{ font-weight: 900; color: rgba(42,31,22,0.9); margin-bottom: 6px; }
+    .slotBox{ border-radius: 14px; border: 1px dashed rgba(217,200,170,0.95); background: rgba(255,255,255,0.55); padding: 10px 12px; }
+    .discoveredList{
+      margin-top: 8px;
+      display:flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .discoveredPill{
+      border-radius: 999px;
       border: 1px solid rgba(217,200,170,0.95);
-      background: rgba(255,255,255,0.6);
-      box-shadow: var(--shadow2);
+      padding: 6px 10px;
+      background: rgba(255,255,255,0.72);
+      font-weight: 900;
+      color: rgba(42,31,22,0.82);
+      font-size: 13px;
     }
-
-    .img-sm{
-      width: 56px;
-      height: 56px;
+    .resultBox{
+      margin-top: 10px;
       border-radius: 14px;
       border: 1px solid rgba(217,200,170,0.95);
-      object-fit: cover;
-      background: rgba(255,255,255,0.6);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.10);
+      background: rgba(255,255,255,0.65);
+      padding: 10px 12px;
     }
 
     .toast{
@@ -205,9 +408,27 @@
       display:none;
       z-index: 50;
       font-size: 14px;
+      font-weight: 800;
     }
     .toast.good{ border-color: rgba(31,122,58,0.40); }
     .toast.bad{ border-color: rgba(139,29,44,0.35); }
+
+    .hr{ height:1px; background: rgba(217,200,170,0.8); margin: 12px 0; }
+
+    details{
+      border: 1px dashed rgba(217,200,170,0.95);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.45);
+      padding: 10px 12px;
+      margin-top: 12px;
+    }
+    details summary{
+      cursor: pointer;
+      font-weight: 900;
+      color: rgba(42,31,22,0.85);
+      list-style: none;
+    }
+    details summary::-webkit-details-marker{ display:none; }
 
     .sigil{
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -215,449 +436,298 @@
       font-size: 12px;
       color: rgba(42,31,22,0.55);
     }
-
-    .hide-tools{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items:center;
-      justify-content:flex-end;
-    }
-
-    details{
-      border: 1px dashed rgba(217,200,170,0.95);
-      border-radius: 14px;
-      background: rgba(255,255,255,0.45);
-      padding: 10px 12px;
-    }
-    details summary{
-      cursor: pointer;
-      font-weight: 700;
-      color: rgba(42,31,22,0.85);
-      list-style: none;
-    }
-    details summary::-webkit-details-marker{ display:none; }
-
-    /* Satchel list with +/- counter, stays even at 0 */
-    .satchel-list{
-      display:flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    .satchel-row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(217,200,170,0.95);
-      background: rgba(255,255,255,0.70);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.07);
-    }
-    .satchel-name{
-      font-size: 16px;
-      font-weight: 800;
-      color: rgba(42,31,22,0.92);
-      border: none;
-      background: transparent;
-      padding: 0;
-      text-align:left;
-      cursor:pointer;
-      font-family: inherit;
-    }
-    .qty{
-      display:flex;
-      align-items:center;
-      gap: 8px;
-      white-space: nowrap;
-    }
-    .qty .count{
-      min-width: 34px;
-      text-align:center;
-      font-weight: 800;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(217,200,170,0.95);
-      background: rgba(255,255,255,0.75);
-    }
-    .qty button{
-      padding: 8px 10px;
-      border-radius: 12px;
-      font-weight: 900;
-      min-width: 42px;
-    }
-
-    /* Optional third ingredient UI */
-    .optional{
-      border: 1px dashed rgba(217,200,170,0.95);
-      border-radius: 14px;
-      background: rgba(255,255,255,0.45);
-      padding: 10px 12px;
-      margin-top: 10px;
-    }
-
-    /* Brewing diagram */
-    .brew-stage{
-      margin-top: 10px;
-      border-radius: 14px;
-      border: 1px solid rgba(217,200,170,0.95);
-      background: rgba(255,255,255,0.55);
-      padding: 10px 12px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.07);
-    }
-    .brew-top{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items:flex-start;
-      justify-content:space-between;
-    }
-    .slot{
-      flex: 1 1 180px;
-      min-width: 180px;
-      display:flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .slot-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap: 10px;
-    }
-    .slot-title{
-      font-weight: 800;
-      color: rgba(42,31,22,0.85);
-      display:flex;
-      align-items:center;
-      gap: 6px;
-    }
-    .slot select{
-      width: 100%;
-      min-width: 180px;
-    }
-
-    .diagram{
-      position: relative;
-      margin-top: 12px;
-      padding-top: 12px;
-    }
-
-    .cauldron-wrap{
-      display:flex;
-      gap: 12px;
-      align-items:center;
-      justify-content:center;
-      margin-top: 6px;
-    }
-
-    .result-banner{
-      margin-top: 10px;
-    }
-
-    .icon{
-      width: 22px;
-      height: 22px;
-      display:inline-block;
-      vertical-align: middle;
-    }
-    .icon-lg{
-      width: 26px;
-      height: 26px;
-      display:inline-block;
-      vertical-align: middle;
-    }
-
-    /* Property rows now stack under the image by default */
-    .prop-area{
-      margin-top: 10px;
-    }
-    .effects{
-      max-width: 520px;
-    }
-    @media (min-width: 820px){
-      .effects{ max-width: unset; }
-    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="title">
       <div>
-        <h1>Field Alchemy Notes</h1>
-        <div class="sub">A traveling page of tinctures, petals, powders, and strange little miracles.</div>
+        <h1>Field Notes</h1>
+        <div class="sub">A travel-worn record of leaves, powders, and quiet discoveries.</div>
       </div>
-      <div class="hide-tools">
-        <button class="btn-quiet small" id="refreshBtn" title="Pulls in anything new that was prepared ahead of time.">Update Notes</button>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <button class="btn-quiet" id="refreshBtn" title="Pulls in any prepared ingredients.">Update Notes</button>
       </div>
     </div>
 
-    <div class="card">
-      <div class="label">
-        <span class="icon-lg" aria-hidden="true">
-          <!-- quill -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.85);">
-            <path d="M20 3c-5 1-9 5-10 10l-1 5 5-1c5-1 9-5 10-10-2 1-4 1-6 0-1-2-1-4 2-4z"/>
-            <path d="M9 13l2 2"/>
-            <path d="M4 20c2-2 4-3 7-3"/>
-          </svg>
-        </span>
-        Add Ingredient
-      </div>
-      <div class="muted">Write the mark you were given, then press Add.</div>
-      <div class="row" style="margin-top:10px;">
-        <input id="markInput" inputmode="numeric" placeholder="Mark" aria-label="Mark" />
-        <button class="btn-primary" id="addBtn">Add</button>
-        <button class="btn" id="openBtn">Open</button>
-        <button class="btn-danger" id="closeBtn">Close Page</button>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="label">
-        <span class="icon-lg" aria-hidden="true">
-          <!-- satchel -->
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.85);">
-            <path d="M8 7c0-2 1.6-3 4-3s4 1 4 3"/>
-            <path d="M6 9h12l-1 11H7L6 9z"/>
-            <path d="M9 9c0 2 1.2 3 3 3s3-1 3-3"/>
-            <path d="M9 14h6"/>
-          </svg>
-        </span>
-        Satchel
-      </div>
-      <div class="muted">What you have chosen to keep close at hand.</div>
-      <div class="satchel-list" id="satchel"></div>
-    </div>
-
-    <div class="grid2">
-      <div class="card">
-        <div class="label">
-          <span class="icon-lg" aria-hidden="true">
-            <!-- mortar & pestle -->
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.85);">
-              <path d="M7 10h10l-1 7a4 4 0 0 1-4 3H12a4 4 0 0 1-4-3l-1-7z"/>
-              <path d="M6 10c-1.5 0-2.5-.8-2.5-2S4.5 6 6 6h12c1.5 0 2.5.8 2.5 2S19.5 10 18 10"/>
-              <path d="M13.5 5.5l4-2"/>
-              <path d="M14 7l4-2"/>
-            </svg>
-          </span>
-          Mortar and Pestle
-        </div>
-        <div class="muted">Choose two, or optionally three, then Brew.</div>
-
-        <div class="brew-stage">
-          <div class="brew-top">
-            <div class="slot">
-              <div class="slot-head">
-                <div class="slot-title">
-                  <span class="icon" aria-hidden="true">
-                    <!-- leaf -->
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.75);">
-                      <path d="M20 4c-8 1-13 6-14 14 8-1 13-6 14-14z"/>
-                      <path d="M6 18c3-3 6-5 10-7"/>
-                    </svg>
-                  </span>
-                  First
-                </div>
-              </div>
-              <select id="mixA"></select>
-            </div>
-
-            <div class="slot">
-              <div class="slot-head">
-                <div class="slot-title">
-                  <span class="icon" aria-hidden="true">
-                    <!-- leaf -->
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.75);">
-                      <path d="M20 4c-8 1-13 6-14 14 8-1 13-6 14-14z"/>
-                      <path d="M6 18c3-3 6-5 10-7"/>
-                    </svg>
-                  </span>
-                  Second
-                </div>
-              </div>
-              <select id="mixB"></select>
-            </div>
-
-            <div class="slot" id="thirdSlot" style="display:none;">
-              <div class="slot-head">
-                <div class="slot-title">
-                  <span class="icon" aria-hidden="true">
-                    <!-- leaf -->
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.75);">
-                      <path d="M20 4c-8 1-13 6-14 14 8-1 13-6 14-14z"/>
-                      <path d="M6 18c3-3 6-5 10-7"/>
-                    </svg>
-                  </span>
-                  Third
-                </div>
-              </div>
-              <select id="mixC"></select>
-            </div>
-          </div>
-
-          <div class="optional">
-            <div class="row" style="justify-content:space-between; align-items:center;">
-              <div style="font-weight:800;">Optional third ingredient</div>
-              <label class="row" style="gap:8px;">
-                <input type="checkbox" id="useThird" />
-                <span class="muted">Include</span>
-              </label>
-            </div>
-            <div class="muted" style="margin-top:8px;">If included, it must be available in the satchel.</div>
-          </div>
-
-          <div class="diagram">
-            <!-- connector lines -->
-            <svg viewBox="0 0 1000 240" preserveAspectRatio="none" width="100%" height="110" aria-hidden="true" style="position:absolute; left:0; top:0; pointer-events:none;">
-              <path id="lineA" d="M180 10 C220 60, 300 80, 500 200" fill="none" stroke="rgba(42,31,22,0.25)" stroke-width="3" stroke-linecap="round"/>
-              <path id="lineB" d="M500 10 C500 70, 500 90, 500 200" fill="none" stroke="rgba(42,31,22,0.25)" stroke-width="3" stroke-linecap="round"/>
-              <path id="lineC" d="M820 10 C780 60, 700 80, 500 200" fill="none" stroke="rgba(42,31,22,0.25)" stroke-width="3" stroke-linecap="round" style="display:none;"/>
-            </svg>
-
-            <div class="cauldron-wrap" style="padding-top: 70px;">
-              <img class="img-sm" id="mixImgA" alt="First ingredient" />
-              <img class="img-sm" id="mixImgB" alt="Second ingredient" />
-              <img class="img-sm" id="mixImgC" alt="Third ingredient" style="display:none;" />
-            </div>
-
-            <div class="cauldron-wrap" style="margin-top: 2px;">
-              <div style="display:flex; flex-direction:column; align-items:center;">
-                <span class="icon-lg" aria-hidden="true">
-                  <!-- cauldron -->
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.85);">
-                    <path d="M7 10h10"/>
-                    <path d="M6 10c0 6 2 10 6 10s6-4 6-10"/>
-                    <path d="M5 10c-1.2 0-2-.8-2-1.8S3.8 6.5 5 6.5h14c1.2 0 2 .8 2 1.7S20.2 10 19 10"/>
-                    <path d="M9 20l-1 2"/>
-                    <path d="M15 20l1 2"/>
-                    <path d="M10 6c0-1 .8-2 2-2s2 1 2 2"/>
-                    <path d="M9 13c1 1 2 1.5 3 1.5S14 14 15 13"/>
-                  </svg>
-                </span>
-                <button class="btn-primary" id="brewBtn" style="margin-top:8px;">Brew</button>
-              </div>
-            </div>
-
-            <div class="mix-result result-banner" id="mixResult">
-              <div class="muted">No mixture yet.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" id="ingredientCard" style="display:none;">
-        <div class="label">
-          <span class="icon-lg" aria-hidden="true">
-            <!-- herb -->
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(42,31,22,0.85);">
-              <path d="M12 21V9"/>
-              <path d="M12 9c-4 0-6-2-6-5 3 0 6 1 6 5z"/>
-              <path d="M12 9c4 0 6-2 6-5-3 0-6 1-6 5z"/>
-              <path d="M8 14c-2 0-3-1-3-3 2 0 3 1 3 3z"/>
-              <path d="M16 14c2 0 3-1 3-3-2 0-3 1-3 3z"/>
-            </svg>
-          </span>
-          Ingredient
+    <!-- MAIN -->
+    <section id="viewMain">
+      <div class="main-grid">
+        <div class="panel" title="Open Field Notes">
+          <button class="overlayBtn" id="openBookBtn" aria-label="Open Field Notes">
+            <img class="coverArt" src="assets/ui/cover_closed.webp" alt="Field Notes cover" />
+            <div class="hint">Tap to open</div>
+          </button>
         </div>
 
-        <div class="ing-card">
-          <div>
-            <img class="img" id="ingImage" alt="Ingredient" />
-          </div>
+        <div class="panel" title="Brewing">
+          <button class="overlayBtn" id="openBrewBtn" aria-label="Open brewing">
+            <img class="coverArt" src="assets/ui/cauldron_main.webp" alt="Brewing cauldron" />
+            <div class="hint">Brewing</div>
+          </button>
+        </div>
+      </div>
+      <div class="muted" style="margin-top:10px;">
+        Your discoveries stay on this device.
+      </div>
+    </section>
 
-          <div>
-            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:space-between;">
-              <div>
-                <div style="font-size:20px; font-weight:800;" id="ingName"></div>
-                <div style="margin-top:6px;">
-                  <span class="pill" id="rarityPill">Unknown</span>
-                </div>
-              </div>
-              <div class="row">
-                <button class="btn small" id="revealRandomBtn">Reveal a Property</button>
-                <button class="btn-danger small" id="resetRevealsBtn">Forget Properties</button>
-                <button class="btn small" id="closeIngredientBtn">Close</button>
-              </div>
+    <!-- BOOK -->
+    <section id="viewBook" class="scene hidden">
+      <div class="sceneTopBar">
+        <button class="backBtn" id="closeBookBtn" type="button" aria-label="Close book">
+          <img src="assets/icons/arrow_back.webp" alt="" />
+          Close
+        </button>
+        <div class="muted" id="bookStatus">Ink drying.</div>
+      </div>
+
+      <div class="bookWrap">
+        <img class="bookBg" src="assets/ui/book_open.webp" alt="" />
+
+        <!-- BOOK: INDEX SPREAD -->
+        <div class="bookPages" id="spreadIndex">
+          <div class="page">
+            <h2>Index</h2>
+            <div class="muted">Tap a name to open its page.</div>
+
+            <div class="hr"></div>
+
+            <h3>Record Ingredient</h3>
+            <div class="muted">Write the mark you were given.</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+              <input id="markInput" inputmode="numeric" placeholder="Mark" aria-label="Mark" />
+              <button class="btn-primary" id="recordBtn" type="button">Record</button>
             </div>
 
-            <div class="prop-area">
-              <div class="effects" id="effectsList"></div>
-            </div>
+            <div class="hr"></div>
 
-            <details style="margin-top:10px;">
+            <h3>Inventory</h3>
+            <div id="indexList"></div>
+
+            <details>
               <summary>Keep Safe</summary>
               <div class="muted" style="margin-top:8px;">
-                If you lose this device, export your notes and keep them somewhere safe.
+                If you change devices, export your notes first.
               </div>
-              <div class="row" style="margin-top:10px;">
-                <button class="btn small" id="exportBtn">Export Notes</button>
-                <button class="btn small" id="importBtn">Import Notes</button>
-                <button class="btn-danger small" id="wipeBtn">Burn All Notes</button>
+              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+                <button id="exportBtn" type="button">Export Notes</button>
+                <button id="importBtn" type="button">Import Notes</button>
+                <button id="wipeBtn" type="button">Burn All Notes</button>
               </div>
               <textarea id="saveBox" rows="6" style="width:100%; margin-top:10px;" placeholder="Notes appear here for export or import."></textarea>
               <div class="muted sigil" style="margin-top:8px;">
-                This page never sends your properties anywhere. It stays in the device, unless you export it.
+                This page never sends your discoveries anywhere, unless you export them.
               </div>
             </details>
+          </div>
 
+          <div class="page">
+            <h2>How to Make Concoctions</h2>
+            <div class="noteBox">
+              <div style="font-weight:900; margin-bottom:6px;">Brewing</div>
+              <div class="muted">
+                Choose two ingredients (or three, if your method allows). If they share a nature, a concoction is born.
+              </div>
+              <div style="margin-top:10px; font-weight:900;">Checks</div>
+              <div class="muted">
+                Use the rules your table follows. Write the DC here as a quick reminder.
+              </div>
+              <ul class="muted" style="margin:10px 0 0 18px;">
+                <li>Roll your check.</li>
+                <li>If you succeed, compare properties and note what you learn.</li>
+                <li>If you fail, the mixture may still consume ingredients.</li>
+              </ul>
+              <div class="muted" style="margin-top:10px;">
+                You can change this text any time by editing this page.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOOK: INGREDIENT SPREAD -->
+        <div class="bookPages hidden" id="spreadIngredient">
+          <div class="page">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+              <h2 id="ingName" style="margin:0;">Ingredient</h2>
+              <button class="backBtn" id="backToIndexBtn" type="button" aria-label="Back to Index">
+                <img src="assets/icons/arrow_back.webp" alt="" />
+                Index
+              </button>
+            </div>
+
+            <div style="margin-top:10px;">
+              <span class="pill" id="rarityPill">Unknown</span>
+            </div>
+
+            <div style="margin-top:10px;">
+              <img class="plantImg" id="ingImage" alt="Ingredient" />
+            </div>
+
+            <div style="margin-top:12px;">
+              <h3 style="margin:0 0 8px 0;">Description</h3>
+              <div class="noteBox" id="ingNotes"></div>
+            </div>
+
+            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+              <button id="revealRandomBtn" type="button">Reveal a Property</button>
+              <button id="resetRevealsBtn" type="button" class="btn-quiet">Forget Properties</button>
+            </div>
+
+            <div class="effects" id="effectsList"></div>
+          </div>
+
+          <div class="page">
+            <h2>Known Recipes</h2>
+            <div class="muted">What you have learned so far.</div>
+            <div class="hr"></div>
+            <div id="recipesList" class="noteBox"></div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="card">
-      <div class="muted" id="statusText">Waiting for ink to dry.</div>
-    </div>
+    <!-- BREW -->
+    <section id="viewBrew" class="scene hidden">
+      <div class="sceneTopBar">
+        <button class="backBtn" id="backFromBrewBtn" type="button" aria-label="Back to main">
+          <img src="assets/icons/arrow_back.webp" alt="" />
+          Back
+        </button>
+        <div class="muted" id="brewStatus">Choose your ingredients.</div>
+      </div>
+
+      <div class="brewCanvas">
+        <img class="brewBg" id="brewBg" src="assets/themes/wilderness_bg.webp" alt="" />
+        <div class="brewOverlay">
+          <div class="brewTopRow">
+            <button class="themeBtn" id="themeToggleBtn" type="button" aria-label="Switch theme">
+              <img id="themeIcon" src="assets/icons/theme_wilderness.webp" alt="" />
+              <span id="themeLabel">Wilderness</span>
+            </button>
+
+            <label style="display:flex; align-items:center; gap:8px; font-weight:900; color:rgba(42,31,22,0.85);">
+              <input type="checkbox" id="useThird" />
+              Third ingredient (optional)
+            </label>
+          </div>
+
+          <div class="brewPanel">
+            <div class="brewGrid">
+              <div class="slotBox">
+                <div class="slotTitle">First ingredient</div>
+                <select id="mixA"></select>
+                <div class="muted" style="margin-top:8px;">Discovered effects</div>
+                <div class="discoveredList" id="discA"></div>
+              </div>
+
+              <div class="slotBox">
+                <div class="slotTitle">Second ingredient</div>
+                <select id="mixB"></select>
+                <div class="muted" style="margin-top:8px;">Discovered effects</div>
+                <div class="discoveredList" id="discB"></div>
+              </div>
+
+              <div class="slotBox hidden" id="thirdSlot">
+                <div class="slotTitle">Third ingredient</div>
+                <select id="mixC"></select>
+                <div class="muted" style="margin-top:8px;">Discovered effects</div>
+                <div class="discoveredList" id="discC"></div>
+              </div>
+
+              <div class="slotBox">
+                <div class="slotTitle">Brew</div>
+                <button class="btn-primary" id="brewBtn" type="button" style="width:100%;">Brew</button>
+                <div class="resultBox" id="mixResult" style="margin-top:10px;">
+                  <div class="muted">No mixture yet.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="muted" style="margin-top:10px;">
+              Brewing draws from your Inventory. If you lack an ingredient, the attempt is refused.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </div>
 
   <div class="toast" id="toast"></div>
 
+  <audio id="sfxPage" src="assets/sfx/page_turn.mp3" preload="auto"></audio>
+  <audio id="sfxSuccess" src="assets/sfx/brew_success.mp3" preload="auto"></audio>
+
 <script>
+  // Supabase connection (read-only usage through your existing policies)
   const SUPABASE_URL = "https://yjelzojkirlzdnwftupz.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqZWx6b2praXJsemRud2Z0dXB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzNTk0MTEsImV4cCI6MjA4NTkzNTQxMX0.5TCIyj5cAUlCAmNc2yBOIdpfNoN4NLqOOfcnBVbCzZA";
+  const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE";
 
   const REST_BASE = `${SUPABASE_URL}/rest/v1`;
   const INGREDIENTS_ENDPOINT = `${REST_BASE}/ingredients?select=id,name,effect_1,effect_2,effect_3,effect_4,image_path,rarity,notes&order=id.asc`;
   const INGREDIENT_BY_MARK = (mark) => `${REST_BASE}/ingredients?select=id,name,effect_1,effect_2,effect_3,effect_4,image_path,rarity,notes&id=eq.${encodeURIComponent(mark)}&limit=1`;
   const PUBLIC_STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/`;
 
-  const LOCAL_KEY = "field_alchemy_notes_v6";
-  function loadLocal() {
-    const raw = localStorage.getItem(LOCAL_KEY);
-    if (!raw) return { reveals: {}, satchel: {} };
-    try {
-      const parsed = JSON.parse(raw);
-      const sat = (parsed && typeof parsed.satchel === "object" && parsed.satchel) ? parsed.satchel : {};
-      const cleanedSatchel = {};
-      for (const [k,v] of Object.entries(sat)) {
-        const n = Number(v);
-        if (Number.isFinite(n) && n >= 0) cleanedSatchel[String(k)] = Math.floor(n);
-      }
-      return {
-        reveals: (parsed && typeof parsed.reveals === "object" && parsed.reveals) ? parsed.reveals : {},
-        satchel: cleanedSatchel
-      };
-    } catch {
-      return { reveals: {}, satchel: {} };
-    }
-  }
-  function saveLocal() { localStorage.setItem(LOCAL_KEY, JSON.stringify(LOCAL)); }
-
+  // Local state
+  // - reveals: ingredient id -> [bool,bool,bool,bool]
+  // - index: ingredient id -> quantity (can be 0, stays listed)
+  // - recipes: array of { ids: [id,id,(id)], effects: [string...], at: timestamp }
+  const LOCAL_KEY = "field_notes_v1";
   let LOCAL = loadLocal();
   let REVEALS = LOCAL.reveals;
-  let SATCHEL = LOCAL.satchel;
+  let INDEX = LOCAL.index;
+  let RECIPES = LOCAL.recipes;
 
-  let ING_BY_ID = {};
+  // Cache
+  let ING_BY_ID = {}; // id -> ingredient row
+
+  // Views
+  const viewMain = document.getElementById("viewMain");
+  const viewBook = document.getElementById("viewBook");
+  const viewBrew = document.getElementById("viewBrew");
+  const spreadIndex = document.getElementById("spreadIndex");
+  const spreadIngredient = document.getElementById("spreadIngredient");
+
+  // Book state
+  let currentIngredientId = null;
+
+  // Brew state
+  let theme = "wilderness"; // wilderness | town
+
+  // Helpers
   const el = (id) => document.getElementById(id);
 
   function headers() {
-    return { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
+    return {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    };
+  }
+
+  function saveLocal() {
+    LOCAL = { reveals: REVEALS, index: INDEX, recipes: RECIPES };
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(LOCAL));
+  }
+
+  function loadLocal() {
+    const raw = localStorage.getItem(LOCAL_KEY);
+    if (!raw) return { reveals: {}, index: {}, recipes: [] };
+    try {
+      const parsed = JSON.parse(raw);
+      const reveals = (parsed && typeof parsed.reveals === "object" && parsed.reveals) ? parsed.reveals : {};
+      const index = (parsed && typeof parsed.index === "object" && parsed.index) ? parsed.index : {};
+      const recipes = Array.isArray(parsed?.recipes) ? parsed.recipes : [];
+      // sanitize quantities
+      const cleanIndex = {};
+      for (const [k,v] of Object.entries(index)) {
+        const n = Number(v);
+        if (Number.isFinite(n) && n >= 0) cleanIndex[String(k)] = Math.floor(n);
+      }
+      return { reveals, index: cleanIndex, recipes };
+    } catch {
+      return { reveals: {}, index: {}, recipes: [] };
+    }
   }
 
   function toast(msg, kind) {
@@ -671,28 +741,68 @@
     toast._timer = setTimeout(() => { t.style.display = "none"; }, 2200);
   }
 
+  function playSfx(audioId) {
+    const a = document.getElementById(audioId);
+    if (!a) return;
+    a.currentTime = 0;
+    a.play().catch(() => {});
+  }
+
+  function showOnly(which) {
+    viewMain.classList.add("hidden");
+    viewBook.classList.add("hidden");
+    viewBrew.classList.add("hidden");
+    if (which === "main") viewMain.classList.remove("hidden");
+    if (which === "book") viewBook.classList.remove("hidden");
+    if (which === "brew") viewBrew.classList.remove("hidden");
+  }
+
+  function showBookSpread(which) {
+    spreadIndex.classList.add("hidden");
+    spreadIngredient.classList.add("hidden");
+    if (which === "index") spreadIndex.classList.remove("hidden");
+    if (which === "ingredient") spreadIngredient.classList.remove("hidden");
+  }
+
+  function getImageUrl(image_path) {
+    if (!image_path) return "";
+    return `${PUBLIC_STORAGE_BASE}${image_path}`;
+  }
+
+  function placeholderImageDataUri(label) {
+    const svg =
+      `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='800'>` +
+      `<rect width='100%' height='100%' fill='%23ffffff'/>` +
+      `<rect x='20' y='20' width='760' height='760' rx='38' ry='38' fill='%23f6f0e3' stroke='%23d9c8aa' stroke-width='6'/>` +
+      `<text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%237a3e1f' font-size='42' font-family='Segoe Print,Bradley Hand,cursive'>${escapeHtml(label)}</text>` +
+      `</svg>`;
+    return "data:image/svg+xml," + encodeURIComponent(svg);
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "\"": "&quot;",
+      "'": "&#39;"
+    }[c]));
+  }
+
   function rarityClass(r) {
     const v = String(r || "").trim().toLowerCase();
     if (!v) return "pill-unknown";
     if (v.includes("rare") || v.includes("uncommon") || v.includes("legend")) return "pill-rare";
     return "pill-common";
   }
-  function rarityLabel(r) { const v = String(r || "").trim(); return v ? v : "Unknown"; }
-
-  function getImageUrl(image_path) { return image_path ? `${PUBLIC_STORAGE_BASE}${image_path}` : ""; }
-
-  function placeholderImageDataUri(label) {
-    const svg =
-      `<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'>` +
-      `<rect width='100%' height='100%' fill='%23ffffff'/>` +
-      `<rect x='10' y='10' width='236' height='236' rx='22' ry='22' fill='%23f6f0e3' stroke='%23d9c8aa' stroke-width='4'/>` +
-      `<text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%237a3e1f' font-size='18' font-family='Segoe Print,Bradley Hand,cursive'>${label}</text>` +
-      `</svg>`;
-    return "data:image/svg+xml," + encodeURIComponent(svg);
+  function rarityLabel(r) {
+    const v = String(r || "").trim();
+    return v ? v : "Unknown";
   }
 
   async function fetchAllIngredients() {
-    el("statusText").textContent = "Turning pages...";
+    el("bookStatus").textContent = "Turning pages...";
+    el("brewStatus").textContent = "Stirring embers...";
     try {
       const res = await fetch(INGREDIENTS_ENDPOINT, { headers: headers() });
       if (!res.ok) throw new Error(await res.text());
@@ -704,20 +814,21 @@
         ING_BY_ID[idStr] = r;
         if (!REVEALS[idStr]) REVEALS[idStr] = [false,false,false,false];
       }
-      saveLocal();
 
-      for (const idStr of Object.keys(SATCHEL)) {
-        if (!ING_BY_ID[idStr]) delete SATCHEL[idStr];
+      // Remove index entries that no longer exist
+      for (const idStr of Object.keys(INDEX)) {
+        if (!ING_BY_ID[idStr]) delete INDEX[idStr];
       }
-      LOCAL.satchel = SATCHEL;
-      saveLocal();
 
-      renderSatchel();
-      fillMixChoices();
-      updateMixPictures();
-      el("statusText").textContent = "Notes updated.";
+      saveLocal();
+      renderIndex();
+      fillBrewChoices();
+      renderBrewDiscovered();
+      el("bookStatus").textContent = "Ready.";
+      el("brewStatus").textContent = "Choose your ingredients.";
     } catch (e) {
-      el("statusText").textContent = "Could not update notes.";
+      el("bookStatus").textContent = "Could not update.";
+      el("brewStatus").textContent = "Could not update.";
       toast("The ink smudged. Try again.", "bad");
       console.error(e);
     }
@@ -730,22 +841,151 @@
     return rows?.[0] || null;
   }
 
-  function setRarityPill(row) {
-    const pill = el("rarityPill");
-    pill.className = "pill " + rarityClass(row?.rarity);
-    pill.textContent = rarityLabel(row?.rarity);
+  function sortedIndexIds() {
+    const ids = Object.keys(INDEX).filter(id => ING_BY_ID[id]);
+    ids.sort((a,b) => Number(a) - Number(b));
+    return ids;
+  }
+
+  function setQty(idStr, qty) {
+    const q = Math.max(0, Math.floor(Number(qty) || 0));
+    INDEX[String(idStr)] = q; // keep even if 0
+    saveLocal();
+  }
+
+  function renderIndex() {
+    const wrap = el("indexList");
+    wrap.innerHTML = "";
+
+    const ids = sortedIndexIds();
+    if (ids.length === 0) {
+      const d = document.createElement("div");
+      d.className = "muted";
+      d.textContent = "No entries yet.";
+      wrap.appendChild(d);
+      return;
+    }
+
+    for (const idStr of ids) {
+      const row = ING_BY_ID[idStr];
+      const name = row?.name || "Unknown";
+      const qty = Number(INDEX[idStr]) || 0;
+
+      const line = document.createElement("div");
+      line.className = "indexRow";
+
+      const left = document.createElement("div");
+      const nameBtn = document.createElement("button");
+      nameBtn.type = "button";
+      nameBtn.className = "ingNameBtn";
+      nameBtn.textContent = name;
+      nameBtn.addEventListener("click", () => {
+        playSfx("sfxPage");
+        openIngredient(idStr);
+      });
+      left.appendChild(nameBtn);
+
+      const right = document.createElement("div");
+      right.className = "inventoryBox";
+
+      const invLabel = document.createElement("div");
+      invLabel.className = "invLabel";
+      invLabel.textContent = "Inventory";
+
+      const minus = document.createElement("button");
+      minus.type = "button";
+      minus.className = "qtyBtn";
+      minus.textContent = "-";
+      minus.addEventListener("click", () => {
+        setQty(idStr, qty - 1);
+        renderIndex();
+        fillBrewChoices();
+        renderBrewDiscovered();
+      });
+
+      const count = document.createElement("div");
+      count.className = "count";
+      count.textContent = String(qty);
+
+      const plus = document.createElement("button");
+      plus.type = "button";
+      plus.className = "qtyBtn";
+      plus.textContent = "+";
+      plus.addEventListener("click", () => {
+        setQty(idStr, qty + 1);
+        renderIndex();
+        fillBrewChoices();
+        renderBrewDiscovered();
+      });
+
+      right.appendChild(invLabel);
+      right.appendChild(minus);
+      right.appendChild(count);
+      right.appendChild(plus);
+
+      line.appendChild(left);
+      line.appendChild(right);
+      wrap.appendChild(line);
+    }
+  }
+
+  async function recordIngredientFromMark(mark) {
+    const clean = String(mark || "").trim();
+    if (!clean) return;
+
+    // Already known in cache
+    if (ING_BY_ID[clean]) {
+      if (INDEX[clean] === undefined) INDEX[clean] = 0;
+      saveLocal();
+      renderIndex();
+      fillBrewChoices();
+      renderBrewDiscovered();
+      toast("Recorded.", "good");
+      return;
+    }
+
+    // Fetch just this one
+    try {
+      const row = await fetchOne(clean);
+      if (!row) {
+        toast("That mark is unknown.", "bad");
+        return;
+      }
+      ING_BY_ID[clean] = row;
+      if (!REVEALS[clean]) REVEALS[clean] = [false,false,false,false];
+      if (INDEX[clean] === undefined) INDEX[clean] = 0;
+      saveLocal();
+      renderIndex();
+      fillBrewChoices();
+      renderBrewDiscovered();
+      toast("Recorded.", "good");
+    } catch {
+      toast("Could not read that mark.", "bad");
+    }
+  }
+
+  function openIngredient(idStr) {
+    currentIngredientId = idStr;
+    showBookSpread("ingredient");
+    renderIngredient(idStr);
   }
 
   function renderIngredient(idStr) {
     const row = ING_BY_ID[idStr];
-    if (!row) { toast("That mark is not in your notes.", "bad"); return; }
+    if (!row) {
+      toast("That page is missing.", "bad");
+      showBookSpread("index");
+      return;
+    }
 
-    el("ingredientCard").style.display = "block";
     el("ingName").textContent = row.name || "Unknown Ingredient";
-    setRarityPill(row);
+    const pill = el("rarityPill");
+    pill.className = "pill " + rarityClass(row?.rarity);
+    pill.textContent = rarityLabel(row?.rarity);
 
     const imgUrl = getImageUrl(row.image_path);
     el("ingImage").src = imgUrl || placeholderImageDataUri("No sketch");
+    el("ingNotes").textContent = row.notes ? String(row.notes) : "No notes written yet.";
 
     const effects = [row.effect_1,row.effect_2,row.effect_3,row.effect_4].map(v => v || "");
     const revealed = REVEALS[idStr] || [false,false,false,false];
@@ -764,17 +1004,17 @@
       const text = document.createElement("div");
       text.className = "effect-text";
       text.textContent = eff || "(blank)";
-      if (!revealed[idx]) text.classList.add("hidden");
+      if (!revealed[idx]) text.classList.add("effect-hidden");
 
       const btn = document.createElement("button");
-      btn.className = "btn small";
+      btn.className = "small";
       btn.textContent = revealed[idx] ? "Known" : "Reveal";
       btn.disabled = revealed[idx];
       btn.addEventListener("click", () => {
         REVEALS[idStr][idx] = true;
         saveLocal();
         renderIngredient(idStr);
-        toast("A property reveals itself.", "good");
+        toast("Noted.", "good");
       });
 
       line.appendChild(label);
@@ -786,153 +1026,86 @@
     el("revealRandomBtn").onclick = () => {
       const hidden = [];
       for (let i = 0; i < 4; i++) if (!REVEALS[idStr][i]) hidden.push(i);
-      if (hidden.length === 0) { toast("Nothing more to learn here.", "good"); return; }
+      if (hidden.length === 0) {
+        toast("Nothing more to learn here.", "good");
+        return;
+      }
       const pick = hidden[Math.floor(Math.random() * hidden.length)];
       REVEALS[idStr][pick] = true;
       saveLocal();
       renderIngredient(idStr);
-      toast("A property reveals itself.", "good");
+      toast("Noted.", "good");
     };
 
     el("resetRevealsBtn").onclick = () => {
       REVEALS[idStr] = [false,false,false,false];
       saveLocal();
       renderIngredient(idStr);
-      toast("Properties forgotten.", "bad");
+      toast("Forgotten.", "bad");
     };
+
+    renderRecipesForIngredient(idStr);
   }
 
-  function closeIngredient() { el("ingredientCard").style.display = "none"; }
+  function renderRecipesForIngredient(idStr) {
+    const box = el("recipesList");
+    const nameOf = (iid) => ING_BY_ID[iid]?.name || `Ingredient ${iid}`;
 
-  function satchelIdsAll() {
-    const ids = Object.keys(SATCHEL).filter(id => ING_BY_ID[id]);
-    ids.sort((a,b) => Number(a) - Number(b));
-    return ids;
-  }
-
-  function satchelIdsAvailable() {
-    const ids = Object.keys(SATCHEL).filter(id => ING_BY_ID[id] && (Number(SATCHEL[id]) || 0) > 0);
-    ids.sort((a,b) => Number(a) - Number(b));
-    return ids;
-  }
-
-  function setQty(idStr, qty) {
-    const q = Math.max(0, Math.floor(Number(qty) || 0));
-    SATCHEL[String(idStr)] = q;
-    LOCAL.satchel = SATCHEL;
-    saveLocal();
-  }
-
-  function renderSatchel() {
-    const wrap = el("satchel");
-    wrap.innerHTML = "";
-
-    const ids = satchelIdsAll();
-    if (ids.length === 0) {
-      const d = document.createElement("div");
-      d.className = "muted";
-      d.textContent = "Your satchel is empty.";
-      wrap.appendChild(d);
-      fillMixChoices();
-      updateMixPictures();
+    const related = RECIPES.filter(r => Array.isArray(r.ids) && r.ids.includes(idStr));
+    if (related.length === 0) {
+      box.textContent = "No recipes recorded yet.";
       return;
     }
 
-    for (const idStr of ids) {
-      const row = ING_BY_ID[idStr];
-      const name = row?.name || "Unknown";
-      const qty = Number(SATCHEL[idStr]) || 0;
+    const lines = related.map(r => {
+      const parts = r.ids.map(x => nameOf(String(x)));
+      const effects = Array.isArray(r.effects) ? r.effects : [];
+      const effText = effects.length ? effects.join(", ") : "Unknown";
+      return `• ${parts.join(" + ")} = Concoction of ${effText}`;
+    });
 
-      const line = document.createElement("div");
-      line.className = "satchel-row";
+    box.textContent = lines.join("\n");
+    box.style.whiteSpace = "pre-wrap";
+  }
 
-      const nameBtn = document.createElement("button");
-      nameBtn.type = "button";
-      nameBtn.className = "satchel-name";
-      nameBtn.textContent = name;
-      nameBtn.addEventListener("click", () => renderIngredient(idStr));
-
-      const qtyWrap = document.createElement("div");
-      qtyWrap.className = "qty";
-
-      const minus = document.createElement("button");
-      minus.type = "button";
-      minus.className = "btn small";
-      minus.textContent = "-";
-      minus.addEventListener("click", () => {
-        setQty(idStr, qty - 1);
-        renderSatchel();
-        fillMixChoices();
-        updateMixPictures();
-        toast("Noted.", "bad");
-      });
-
-      const count = document.createElement("div");
-      count.className = "count";
-      count.textContent = String(qty);
-
-      const plus = document.createElement("button");
-      plus.type = "button";
-      plus.className = "btn small";
-      plus.textContent = "+";
-      plus.addEventListener("click", () => {
-        setQty(idStr, qty + 1);
-        renderSatchel();
-        fillMixChoices();
-        updateMixPictures();
-        toast("Noted.", "good");
-      });
-
-      qtyWrap.appendChild(minus);
-      qtyWrap.appendChild(count);
-      qtyWrap.appendChild(plus);
-
-      line.appendChild(nameBtn);
-      line.appendChild(qtyWrap);
-      wrap.appendChild(line);
+  function setTheme(next) {
+    theme = next;
+    if (theme === "wilderness") {
+      el("brewBg").src = "assets/themes/wilderness_bg.webp";
+      el("themeIcon").src = "assets/icons/theme_wilderness.webp";
+      el("themeLabel").textContent = "Wilderness";
+    } else {
+      el("brewBg").src = "assets/themes/town_bg.webp";
+      el("themeIcon").src = "assets/icons/theme_town.webp";
+      el("themeLabel").textContent = "Town";
     }
-
-    fillMixChoices();
-    updateMixPictures();
   }
 
-  function setThirdVisibility(on) {
-    el("thirdSlot").style.display = on ? "block" : "none";
-    el("mixC").disabled = !on;
-    el("mixImgC").style.display = on ? "block" : "none";
-    el("lineC").style.display = on ? "block" : "none";
+  function availableForBrewIds() {
+    const ids = Object.keys(INDEX).filter(id => ING_BY_ID[id] && (Number(INDEX[id]) || 0) > 0);
+    ids.sort((a,b) => Number(a) - Number(b));
+    return ids;
   }
 
-  function fillMixChoices() {
-    const a = el("mixA");
-    const b = el("mixB");
-    const c = el("mixC");
-
-    const ids = satchelIdsAvailable();
-    const all = satchelIdsAll();
+  function fillBrewChoices() {
+    const a = el("mixA"), b = el("mixB"), c = el("mixC");
+    const ids = availableForBrewIds();
 
     if (ids.length < 2) {
       a.innerHTML = "";
       b.innerHTML = "";
       c.innerHTML = "";
-      el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your satchel to brew.</div>`;
-      const pick = all[0];
-      const row = pick ? ING_BY_ID[pick] : null;
-      el("mixImgA").src = getImageUrl(row?.image_path) || placeholderImageDataUri("?");
-      el("mixImgB").src = placeholderImageDataUri("?");
-      el("mixImgC").src = placeholderImageDataUri("?");
+      el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your Inventory to brew.</div>`;
       return;
     }
 
     const opts = ids.map(idStr => {
       const name = ING_BY_ID[idStr]?.name || "Unknown";
-      const qty = Number(SATCHEL[idStr]) || 0;
+      const qty = Number(INDEX[idStr]) || 0;
       return `<option value="${escapeHtml(idStr)}">${escapeHtml(name)} (${qty})</option>`;
     }).join("");
 
-    const prevA = a.value;
-    const prevB = b.value;
-    const prevC = c.value;
+    const prevA = a.value, prevB = b.value, prevC = c.value;
 
     a.innerHTML = opts;
     b.innerHTML = opts;
@@ -940,7 +1113,6 @@
 
     a.value = ids.includes(prevA) ? prevA : ids[0];
     b.value = ids.includes(prevB) ? prevB : ids[1];
-
     if (a.value === b.value) b.value = ids.find(x => x !== a.value) || ids[1];
 
     c.value = ids.includes(prevC) ? prevC : ids.find(x => x !== a.value && x !== b.value) || ids[0];
@@ -948,33 +1120,54 @@
       c.value = ids.find(x => x !== a.value && x !== b.value) || c.value;
     }
 
-    updateMixPictures();
+    renderBrewDiscovered();
   }
 
-  function updateMixPictures() {
+  function discoveredEffectsFor(idStr) {
+    const row = ING_BY_ID[idStr];
+    if (!row) return [];
+    const effs = [row.effect_1,row.effect_2,row.effect_3,row.effect_4];
+    const revealed = REVEALS[idStr] || [false,false,false,false];
+    const known = [];
+    for (let i = 0; i < 4; i++) {
+      if (revealed[i] && effs[i]) known.push(String(effs[i]));
+    }
+    return known;
+  }
+
+  function renderDiscoveredInto(containerId, effects) {
+    const wrap = el(containerId);
+    wrap.innerHTML = "";
+    if (!effects.length) {
+      const s = document.createElement("div");
+      s.className = "muted";
+      s.textContent = "None yet.";
+      wrap.appendChild(s);
+      return;
+    }
+    effects.forEach(e => {
+      const p = document.createElement("div");
+      p.className = "discoveredPill";
+      p.textContent = e;
+      wrap.appendChild(p);
+    });
+  }
+
+  function renderBrewDiscovered() {
     const aId = el("mixA").value;
     const bId = el("mixB").value;
     const useThird = el("useThird").checked;
-    const cId = useThird ? el("mixC").value : null;
+    const cId = useThird ? el("mixC").value : "";
 
-    const aRow = ING_BY_ID[aId];
-    const bRow = ING_BY_ID[bId];
-    const cRow = cId ? ING_BY_ID[cId] : null;
-
-    el("mixImgA").src = getImageUrl(aRow?.image_path) || placeholderImageDataUri("?");
-    el("mixImgB").src = getImageUrl(bRow?.image_path) || placeholderImageDataUri("?");
-    if (useThird) el("mixImgC").src = getImageUrl(cRow?.image_path) || placeholderImageDataUri("?");
-
-    el("mixImgA").alt = aRow?.name || "Ingredient";
-    el("mixImgB").alt = bRow?.name || "Ingredient";
-    el("mixImgC").alt = cRow?.name || "Ingredient";
+    renderDiscoveredInto("discA", aId ? discoveredEffectsFor(aId) : []);
+    renderDiscoveredInto("discB", bId ? discoveredEffectsFor(bId) : []);
+    if (useThird) renderDiscoveredInto("discC", cId ? discoveredEffectsFor(cId) : []);
   }
 
   function computeShared(ids) {
     const rows = ids.map(id => ING_BY_ID[id]).filter(Boolean);
     if (rows.length < 2) return [];
-
-    const sets = rows.map(r => new Set([r.effect_1, r.effect_2, r.effect_3, r.effect_4].filter(Boolean)));
+    const sets = rows.map(r => new Set([r.effect_1,r.effect_2,r.effect_3,r.effect_4].filter(Boolean)));
     let shared = sets[0];
     for (let i = 1; i < sets.length; i++) {
       shared = new Set([...shared].filter(x => sets[i].has(x)));
@@ -982,26 +1175,11 @@
     return [...shared];
   }
 
-  function revealSharedAutomatically(ids, shared) {
-    for (const idStr of ids) {
-      const row = ING_BY_ID[idStr];
-      if (!row) continue;
-
-      const effs = [row.effect_1,row.effect_2,row.effect_3,row.effect_4];
-      if (!REVEALS[idStr]) REVEALS[idStr] = [false,false,false,false];
-
-      for (let i = 0; i < 4; i++) {
-        if (shared.includes(effs[i])) REVEALS[idStr][i] = true;
-      }
-    }
-    saveLocal();
-  }
-
   function canSpend(ids) {
     const needed = {};
     for (const id of ids) needed[id] = (needed[id] || 0) + 1;
     for (const [id, n] of Object.entries(needed)) {
-      const have = Number(SATCHEL[id]) || 0;
+      const have = Number(INDEX[id]) || 0;
       if (have < n) return false;
     }
     return true;
@@ -1011,95 +1189,118 @@
     const needed = {};
     for (const id of ids) needed[id] = (needed[id] || 0) + 1;
     for (const [id, n] of Object.entries(needed)) {
-      setQty(id, (Number(SATCHEL[id]) || 0) - n);
+      setQty(id, (Number(INDEX[id]) || 0) - n);
     }
+  }
+
+  function revealSharedAutomatically(ids, shared) {
+    for (const idStr of ids) {
+      const row = ING_BY_ID[idStr];
+      if (!row) continue;
+      const effs = [row.effect_1,row.effect_2,row.effect_3,row.effect_4];
+      if (!REVEALS[idStr]) REVEALS[idStr] = [false,false,false,false];
+      for (let i = 0; i < 4; i++) {
+        if (shared.includes(effs[i])) REVEALS[idStr][i] = true;
+      }
+    }
+    saveLocal();
+  }
+
+  function recordRecipe(ids, shared) {
+    const norm = ids.map(String).slice().sort((a,b) => Number(a) - Number(b));
+    const key = norm.join("+") + "::" + shared.slice().sort().join("|");
+    const exists = RECIPES.some(r => (Array.isArray(r.ids) ? r.ids.slice().sort((a,b)=>Number(a)-Number(b)).join("+") : "") + "::" + (Array.isArray(r.effects)? r.effects.slice().sort().join("|"):"") === key);
+    if (exists) return;
+    RECIPES.push({ ids: norm, effects: shared.slice(), at: Date.now() });
+    saveLocal();
   }
 
   function brew() {
     const aId = el("mixA").value;
     const bId = el("mixB").value;
     const useThird = el("useThird").checked;
-    const cId = useThird ? el("mixC").value : null;
+    const cId = useThird ? el("mixC").value : "";
 
     const ids = [aId,bId].filter(Boolean);
     if (useThird && cId) ids.push(cId);
 
+    if (ids.length < 2) {
+      el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your Inventory to brew.</div>`;
+      return;
+    }
+
     if (useThird && (aId === bId || aId === cId || bId === cId)) {
       el("mixResult").innerHTML = `
-        <div style="color:var(--warn); font-weight:800;">Choose different ingredients.</div>
+        <div style="color:var(--warn); font-weight:900;">Choose different ingredients.</div>
         <div class="muted" style="margin-top:6px;">The third ingredient should be different.</div>
       `;
       toast("Choose different ingredients.", "bad");
       return;
     }
 
-    updateMixPictures();
-
-    if (ids.length < 2) {
-      el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your satchel to brew.</div>`;
-      return;
-    }
-
     if (!canSpend(ids)) {
       el("mixResult").innerHTML = `
-        <div style="color:var(--warn); font-weight:800;">Not enough in the satchel.</div>
-        <div class="muted" style="margin-top:6px;">One of the chosen ingredients is missing.</div>
+        <div style="color:var(--warn); font-weight:900;">Not enough in the Inventory.</div>
+        <div class="muted" style="margin-top:6px;">You are missing one of the chosen ingredients.</div>
       `;
-      toast("Not enough in the satchel.", "bad");
+      toast("Not enough in the Inventory.", "bad");
       return;
     }
 
     const shared = computeShared(ids);
 
+    // Consume ingredients regardless of outcome (as previously established)
     spend(ids);
-    renderSatchel();
-    fillMixChoices();
-    updateMixPictures();
+    renderIndex();
+    fillBrewChoices();
+    renderBrewDiscovered();
 
     if (shared.length === 0) {
       el("mixResult").innerHTML = `
-        <div style="color:var(--warn); font-weight:800;">The mixture fizzles.</div>
+        <div style="color:var(--warn); font-weight:900;">The mixture fizzles.</div>
         <div class="muted" style="margin-top:6px;">Nothing in common, nothing takes hold.</div>
       `;
-      toast("The mixture fizzles.", "bad");
+      toast("Fizzled.", "bad");
       return;
     }
 
     revealSharedAutomatically(ids, shared);
+    recordRecipe(ids, shared);
+
+    playSfx("sfxSuccess");
 
     const effectText = shared.join(", ");
     el("mixResult").innerHTML = `
-      <div style="color:var(--good); font-weight:900;">Made Concoction of ${escapeHtml(effectText)}</div>
+      <div style="color:var(--good); font-weight:950;">Made Concoction of ${escapeHtml(effectText)}</div>
       <div class="muted" style="margin-top:6px;">The shared nature has been noted.</div>
     `;
     toast("A concoction is born.", "good");
   }
 
+  // Export / Import
   function exportNotes() {
-    const payload = { reveals: REVEALS, satchel: SATCHEL };
-    el("saveBox").value = JSON.stringify(payload, null, 2);
-    toast("Notes copied to the box.", "good");
+    el("saveBox").value = JSON.stringify({ reveals: REVEALS, index: INDEX, recipes: RECIPES }, null, 2);
+    toast("Copied to the box.", "good");
   }
 
   function importNotes() {
     try {
       const parsed = JSON.parse(el("saveBox").value);
-      if (!parsed || typeof parsed !== "object") throw new Error("Bad");
+      if (!parsed || typeof parsed !== "object") throw new Error("bad");
       REVEALS = (parsed.reveals && typeof parsed.reveals === "object") ? parsed.reveals : {};
-      const sat = (parsed && typeof parsed.satchel === "object" && parsed.satchel) ? parsed.satchel : {};
-      const cleaned = {};
-      for (const [k,v] of Object.entries(sat)) {
+      const idx = (parsed.index && typeof parsed.index === "object") ? parsed.index : {};
+      const clean = {};
+      for (const [k,v] of Object.entries(idx)) {
         const n = Number(v);
-        if (Number.isFinite(n) && n >= 0) cleaned[String(k)] = Math.floor(n);
+        if (Number.isFinite(n) && n >= 0) clean[String(k)] = Math.floor(n);
       }
-      SATCHEL = cleaned;
-
-      LOCAL = { reveals: REVEALS, satchel: SATCHEL };
+      INDEX = clean;
+      RECIPES = Array.isArray(parsed.recipes) ? parsed.recipes : [];
       saveLocal();
-      renderSatchel();
-      fillMixChoices();
-      updateMixPictures();
-      toast("Notes restored.", "good");
+      renderIndex();
+      fillBrewChoices();
+      renderBrewDiscovered();
+      toast("Restored.", "good");
     } catch {
       toast("Those notes do not make sense.", "bad");
     }
@@ -1107,101 +1308,81 @@
 
   function burnAll() {
     if (!confirm("Burn all notes on this device?")) return;
-    LOCAL = { reveals: {}, satchel: {} };
-    REVEALS = LOCAL.reveals;
-    SATCHEL = LOCAL.satchel;
+    REVEALS = {};
+    INDEX = {};
+    RECIPES = [];
     saveLocal();
-    closeIngredient();
-    renderSatchel();
-    fillMixChoices();
-    updateMixPictures();
-    el("mixResult").innerHTML = `<div class="muted">No mixture yet.</div>`;
+    renderIndex();
+    fillBrewChoices();
+    renderBrewDiscovered();
+    showOnly("main");
     toast("Ashes and silence.", "bad");
   }
 
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, (c) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      "\"": "&quot;",
-      "'": "&#39;"
-    }[c]));
-  }
-
-  async function addToSatchelFromMark(mark) {
-    const clean = String(mark || "").trim();
-    if (!clean) return;
-
-    if (!ING_BY_ID[clean]) {
-      try {
-        const row = await fetchOne(clean);
-        if (!row) { toast("That mark is unknown.", "bad"); return; }
-        ING_BY_ID[clean] = row;
-        if (!REVEALS[clean]) REVEALS[clean] = [false,false,false,false];
-        saveLocal();
-      } catch {
-        toast("Could not read that mark.", "bad");
-        return;
-      }
-    }
-
-    const current = Number(SATCHEL[clean]);
-    const qty = Number.isFinite(current) ? current : 0;
-    setQty(clean, qty + 1);
-
-    renderSatchel();
-    fillMixChoices();
-    updateMixPictures();
-    toast("Added to satchel.", "good");
-
-    renderIngredient(clean);
-  }
-
-  // Events
+  // Wire UI
   el("refreshBtn").addEventListener("click", fetchAllIngredients);
 
-  el("addBtn").addEventListener("click", () => addToSatchelFromMark(el("markInput").value));
-  el("openBtn").addEventListener("click", () => {
-    const mark = el("markInput").value.trim();
-    if (!mark) return;
-    if (!ING_BY_ID[mark]) { toast("Add it first.", "bad"); return; }
-    renderIngredient(mark);
+  el("openBookBtn").addEventListener("click", () => {
+    playSfx("sfxPage");
+    showOnly("book");
+    showBookSpread("index");
+    renderIndex();
   });
-  el("closeBtn").addEventListener("click", closeIngredient);
-  el("closeIngredientBtn").addEventListener("click", closeIngredient);
 
-  el("mixA").addEventListener("change", updateMixPictures);
-  el("mixB").addEventListener("change", updateMixPictures);
-  el("mixC").addEventListener("change", updateMixPictures);
+  el("openBrewBtn").addEventListener("click", () => {
+    showOnly("brew");
+    fillBrewChoices();
+    renderBrewDiscovered();
+  });
+
+  el("closeBookBtn").addEventListener("click", () => {
+    playSfx("sfxPage");
+    showOnly("main");
+  });
+
+  el("backToIndexBtn").addEventListener("click", () => {
+    playSfx("sfxPage");
+    currentIngredientId = null;
+    showBookSpread("index");
+    renderIndex();
+  });
+
+  el("backFromBrewBtn").addEventListener("click", () => {
+    showOnly("main");
+  });
+
+  el("recordBtn").addEventListener("click", () => {
+    recordIngredientFromMark(el("markInput").value);
+  });
+
+  el("markInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") recordIngredientFromMark(el("markInput").value);
+  });
+
+  el("themeToggleBtn").addEventListener("click", () => {
+    setTheme(theme === "wilderness" ? "town" : "wilderness");
+  });
 
   el("useThird").addEventListener("change", () => {
     const on = el("useThird").checked;
-    setThirdVisibility(on);
-    fillMixChoices();
-    updateMixPictures();
+    el("thirdSlot").classList.toggle("hidden", !on);
+    fillBrewChoices();
+    renderBrewDiscovered();
   });
 
+  el("mixA").addEventListener("change", renderBrewDiscovered);
+  el("mixB").addEventListener("change", renderBrewDiscovered);
+  el("mixC").addEventListener("change", renderBrewDiscovered);
   el("brewBtn").addEventListener("click", brew);
 
   el("exportBtn").addEventListener("click", exportNotes);
   el("importBtn").addEventListener("click", importNotes);
   el("wipeBtn").addEventListener("click", burnAll);
 
-  el("markInput").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") addToSatchelFromMark(el("markInput").value);
-  });
-
   // Initial
-  el("mixImgA").src = placeholderImageDataUri("?");
-  el("mixImgB").src = placeholderImageDataUri("?");
-  el("mixImgC").src = placeholderImageDataUri("?");
-  setThirdVisibility(false);
-
+  setTheme("wilderness");
+  showOnly("main");
   fetchAllIngredients();
-  renderSatchel();
-  fillMixChoices();
-  updateMixPictures();
 </script>
 </body>
 </html>

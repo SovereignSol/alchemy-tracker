@@ -7,7 +7,7 @@
   <style>
     :root{
       --ink:#2a1f16;
-      --ink2:rgba(42,31,22,0.72);
+      --ink2:rgba(42,31,22,0.70);
       --paper:#f6f0e3;
       --paper2:#efe5d3;
       --edge:#d9c8aa;
@@ -28,16 +28,16 @@
         radial-gradient(900px 520px at 90% 20%, rgba(31,122,58,0.06), transparent 60%),
         linear-gradient(180deg, var(--paper), var(--paper2));
       font-family: "Segoe Print","Bradley Hand","Comic Sans MS",cursive,system-ui;
-      letter-spacing: 0.2px;
+      letter-spacing: 0.15px;
+      font-size: 14px;
     }
 
-    .wrap{ max-width: 1100px; margin: 0 auto; padding: 16px; }
-
+    .wrap{ max-width: 1100px; margin: 0 auto; padding: 14px; }
     .hidden{ display:none !important; }
 
     button, input, select, textarea{
-      font-size: 16px;
-      padding: 10px 12px;
+      font-size: 14px;
+      padding: 9px 10px;
       border-radius: 14px;
       border: 1px solid rgba(217,200,170,0.95);
       background: rgba(255,255,255,0.75);
@@ -45,8 +45,14 @@
       outline: none;
       box-shadow: 0 2px 0 rgba(0,0,0,0.04) inset;
       font-family: inherit;
+      line-height: 1.15;
     }
-    button{ cursor:pointer; user-select:none; transition: transform 120ms ease, box-shadow 120ms ease; }
+    input::placeholder{ color: rgba(42,31,22,0.45); }
+    button{
+      cursor:pointer;
+      user-select:none;
+      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+    }
     button:active{ transform: translateY(1px); }
 
     .btn-primary{
@@ -55,17 +61,1350 @@
       border-color: rgba(122,62,31,0.55);
       box-shadow: 0 10px 22px rgba(122,62,31,0.18);
     }
+    .btn-primary:hover{ box-shadow: 0 14px 28px rgba(122,62,31,0.22); }
     .btn-quiet{
       background: rgba(255,255,255,0.65);
       color: rgba(42,31,22,0.78);
     }
 
-    .muted{ color: var(--ink2); font-size: 13px; }
+    .muted{ color: var(--ink2); font-size: 12.5px; }
     .title{
       display:flex;
       align-items:flex-end;
       justify-content:space-between;
       gap:12px;
+      margin-bottom:10px;
+    }
+    h1{
+      margin:0;
+      font-size: 20px;
+      line-height:1.05;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+      font-weight: 900;
+    }
+    .sub{ margin-top:4px; color:var(--ink2); font-size:12.5px; }
+
+    /* Main screen */
+    .main-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 900px){
+      .main-grid{ grid-template-columns: 1fr 1fr; }
+    }
+    .panel{
+      border-radius: 18px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.55);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+      min-height: 320px;
+      position: relative;
+    }
+    .panel button.overlayBtn{
+      all: unset;
+      cursor: pointer;
+      display:block;
+      width:100%;
+      height:100%;
+    }
+    .panel img.coverArt{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+      filter: saturate(1.02);
+    }
+    .panel .hint{
+      position:absolute;
+      left: 12px;
+      bottom: 12px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.75);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+      font-weight: 900;
+      color: rgba(42,31,22,0.82);
+      font-size: 13px;
+    }
+
+    /* Book scene */
+    .scene{
+      border-radius: 18px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.55);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+      position: relative;
+    }
+    .sceneTopBar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(217,200,170,0.75);
+      background: rgba(255,255,255,0.35);
+    }
+    .backBtn{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.72);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.10);
+      font-weight: 900;
+      color: rgba(42,31,22,0.88);
+      font-size: 13px;
+    }
+    .backBtn img{ width: 18px; height: 18px; opacity: 0.9; }
+
+    .bookWrap{
+      position: relative;
+      width:100%;
+      height: min(78vh, 720px);
+      min-height: 520px;
+      background: rgba(255,255,255,0.25);
+    }
+    .bookBg{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      opacity: 0.98;
+      pointer-events:none;
+      user-select:none;
+    }
+    .bookPages{
+      position:absolute;
+      inset: 0;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      padding: 5.5% 6.5%;
+    }
+    @media (max-width: 720px){
+      .bookWrap{ height: auto; min-height: 740px; }
+      .bookPages{
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 10% 8%;
+      }
+    }
+
+    .page{
+      border-radius: 18px;
+      padding: 12px;
+      background: rgba(255,255,255,0.02);
+      overflow:auto;
+    }
+    .page h2{
+      margin: 0 0 6px 0;
+      font-size: 16px;
+      font-weight: 950;
+      color: rgba(42,31,22,0.92);
+    }
+    .page h3{
+      margin: 12px 0 6px 0;
+      font-size: 13.5px;
+      font-weight: 950;
+      color: rgba(42,31,22,0.90);
+    }
+
+    /* Index list */
+    .indexRow{
+      display:grid;
+      grid-template-columns: 1fr 170px;
+      gap: 10px;
+      align-items:center;
+      padding: 9px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.65);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.07);
+      margin-bottom: 8px;
+    }
+    @media (max-width: 420px){
+      .indexRow{ grid-template-columns: 1fr; }
+      .inventoryBox{ justify-content:flex-start; }
+    }
+    .ingNameBtn{
+      all: unset;
+      cursor:pointer;
+      font-weight: 950;
+      color: rgba(42,31,22,0.92);
+      padding: 2px 4px;
+      font-size: 14px;
+    }
+    .inventoryBox{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+    .invLabel{
+      font-weight: 950;
+      color: rgba(42,31,22,0.78);
+      font-size: 12px;
+    }
+    .count{
+      min-width: 28px;
+      text-align:center;
+      font-weight: 950;
+      padding: 6px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.75);
+      font-size: 13px;
+    }
+    .qtyBtn{
+      padding: 7px 9px;
+      border-radius: 12px;
+      font-weight: 950;
+      min-width: 36px;
+      background: rgba(255,255,255,0.78);
+      font-size: 13px;
+    }
+
+    .noteBox{
+      border-radius: 14px;
+      border: 1px dashed rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.45);
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.25;
+      white-space: pre-wrap;
+    }
+
+    /* Ingredient pages */
+    .plantImg{
+      width:100%;
+      max-width: 340px;
+      border-radius: 16px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.6);
+      box-shadow: var(--shadow2);
+      display:block;
+    }
+
+    .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.68);
+      color: rgba(42,31,22,0.78);
+      font-size: 12px;
+      font-weight: 950;
+    }
+    .pill-rare{ border-color: rgba(31,122,58,0.35); background: rgba(31,122,58,0.08); }
+    .pill-common{ border-color: rgba(122,62,31,0.35); background: rgba(122,62,31,0.06); }
+    .pill-unknown{ border-color: rgba(42,31,22,0.25); background: rgba(42,31,22,0.05); }
+
+    .effects{ display:grid; gap: 10px; margin-top: 10px; }
+    .effect-line{ display:flex; gap: 10px; align-items:stretch; }
+    .effect-text{
+      flex:1;
+      padding: 9px 10px;
+      border-radius: 14px;
+      border: 1px dashed rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.6);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset;
+      min-height: 18px;
+      display:flex;
+      align-items:center;
+      font-size: 13px;
+      line-height: 1.2;
+    }
+    .effect-hidden{
+      color: transparent;
+      text-shadow: 0 0 11px rgba(42,31,22,0.55);
+      user-select: none;
+    }
+    .small{ padding: 7px 9px; font-size: 13px; border-radius: 12px; font-weight: 950; }
+
+    /* Brew scene */
+    .brewCanvas{
+      position: relative;
+      width:100%;
+      height: min(78vh, 720px);
+      min-height: 520px;
+      border-radius: 18px;
+      overflow:hidden;
+    }
+    .brewBg{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      opacity: 1;
+      pointer-events:none;
+      user-select:none;
+    }
+    .brewOverlay{
+      position:absolute;
+      inset:0;
+      display:flex;
+      flex-direction: column;
+      padding: 12px;
+      gap: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
+    }
+    .brewTopRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .themeBtn{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.72);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.10);
+      font-weight: 950;
+      color: rgba(42,31,22,0.88);
+      font-size: 13px;
+    }
+    .themeBtn img{ width: 18px; height: 18px; opacity: 0.92; }
+
+    .brewPanel{
+      margin-top: auto;
+      border-radius: 18px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.70);
+      box-shadow: var(--shadow);
+      padding: 12px;
+    }
+    .brewGrid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 860px){
+      .brewGrid{ grid-template-columns: 1fr 1fr; }
+    }
+    .slotTitle{ font-weight: 950; color: rgba(42,31,22,0.9); margin-bottom: 6px; font-size: 13px; }
+    .slotBox{ border-radius: 14px; border: 1px dashed rgba(217,200,170,0.95); background: rgba(255,255,255,0.55); padding: 10px 12px; }
+    .discoveredList{
+      margin-top: 8px;
+      display:flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .discoveredPill{
+      border-radius: 999px;
+      border: 1px solid rgba(217,200,170,0.95);
+      padding: 6px 10px;
+      background: rgba(255,255,255,0.72);
+      font-weight: 950;
+      color: rgba(42,31,22,0.82);
+      font-size: 12px;
+    }
+    .resultBox{
+      margin-top: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(217,200,170,0.95);
+      background: rgba(255,255,255,0.65);
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(217,200,170,0.95);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 10px 14px;
+      box-shadow: var(--shadow);
+      max-width: calc(100vw - 32px);
+      display:none;
+      z-index: 50;
+      font-size: 13px;
+      font-weight: 950;
+    }
+    .toast.good{ border-color: rgba(31,122,58,0.40); }
+    .toast.bad{ border-color: rgba(139,29,44,0.35); }
+
+    .hr{ height:1px; background: rgba(217,200,170,0.8); margin: 12px 0; }
+
+    details{
+      border: 1px dashed rgba(217,200,170,0.95);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.45);
+      padding: 10px 12px;
+      margin-top: 12px;
+    }
+    details summary{
+      cursor: pointer;
+      font-weight: 950;
+      color: rgba(42,31,22,0.85);
+      list-style: none;
+      font-size: 13px;
+    }
+    details summary::-webkit-details-marker{ display:none; }
+
+    .sigil{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      letter-spacing: 0.5px;
+      font-size: 12px;
+      color: rgba(42,31,22,0.55);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">
+      <div>
+        <h1>Field Notes</h1>
+        <div class="sub">A travel-worn record of leaves, powders, and quiet discoveries.</div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <button class="btn-quiet" id="refreshBtn" title="Pulls in any prepared ingredients.">Update Notes</button>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <section id="viewMain">
+      <div class="main-grid">
+        <div class="panel" title="Open Field Notes">
+          <button class="overlayBtn" id="openBookBtn" aria-label="Open Field Notes">
+            <img class="coverArt" src="assets/ui/cover_closed.webp" alt="Field Notes cover" />
+            <div class="hint">Tap to open</div>
+          </button>
+        </div>
+
+        <div class="panel" title="Brewing">
+          <button class="overlayBtn" id="openBrewBtn" aria-label="Open brewing">
+            <img class="coverArt" src="assets/ui/cauldron_main.webp" alt="Brewing cauldron" />
+            <div class="hint">Brewing</div>
+          </button>
+        </div>
+      </div>
+      <div class="muted" style="margin-top:10px;">
+        Your discoveries stay on this device.
+      </div>
+    </section>
+
+    <!-- BOOK -->
+    <section id="viewBook" class="scene hidden">
+      <div class="sceneTopBar">
+        <button class="backBtn" id="closeBookBtn" type="button" aria-label="Close book">
+          <img src="assets/icons/arrow_back.webp" alt="" />
+          Close
+        </button>
+        <div class="muted" id="bookStatus">Ready.</div>
+      </div>
+
+      <div class="bookWrap">
+        <img class="bookBg" src="assets/ui/book_open.webp" alt="" />
+
+        <!-- BOOK: INDEX SPREAD -->
+        <div class="bookPages" id="spreadIndex">
+          <div class="page">
+            <h2>Index</h2>
+            <div class="muted">Tap a name to open its page.</div>
+
+            <div class="hr"></div>
+
+            <h3>Record Ingredient</h3>
+            <div class="muted">Write the mark you were given.</div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+              <input id="markInput" inputmode="numeric" placeholder="Mark" aria-label="Mark" />
+              <button class="btn-primary" id="recordBtn" type="button">Record</button>
+            </div>
+
+            <div class="hr"></div>
+
+            <h3>Inventory</h3>
+            <div id="indexList"></div>
+
+            <details>
+              <summary>Keep Safe</summary>
+              <div class="muted" style="margin-top:8px;">
+                If you change devices, export your notes first.
+              </div>
+              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+                <button id="exportBtn" type="button">Export Notes</button>
+                <button id="importBtn" type="button">Import Notes</button>
+                <button id="wipeBtn" type="button">Burn All Notes</button>
+              </div>
+              <textarea id="saveBox" rows="6" style="width:100%; margin-top:10px;" placeholder="Notes appear here for export or import."></textarea>
+              <div class="muted sigil" style="margin-top:8px;">
+                This page never sends your discoveries anywhere, unless you export them.
+              </div>
+            </details>
+          </div>
+
+          <div class="page">
+            <h2>How to Make Concoctions</h2>
+            <div class="noteBox">
+Brewing
+
+Choose two ingredients (or three, if your method allows). If they share a nature, a concoction is born.
+
+Checks
+
+Use the rules your table follows. Write the DC here as a quick reminder.
+
+• Roll your check.
+• If you succeed, compare properties and note what you learn.
+• If you fail, the mixture may still consume ingredients.
+            </div>
+          </div>
+        </div>
+
+        <!-- BOOK: INGREDIENT SPREAD -->
+        <div class="bookPages hidden" id="spreadIngredient">
+          <div class="page">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+              <h2 id="ingName" style="margin:0;">Ingredient</h2>
+              <button class="backBtn" id="backToIndexBtn" type="button" aria-label="Back to Index">
+                <img src="assets/icons/arrow_back.webp" alt="" />
+                Index
+              </button>
+            </div>
+
+            <div style="margin-top:10px;">
+              <span class="pill" id="rarityPill">Unknown</span>
+            </div>
+
+            <div style="margin-top:10px;">
+              <img class="plantImg" id="ingImage" alt="Ingredient" />
+            </div>
+
+            <div style="margin-top:12px;">
+              <h3 style="margin:0 0 8px 0;">Description</h3>
+              <div class="noteBox" id="ingNotes"></div>
+            </div>
+
+            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+              <button id="revealRandomBtn" type="button">Reveal a Property</button>
+              <button id="resetRevealsBtn" type="button" class="btn-quiet">Forget Properties</button>
+            </div>
+
+            <div class="effects" id="effectsList"></div>
+          </div>
+
+          <div class="page">
+            <h2>Known Recipes</h2>
+            <div class="muted">What you have learned so far.</div>
+            <div class="hr"></div>
+            <div id="recipesList" class="noteBox"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BREW -->
+    <section id="viewBrew" class="scene hidden">
+      <div class="sceneTopBar">
+        <button class="backBtn" id="backFromBrewBtn" type="button" aria-label="Back to main">
+          <img src="assets/icons/arrow_back.webp" alt="" />
+          Back
+        </button>
+        <div class="muted" id="brewStatus">Choose your ingredients.</div>
+      </div>
+
+      <div class="brewCanvas">
+        <img class="brewBg" id="brewBg" src="assets/themes/wilderness_bg.webp" alt="" />
+        <div class="brewOverlay">
+          <div class="brewTopRow">
+            <button class="themeBtn" id="themeToggleBtn" type="button" aria-label="Switch theme">
+              <img id="themeIcon" src="assets/icons/theme_wilderness.webp" alt="" />
+              <span id="themeLabel">Wilderness</span>
+            </button>
+
+            <label style="display:flex; align-items:center; gap:8px; font-weight:950; color:rgba(42,31,22,0.85); font-size:13px;">
+              <input type="checkbox" id="useThird" />
+              Third ingredient (optional)
+            </label>
+          </div>
+
+          <div class="brewPanel">
+            <div class="brewGrid">
+              <div class="slotBox">
+                <div class="slotTitle">First ingredient</div>
+                <select id="mixA"></select>
+                <div class="muted" style="margin-top:8px;">Discovered effects</div>
+                <div class="discoveredList" id="discA"></div>
+              </div>
+
+              <div class="slotBox">
+                <div class="slotTitle">Second ingredient</div>
+                <select id="mixB"></select>
+                <div class="muted" style="margin-top:8px;">Discovered effects</div>
+                <div class="discoveredList" id="discB"></div>
+              </div>
+
+              <div class="slotBox hidden" id="thirdSlot">
+                <div class="slotTitle">Third ingredient</div>
+                <select id="mixC"></select>
+                <div class="muted" style="margin-top:8px;">Discovered effects</div>
+                <div class="discoveredList" id="discC"></div>
+              </div>
+
+              <div class="slotBox">
+                <div class="slotTitle">Brew</div>
+                <button class="btn-primary" id="brewBtn" type="button" style="width:100%;">Brew</button>
+                <div class="resultBox" id="mixResult" style="margin-top:10px;">
+                  <div class="muted">No mixture yet.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="muted" style="margin-top:10px;">
+              Brewing draws from your Inventory. If you lack an ingredient, the attempt is refused.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <audio id="sfxPage" src="assets/sfx/page_turn.mp3" preload="auto"></audio>
+  <audio id="sfxSuccess" src="assets/sfx/brew_success.mp3" preload="auto"></audio>
+
+<script>
+  // Supabase connection (read-only usage through your existing policies)
+  const SUPABASE_URL = "https://yjelzojkirlzdnwftupz.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlqZWx6b2praXJsemRud2Z0dXB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzNTk0MTEsImV4cCI6MjA4NTkzNTQxMX0.5TCIyj5cAUlCAmNc2yBOIdpfNoN4NLqOOfcnBVbCzZA";
+
+  const REST_BASE = `${SUPABASE_URL}/rest/v1`;
+  const INGREDIENTS_ENDPOINT = `${REST_BASE}/ingredients?select=id,name,effect_1,effect_2,effect_3,effect_4,image_path,rarity,notes&order=id.asc`;
+  const INGREDIENT_BY_MARK = (mark) => `${REST_BASE}/ingredients?select=id,name,effect_1,effect_2,effect_3,effect_4,image_path,rarity,notes&id=eq.${encodeURIComponent(mark)}&limit=1`;
+  const PUBLIC_STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/`;
+
+  // Local state
+  // - reveals: ingredient id -> [bool,bool,bool,bool]
+  // - index: ingredient id -> quantity (can be 0, stays listed)
+  // - recipes: array of { ids: [id,id,(id)], effects: [string...], at: timestamp }
+  const LOCAL_KEY = "field_notes_v2";
+  let LOCAL = loadLocal();
+  let REVEALS = LOCAL.reveals;
+  let INDEX = LOCAL.index;
+  let RECIPES = LOCAL.recipes;
+
+  // Cache
+  let ING_BY_ID = {}; // id -> ingredient row
+
+  // Views
+  const viewMain = document.getElementById("viewMain");
+  const viewBook = document.getElementById("viewBook");
+  const viewBrew = document.getElementById("viewBrew");
+  const spreadIndex = document.getElementById("spreadIndex");
+  const spreadIngredient = document.getElementById("spreadIngredient");
+
+  // Book state
+  let currentIngredientId = null;
+
+  // Brew state
+  let theme = "wilderness"; // wilderness | town
+
+  const el = (id) => document.getElementById(id);
+
+  function headers() {
+    return { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
+  }
+
+  function saveLocal() {
+    LOCAL = { reveals: REVEALS, index: INDEX, recipes: RECIPES };
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(LOCAL));
+  }
+
+  function loadLocal() {
+    const raw = localStorage.getItem(LOCAL_KEY);
+    if (!raw) return { reveals: {}, index: {}, recipes: [] };
+    try {
+      const parsed = JSON.parse(raw);
+      const reveals = (parsed && typeof parsed.reveals === "object" && parsed.reveals) ? parsed.reveals : {};
+      const index = (parsed && typeof parsed.index === "object" && parsed.index) ? parsed.index : {};
+      const recipes = Array.isArray(parsed?.recipes) ? parsed.recipes : [];
+      const cleanIndex = {};
+      for (const [k,v] of Object.entries(index)) {
+        const n = Number(v);
+        if (Number.isFinite(n) && n >= 0) cleanIndex[String(k)] = Math.floor(n);
+      }
+      return { reveals, index: cleanIndex, recipes };
+    } catch {
+      return { reveals: {}, index: {}, recipes: [] };
+    }
+  }
+
+  function toast(msg, kind) {
+    const t = el("toast");
+    t.className = "toast";
+    if (kind === "good") t.classList.add("good");
+    if (kind === "bad") t.classList.add("bad");
+    t.textContent = msg;
+    t.style.display = "block";
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => { t.style.display = "none"; }, 2200);
+  }
+
+  function playSfx(audioId) {
+    const a = document.getElementById(audioId);
+    if (!a) return;
+    a.currentTime = 0;
+    a.play().catch(() => {});
+  }
+
+  function showOnly(which) {
+    viewMain.classList.add("hidden");
+    viewBook.classList.add("hidden");
+    viewBrew.classList.add("hidden");
+    if (which === "main") viewMain.classList.remove("hidden");
+    if (which === "book") viewBook.classList.remove("hidden");
+    if (which === "brew") viewBrew.classList.remove("hidden");
+  }
+
+  function showBookSpread(which) {
+    spreadIndex.classList.add("hidden");
+    spreadIngredient.classList.add("hidden");
+    if (which === "index") spreadIndex.classList.remove("hidden");
+    if (which === "ingredient") spreadIngredient.classList.remove("hidden");
+  }
+
+  function getImageUrl(image_path) {
+    if (!image_path) return "";
+    return `${PUBLIC_STORAGE_BASE}${image_path}`;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "\"": "&quot;",
+      "'": "&#39;"
+    }[c]));
+  }
+
+  function placeholderImageDataUri(label) {
+    const svg =
+      `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='800'>` +
+      `<rect width='100%' height='100%' fill='%23ffffff'/>` +
+      `<rect x='20' y='20' width='760' height='760' rx='38' ry='38' fill='%23f6f0e3' stroke='%23d9c8aa' stroke-width='6'/>` +
+      `<text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%237a3e1f' font-size='42' font-family='Segoe Print,Bradley Hand,cursive'>${escapeHtml(label)}</text>` +
+      `</svg>`;
+    return "data:image/svg+xml," + encodeURIComponent(svg);
+  }
+
+  function rarityClass(r) {
+    const v = String(r || "").trim().toLowerCase();
+    if (!v) return "pill-unknown";
+    if (v.includes("rare") || v.includes("uncommon") || v.includes("legend")) return "pill-rare";
+    return "pill-common";
+  }
+  function rarityLabel(r) {
+    const v = String(r || "").trim();
+    return v ? v : "Unknown";
+  }
+
+  async function fetchAllIngredients() {
+    el("bookStatus").textContent = "Turning pages...";
+    el("brewStatus").textContent = "Stirring embers...";
+    try {
+      const res = await fetch(INGREDIENTS_ENDPOINT, { headers: headers() });
+      if (!res.ok) throw new Error(await res.text());
+      const rows = await res.json();
+
+      ING_BY_ID = {};
+      for (const r of rows) {
+        const idStr = String(r.id);
+        ING_BY_ID[idStr] = r;
+        if (!REVEALS[idStr]) REVEALS[idStr] = [false,false,false,false];
+      }
+
+      for (const idStr of Object.keys(INDEX)) {
+        if (!ING_BY_ID[idStr]) delete INDEX[idStr];
+      }
+
+      saveLocal();
+      renderIndex();
+      fillBrewChoices();
+      renderBrewDiscovered();
+      el("bookStatus").textContent = "Ready.";
+      el("brewStatus").textContent = "Choose your ingredients.";
+    } catch (e) {
+      el("bookStatus").textContent = "Could not update.";
+      el("brewStatus").textContent = "Could not update.";
+      toast("The ink smudged. Try again.", "bad");
+      console.error(e);
+    }
+  }
+
+  async function fetchOne(mark) {
+    const res = await fetch(INGREDIENT_BY_MARK(mark), { headers: headers() });
+    if (!res.ok) throw new Error(await res.text());
+    const rows = await res.json();
+    return rows?.[0] || null;
+  }
+
+  function sortedIndexIds() {
+    const ids = Object.keys(INDEX).filter(id => ING_BY_ID[id]);
+    ids.sort((a,b) => Number(a) - Number(b));
+    return ids;
+  }
+
+  function setQty(idStr, qty) {
+    const q = Math.max(0, Math.floor(Number(qty) || 0));
+    INDEX[String(idStr)] = q;
+    saveLocal();
+  }
+
+  function renderIndex() {
+    const wrap = el("indexList");
+    wrap.innerHTML = "";
+
+    const ids = sortedIndexIds();
+    if (ids.length === 0) {
+      const d = document.createElement("div");
+      d.className = "muted";
+      d.textContent = "No entries yet.";
+      wrap.appendChild(d);
+      return;
+    }
+
+    for (const idStr of ids) {
+      const row = ING_BY_ID[idStr];
+      const name = row?.name || "Unknown";
+      const qty = Number(INDEX[idStr]) || 0;
+
+      const line = document.createElement("div");
+      line.className = "indexRow";
+
+      const left = document.createElement("div");
+      const nameBtn = document.createElement("button");
+      nameBtn.type = "button";
+      nameBtn.className = "ingNameBtn";
+      nameBtn.textContent = name;
+      nameBtn.addEventListener("click", () => {
+        playSfx("sfxPage");
+        openIngredient(idStr);
+      });
+      left.appendChild(nameBtn);
+
+      const right = document.createElement("div");
+      right.className = "inventoryBox";
+
+      const invLabel = document.createElement("div");
+      invLabel.className = "invLabel";
+      invLabel.textContent = "Inventory";
+
+      const minus = document.createElement("button");
+      minus.type = "button";
+      minus.className = "qtyBtn";
+      minus.textContent = "-";
+      minus.addEventListener("click", () => {
+        setQty(idStr, qty - 1);
+        renderIndex();
+        fillBrewChoices();
+        renderBrewDiscovered();
+      });
+
+      const count = document.createElement("div");
+      count.className = "count";
+      count.textContent = String(qty);
+
+      const plus = document.createElement("button");
+      plus.type = "button";
+      plus.className = "qtyBtn";
+      plus.textContent = "+";
+      plus.addEventListener("click", () => {
+        setQty(idStr, qty + 1);
+        renderIndex();
+        fillBrewChoices();
+        renderBrewDiscovered();
+      });
+
+      right.appendChild(invLabel);
+      right.appendChild(minus);
+      right.appendChild(count);
+      right.appendChild(plus);
+
+      line.appendChild(left);
+      line.appendChild(right);
+      wrap.appendChild(line);
+    }
+  }
+
+  async function recordIngredientFromMark(mark) {
+    // Accept 9000, 9,000, 9 000, etc
+    const clean = String(mark || "").replace(/\D/g, "");
+    if (!clean) return;
+
+    if (ING_BY_ID[clean]) {
+      if (INDEX[clean] === undefined) INDEX[clean] = 0;
+      saveLocal();
+      renderIndex();
+      fillBrewChoices();
+      renderBrewDiscovered();
+      toast("Recorded.", "good");
+      return;
+    }
+
+    try {
+      const row = await fetchOne(clean);
+      if (!row) {
+        toast("That mark is unknown.", "bad");
+        return;
+      }
+      ING_BY_ID[clean] = row;
+      if (!REVEALS[clean]) REVEALS[clean] = [false,false,false,false];
+      if (INDEX[clean] === undefined) INDEX[clean] = 0;
+      saveLocal();
+      renderIndex();
+      fillBrewChoices();
+      renderBrewDiscovered();
+      toast("Recorded.", "good");
+    } catch {
+      toast("Could not read that mark.", "bad");
+    }
+  }
+
+  function openIngredient(idStr) {
+    currentIngredientId = idStr;
+    showBookSpread("ingredient");
+    renderIngredient(idStr);
+  }
+
+  function renderIngredient(idStr) {
+    const row = ING_BY_ID[idStr];
+    if (!row) {
+      toast("That page is missing.", "bad");
+      showBookSpread("index");
+      return;
+    }
+
+    el("ingName").textContent = row.name || "Unknown Ingredient";
+    const pill = el("rarityPill");
+    pill.className = "pill " + rarityClass(row?.rarity);
+    pill.textContent = rarityLabel(row?.rarity);
+
+    const imgUrl = getImageUrl(row.image_path);
+    el("ingImage").src = imgUrl || placeholderImageDataUri("No sketch");
+    el("ingNotes").textContent = row.notes ? String(row.notes) : "No notes written yet.";
+
+    const effects = [row.effect_1,row.effect_2,row.effect_3,row.effect_4].map(v => v || "");
+    const revealed = REVEALS[idStr] || [false,false,false,false];
+
+    const list = el("effectsList");
+    list.innerHTML = "";
+
+    effects.forEach((eff, idx) => {
+      const line = document.createElement("div");
+      line.className = "effect-line";
+
+      const label = document.createElement("div");
+      label.className = "pill";
+      label.textContent = `Property ${idx + 1}`;
+
+      const text = document.createElement("div");
+      text.className = "effect-text";
+      text.textContent = eff || "(blank)";
+      if (!revealed[idx]) text.classList.add("effect-hidden");
+
+      const btn = document.createElement("button");
+      btn.className = "small";
+      btn.textContent = revealed[idx] ? "Known" : "Reveal";
+      btn.disabled = revealed[idx];
+      btn.addEventListener("click", () => {
+        REVEALS[idStr][idx] = true;
+        saveLocal();
+        renderIngredient(idStr);
+        toast("Noted.", "good");
+      });
+
+      line.appendChild(label);
+      line.appendChild(text);
+      line.appendChild(btn);
+      list.appendChild(line);
+    });
+
+    el("revealRandomBtn").onclick = () => {
+      const hidden = [];
+      for (let i = 0; i < 4; i++) if (!REVEALS[idStr][i]) hidden.push(i);
+      if (hidden.length === 0) {
+        toast("Nothing more to learn here.", "good");
+        return;
+      }
+      const pick = hidden[Math.floor(Math.random() * hidden.length)];
+      REVEALS[idStr][pick] = true;
+      saveLocal();
+      renderIngredient(idStr);
+      toast("Noted.", "good");
+    };
+
+    el("resetRevealsBtn").onclick = () => {
+      REVEALS[idStr] = [false,false,false,false];
+      saveLocal();
+      renderIngredient(idStr);
+      toast("Forgotten.", "bad");
+    };
+
+    renderRecipesForIngredient(idStr);
+  }
+
+  function renderRecipesForIngredient(idStr) {
+    const box = el("recipesList");
+    const nameOf = (iid) => ING_BY_ID[iid]?.name || `Ingredient ${iid}`;
+
+    const related = RECIPES.filter(r => Array.isArray(r.ids) && r.ids.includes(idStr));
+    if (related.length === 0) {
+      box.textContent = "No recipes recorded yet.";
+      return;
+    }
+
+    const lines = related.map(r => {
+      const parts = r.ids.map(x => nameOf(String(x)));
+      const effects = Array.isArray(r.effects) ? r.effects : [];
+      const effText = effects.length ? effects.join(", ") : "Unknown";
+      return `• ${parts.join(" + ")} = Concoction of ${effText}`;
+    });
+
+    box.textContent = lines.join("\n");
+  }
+
+  function setTheme(next) {
+    theme = next;
+    if (theme === "wilderness") {
+      el("brewBg").src = "assets/themes/wilderness_bg.webp";
+      el("themeIcon").src = "assets/icons/theme_wilderness.webp";
+      el("themeLabel").textContent = "Wilderness";
+    } else {
+      el("brewBg").src = "assets/themes/town_bg.webp";
+      el("themeIcon").src = "assets/icons/theme_town.webp";
+      el("themeLabel").textContent = "Town";
+    }
+  }
+
+  function availableForBrewIds() {
+    const ids = Object.keys(INDEX).filter(id => ING_BY_ID[id] && (Number(INDEX[id]) || 0) > 0);
+    ids.sort((a,b) => Number(a) - Number(b));
+    return ids;
+  }
+
+  function fillBrewChoices() {
+    const a = el("mixA"), b = el("mixB"), c = el("mixC");
+    const ids = availableForBrewIds();
+
+    if (ids.length < 2) {
+      a.innerHTML = "";
+      b.innerHTML = "";
+      c.innerHTML = "";
+      el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your Inventory to brew.</div>`;
+      renderBrewDiscovered();
+      return;
+    }
+
+    const opts = ids.map(idStr => {
+      const name = ING_BY_ID[idStr]?.name || "Unknown";
+      const qty = Number(INDEX[idStr]) || 0;
+      return `<option value="${escapeHtml(idStr)}">${escapeHtml(name)} (${qty})</option>`;
+    }).join("");
+
+    const prevA = a.value, prevB = b.value, prevC = c.value;
+
+    a.innerHTML = opts;
+    b.innerHTML = opts;
+    c.innerHTML = opts;
+
+    a.value = ids.includes(prevA) ? prevA : ids[0];
+    b.value = ids.includes(prevB) ? prevB : ids[1];
+    if (a.value === b.value) b.value = ids.find(x => x !== a.value) || ids[1];
+
+    c.value = ids.includes(prevC) ? prevC : ids.find(x => x !== a.value && x !== b.value) || ids[0];
+    if (el("useThird").checked && (c.value === a.value || c.value === b.value)) {
+      c.value = ids.find(x => x !== a.value && x !== b.value) || c.value;
+    }
+
+    renderBrewDiscovered();
+  }
+
+  function discoveredEffectsFor(idStr) {
+    const row = ING_BY_ID[idStr];
+    if (!row) return [];
+    const effs = [row.effect_1,row.effect_2,row.effect_3,row.effect_4];
+    const revealed = REVEALS[idStr] || [false,false,false,false];
+    const known = [];
+    for (let i = 0; i < 4; i++) {
+      if (revealed[i] && effs[i]) known.push(String(effs[i]));
+    }
+    return known;
+  }
+
+  function renderDiscoveredInto(containerId, effects) {
+    const wrap = el(containerId);
+    wrap.innerHTML = "";
+    if (!effects.length) {
+      const s = document.createElement("div");
+      s.className = "muted";
+      s.textContent = "None yet.";
+      wrap.appendChild(s);
+      return;
+    }
+    effects.forEach(e => {
+      const p = document.createElement("div");
+      p.className = "discoveredPill";
+      p.textContent = e;
+      wrap.appendChild(p);
+    });
+  }
+
+  function renderBrewDiscovered() {
+    const aId = el("mixA").value;
+    const bId = el("mixB").value;
+    const useThird = el("useThird").checked;
+    const cId = useThird ? el("mixC").value : "";
+
+    renderDiscoveredInto("discA", aId ? discoveredEffectsFor(aId) : []);
+    renderDiscoveredInto("discB", bId ? discoveredEffectsFor(bId) : []);
+    if (useThird) renderDiscoveredInto("discC", cId ? discoveredEffectsFor(cId) : []);
+  }
+
+  function computeShared(ids) {
+    const rows = ids.map(id => ING_BY_ID[id]).filter(Boolean);
+    if (rows.length < 2) return [];
+    const sets = rows.map(r => new Set([r.effect_1,r.effect_2,r.effect_3,r.effect_4].filter(Boolean)));
+    let shared = sets[0];
+    for (let i = 1; i < sets.length; i++) {
+      shared = new Set([...shared].filter(x => sets[i].has(x)));
+    }
+    return [...shared];
+  }
+
+  function canSpend(ids) {
+    const needed = {};
+    for (const id of ids) needed[id] = (needed[id] || 0) + 1;
+    for (const [id, n] of Object.entries(needed)) {
+      const have = Number(INDEX[id]) || 0;
+      if (have < n) return false;
+    }
+    return true;
+  }
+
+  function spend(ids) {
+    const needed = {};
+    for (const id of ids) needed[id] = (needed[id] || 0) + 1;
+    for (const [id, n] of Object.entries(needed)) {
+      setQty(id, (Number(INDEX[id]) || 0) - n);
+    }
+  }
+
+  function revealSharedAutomatically(ids, shared) {
+    for (const idStr of ids) {
+      const row = ING_BY_ID[idStr];
+      if (!row) continue;
+      const effs = [row.effect_1,row.effect_2,row.effect_3,row.effect_4];
+      if (!REVEALS[idStr]) REVEALS[idStr] = [false,false,false,false];
+      for (let i = 0; i < 4; i++) {
+        if (shared.includes(effs[i])) REVEALS[idStr][i] = true;
+      }
+    }
+    saveLocal();
+  }
+
+  function recordRecipe(ids, shared) {
+    const norm = ids.map(String).slice().sort((a,b) => Number(a) - Number(b));
+    const key = norm.join("+") + "::" + shared.slice().sort().join("|");
+    const exists = RECIPES.some(r => (Array.isArray(r.ids) ? r.ids.slice().sort((a,b)=>Number(a)-Number(b)).join("+") : "") + "::" + (Array.isArray(r.effects)? r.effects.slice().sort().join("|"):"") === key);
+    if (exists) return;
+    RECIPES.push({ ids: norm, effects: shared.slice(), at: Date.now() });
+    saveLocal();
+  }
+
+  function brew() {
+    const aId = el("mixA").value;
+    const bId = el("mixB").value;
+    const useThird = el("useThird").checked;
+    const cId = useThird ? el("mixC").value : "";
+
+    const ids = [aId,bId].filter(Boolean);
+    if (useThird && cId) ids.push(cId);
+
+    if (ids.length < 2) {
+      el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your Inventory to brew.</div>`;
+      return;
+    }
+
+    if (useThird && (aId === bId || aId === cId || bId === cId)) {
+      el("mixResult").innerHTML = `
+        <div style="color:var(--warn); font-weight:950;">Choose different ingredients.</div>
+        <div class="muted" style="margin-top:6px;">The third ingredient should be different.</div>
+      `;
+      toast("Choose different ingredients.", "bad");
+      return;
+    }
+
+    if (!canSpend(ids)) {
+      el("mixResult").innerHTML = `
+        <div style="color:var(--warn); font-weight:950;">Not enough in the Inventory.</div>
+        <div class="muted" style="margin-top:6px;">You are missing one of the chosen ingredients.</div>
+      `;
+      toast("Not enough in the Inventory.", "bad");
+      return;
+    }
+
+    const shared = computeShared(ids);
+
+    // Consume ingredients regardless of outcome (as previously established)
+    spend(ids);
+    renderIndex();
+    fillBrewChoices();
+    renderBrewDiscovered();
+
+    if (shared.length === 0) {
+      el("mixResult").innerHTML = `
+        <div style="color:var(--warn); font-weight:950;">The mixture fizzles.</div>
+        <div class="muted" style="margin-top:6px;">Nothing in common, nothing takes hold.</div>
+      `;
+      toast("Fizzled.", "bad");
+      return;
+    }
+
+    revealSharedAutomatically(ids, shared);
+    recordRecipe(ids, shared);
+
+    playSfx("sfxSuccess");
+
+    const effectText = shared.join(", ");
+    el("mixResult").innerHTML = `
+      <div style="color:var(--good); font-weight:1000;">Made Concoction of ${escapeHtml(effectText)}</div>
+      <div class="muted" style="margin-top:6px;">The shared nature has been noted.</div>
+    `;
+    toast("A concoction is born.", "good");
+  }
+
+  function exportNotes() {
+    el("saveBox").value = JSON.stringify({ reveals: REVEALS, index: INDEX, recipes: RECIPES }, null, 2);
+    toast("Copied to the box.", "good");
+  }
+
+  function importNotes() {
+    try {
+      const parsed = JSON.parse(el("saveBox").value);
+      if (!parsed || typeof parsed !== "object") throw new Error("bad");
+      REVEALS = (parsed.reveals && typeof parsed.reveals === "object") ? parsed.reveals : {};
+      const idx = (parsed.index && typeof parsed.index === "object") ? parsed.index : {};
+      const clean = {};
+      for (const [k,v] of Object.entries(idx)) {
+        const n = Number(v);
+        if (Number.isFinite(n) && n >= 0) clean[String(k)] = Math.floor(n);
+      }
+      INDEX = clean;
+      RECIPES = Array.isArray(parsed.recipes) ? parsed.recipes : [];
+      saveLocal();
+      renderIndex();
+      fillBrewChoices();
+      renderBrewDiscovered();
+      toast("Restored.", "good");
+    } catch {
+      toast("Those notes do not make sense.", "bad");
+    }
+  }
+
+  function burnAll() {
+    if (!confirm("Burn all notes on this device?")) return;
+    REVEALS = {};
+    INDEX = {};
+    RECIPES = [];
+    saveLocal();
+    renderIndex();
+    fillBrewChoices();
+    renderBrewDiscovered();
+    showOnly("main");
+    toast("Ashes and silence.", "bad");
+  }
+
+  // Wire UI
+  el("refreshBtn").addEventListener("click", fetchAllIngredients);
+
+  el("openBookBtn").addEventListener("click", () => {
+    playSfx("sfxPage");
+    showOnly("book");
+    showBookSpread("index");
+    renderIndex();
+  });
+
+  el("openBrewBtn").addEventListener("click", () => {
+    showOnly("brew");
+    fillBrewChoices();
+    renderBrewDiscovered();
+  });
+
+  el("closeBookBtn").addEventListener("click", () => {
+    playSfx("sfxPage");
+    showOnly("main");
+  });
+
+  el("backToIndexBtn").addEventListener("click", () => {
+    playSfx("sfxPage");
+    currentIngredientId = null;
+    showBookSpread("index");
+    renderIndex();
+  });
+
+  el("backFromBrewBtn").addEventListener("click", () => {
+    showOnly("main");
+  });
+
+  el("recordBtn").addEventListener("click", () => {
+    recordIngredientFromMark(el("markInput").value);
+  });
+
+  el("markInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") recordIngredientFromMark(el("markInput").value);
+  });
+
+  el("themeToggleBtn").addEventListener("click", () => {
+    setTheme(theme === "wilderness" ? "town" : "wilderness");
+  });
+
+  el("useThird").addEventListener("change", () => {
+    const on = el("useThird").checked;
+    el("thirdSlot").classList.toggle("hidden", !on);
+    fillBrewChoices();
+    renderBrewDiscovered();
+  });
+
+  el("mixA").addEventListener("change", renderBrewDiscovered);
+  el("mixB").addEventListener("change", renderBrewDiscovered);
+  el("mixC").addEventListener("change", renderBrewDiscovered);
+  el("brewBtn").addEventListener("click", brew);
+
+  el("exportBtn").addEventListener("click", exportNotes);
+  el("importBtn").addEventListener("click", importNotes);
+  el("wipeBtn").addEventListener("click", burnAll);
+
+  // Initial
+  setTheme("wilderness");
+  showOnly("main");
+  fetchAllIngredients();
+</script>
+</body>
+</html>
       margin-bottom:12px;
     }
     h1{ margin:0; font-size: 26px; line-height:1.05; text-shadow: 0 1px 0 rgba(255,255,255,0.6); }

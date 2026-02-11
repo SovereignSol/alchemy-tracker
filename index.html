@@ -33,7 +33,7 @@
       /* Book UI scale */
       --book-ui: 0.84;
 
-      /* Book overlay placement (RESTORED) */
+      /* Book overlay placement */
       --book-top: 19.8%;
       --book-bottom: 10%;
       --book-left: 3.6%;
@@ -41,10 +41,13 @@
       --book-gap: 2.4%;
       --book-pad: 8px;
 
-      /* Width control inside pages (RESTORED) */
+      /* Width control inside pages */
       --page-content-width: 78%;
       --line-width: 78%;
       --right-box-width: 96%;
+
+      /* Right page shift (NEW): moves How-To + Known Recipes left without touching Index page */
+      --right-page-shift: 14px;
 
       --brew-maxw: 1000px;
     }
@@ -316,6 +319,7 @@
         --page-content-width: 90%;
         --line-width: 90%;
         --right-box-width: 98%;
+        --right-page-shift: 0px;
       }
       .bookWrap{
         height: auto;
@@ -327,7 +331,7 @@
       }
     }
 
-    /* Page alignment (RESTORED) */
+    /* Page alignment */
     .page{
       border-radius: 14px;
       padding: var(--book-pad);
@@ -354,15 +358,18 @@
     .pageInner::-webkit-scrollbar-track{ background: transparent; }
     .pageInner::-webkit-scrollbar-thumb{ background: rgba(0,0,0,0.2); border-radius: 2px; }
 
+    /* Right page: shift left (ONLY affects How-To + Known Recipes pages) */
     .pageRight{
       justify-content: center;
-      align-items: center;
+      align-items: flex-start; /* stop centering */
     }
     .pageRight .pageInner{
       width: var(--right-box-width);
       max-width: var(--right-box-width);
-      margin: 0 auto;
+      margin-left: 0;     /* anchor left */
+      margin-right: auto; /* keep inside page */
       padding-right: 10px;
+      transform: translateX(calc(-1 * var(--right-page-shift)));
     }
 
     .leftCentered{
@@ -414,7 +421,7 @@
       border: 1px solid rgba(0,0,0,0.18);
     }
 
-    /* Index rows (RESTORED widths) */
+    /* Index rows */
     .indexRow{
       display:grid;
       grid-template-columns: 1fr auto;

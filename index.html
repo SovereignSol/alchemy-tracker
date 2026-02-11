@@ -8,47 +8,42 @@
   <style>
     * { box-sizing: border-box; }
 
-    :root{
-      --ink:#000000;
-
-      /* Dark app theme */
-      --app-bg-1:#0a1020;
-      --app-bg-2:#05070d;
+    :root {
+      --ink: #000000;
+      --app-bg-1: #0a1020;
+      --app-bg-2: #05070d;
       --panel-bg: rgba(26, 30, 40, 0.72);
       --panel-border: rgba(120, 130, 155, 0.38);
       --scene-bg: rgba(22, 26, 36, 0.70);
       --scene-border: rgba(120, 130, 155, 0.34);
-
-      --edge:#d9c8aa;
-      --good:#1f7a3a;
-      --warn:#8a5a00;
-      --bad:#8b1d2c;
+      --edge: #d9c8aa;
+      --good: #1f7a3a;
+      --warn: #8a5a00;
+      --bad: #8b1d2c;
       --shadow: 0 16px 40px rgba(0,0,0,0.38);
       --shadow2: 0 10px 24px rgba(0,0,0,0.32);
 
-      --base: 13px;
-      --small: 12px;
-      --h1: 18px;
+      /* Responsive typography */
+      --base: clamp(12px, 2vw, 14px);
+      --small: clamp(11px, 1.8vw, 12px);
+      --h1: clamp(16px, 3vw, 20px);
+      --h2: clamp(13px, 2.2vw, 15px);
+      --h3: clamp(12px, 2vw, 13px);
 
       /* Book UI scale */
-      --book-ui: 0.84;
+      --book-ui: clamp(0.80, 95vw / 980px, 0.95);
 
-      /* Book overlay placement */
-      --book-top: 19.8%;
-      --book-bottom: 10%;
-      --book-left: 3.6%;
-      --book-right: 15.5%;
-      --book-gap: 2.4%;
-      --book-pad: 8px;
+      /* Book overlay placement (do not change, Index placement depends on this) */
+      --book-top: clamp(15%, 8vh + 2%, 24%);
+      --book-bottom: clamp(8%, 5vh, 14%);
+      --book-left: clamp(2%, 3vw, 5%);
+      --book-right: clamp(10%, 4vw, 18%);
+      --book-gap: clamp(2%, 1.5vw, 3%);
+      --book-pad: clamp(6px, 1.2vw, 10px);
 
-      /* Width control inside pages */
-      --page-content-width: 78%;
-      --line-width: 78%;
-      --right-box-width: 96%;
-
-      /* Right page shift (NEW): moves How-To + Known Recipes left without touching Index page */
-      --right-page-shift: 14px;
-
+      /* Page content */
+      --page-content-width: min(88%, 280px);
+      --right-box-width: min(92%, 300px);
       --brew-maxw: 1000px;
     }
 
@@ -59,232 +54,275 @@
       padding: 0;
     }
 
-    body{
+    body {
       color: #e9edf6;
       background:
-        radial-gradient(1100px 640px at 12% 0%, rgba(90,120,255,0.10), transparent 60%),
-        radial-gradient(900px 520px at 90% 20%, rgba(0,255,200,0.06), transparent 60%),
+        radial-gradient(1100px 640px at 12% 0%, rgba(90, 120, 255, 0.10), transparent 60%),
+        radial-gradient(900px 520px at 90% 20%, rgba(0, 255, 200, 0.06), transparent 60%),
         linear-gradient(180deg, var(--app-bg-1), var(--app-bg-2));
-      font-family: "Segoe Print","Bradley Hand","Comic Sans MS",cursive,system-ui;
+      font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive, system-ui;
       letter-spacing: 0.12px;
       font-size: var(--base);
-      line-height: 1.15;
+      line-height: 1.5;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       -webkit-touch-callout: none;
     }
 
-    .wrap{
+    .wrap {
       max-width: 1000px;
       margin: 0 auto;
-      padding: 12px;
+      padding: clamp(8px, 3vw, 16px);
     }
-    .hidden{ display:none !important; }
 
-    button, input, select, textarea{
+    .hidden { display: none !important; }
+
+    /* === BUTTONS & INPUTS === */
+    button, input, select, textarea {
       font-size: var(--base);
-      padding: 8px 9px;
+      padding: clamp(6px, 1.5vw, 10px) clamp(7px, 2vw, 12px);
       border-radius: 14px;
-      border: 1px solid rgba(217,200,170,0.35);
-      background: rgba(255,255,255,0.84);
+      border: 1px solid rgba(217, 200, 170, 0.35);
+      background: rgba(255, 255, 255, 0.84);
       color: #000;
       outline: none;
-      box-shadow: 0 2px 0 rgba(0,0,0,0.04) inset;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.04) inset;
       font-family: inherit;
       line-height: 1.1;
       transition: all 120ms ease;
     }
 
-    button:hover:not(:disabled){
+    button:hover:not(:disabled) {
       transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
     }
-    button:active:not(:disabled){
+
+    button:active:not(:disabled) {
       transform: translateY(1px);
-      box-shadow: 0 2px 0 rgba(0,0,0,0.04) inset;
-    }
-    button:disabled{ opacity: 0.55; cursor: not-allowed; }
-
-    input::placeholder, textarea::placeholder{
-      color: rgba(0,0,0,0.45);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.04) inset;
     }
 
-    .btn-primary{
-      background: linear-gradient(180deg, rgba(122,62,31,0.92), rgba(122,62,31,0.78));
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: rgba(0, 0, 0, 0.45);
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, rgba(122, 62, 31, 0.92), rgba(122, 62, 31, 0.78));
       color: #fff7ee;
-      border-color: rgba(122,62,31,0.45);
-      box-shadow: 0 10px 22px rgba(0,0,0,0.28);
+      border-color: rgba(122, 62, 31, 0.45);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
       font-weight: 900;
     }
-    .btn-primary:hover:not(:disabled){
-      box-shadow: 0 14px 28px rgba(0,0,0,0.32);
+
+    .btn-primary:hover:not(:disabled) {
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.32);
     }
 
-    .btn-quiet{
-      background: rgba(255,255,255,0.70);
+    .btn-quiet {
+      background: rgba(255, 255, 255, 0.70);
       color: #000;
       font-weight: 900;
     }
 
-    input:focus, select:focus, textarea:focus{
-      border-color: rgba(122,62,31,0.6);
-      box-shadow: 0 0 0 3px rgba(122,62,31,0.15) inset;
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(122, 62, 31, 0.6);
+      box-shadow: 0 0 0 3px rgba(122, 62, 31, 0.15) inset;
     }
 
-    .muted{ color: rgba(233,237,246,0.78); font-size: var(--small); }
+    /* === TYPOGRAPHY === */
+    .muted { color: rgba(233, 237, 246, 0.78); font-size: var(--small); }
 
-    .title{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:10px;
+    .title {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
       flex-wrap: wrap;
     }
-    h1{
-      margin:0;
+
+    h1 {
+      margin: 0;
       font-size: var(--h1);
-      line-height:1.05;
-      text-shadow: 0 1px 0 rgba(0,0,0,0.35);
+      line-height: 1.05;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
       font-weight: 900;
       color: #f2f6ff;
     }
-    .sub{ margin-top:4px; color: rgba(233,237,246,0.78); font-size: var(--small); }
 
-    /* Main screen */
-    .main-grid{
-      display:grid;
+    .sub {
+      margin-top: 4px;
+      color: rgba(233, 237, 246, 0.78);
+      font-size: var(--small);
+      line-height: 1.3;
+    }
+
+    /* === MAIN SCREEN === */
+    .main-grid {
+      display: grid;
       grid-template-columns: 1fr;
-      gap: 12px;
+      gap: clamp(10px, 3vw, 16px);
       align-items: stretch;
     }
-    @media (min-width: 860px){
-      .main-grid{ grid-template-columns: 1fr 1fr; }
+
+    @media (min-width: 760px) {
+      .main-grid { grid-template-columns: 1fr 1fr; }
     }
 
-    .panel{
+    .panel {
       border-radius: 18px;
       border: 1px solid var(--panel-border);
       background: var(--panel-bg);
       box-shadow: var(--shadow2);
-      overflow:hidden;
+      overflow: hidden;
       min-height: 220px;
       position: relative;
       transition: transform 200ms ease, box-shadow 200ms ease;
     }
-    .panel:hover{
+
+    .panel:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow);
     }
-    .panel button.overlayBtn{
+
+    .panel button.overlayBtn {
       all: unset;
       cursor: pointer;
-      display:block;
-      width:100%;
-      height:100%;
+      display: block;
+      width: 100%;
+      height: 100%;
+      transition: opacity 200ms ease;
     }
-    .panel img.coverArt{
-      width:100%;
-      height:100%;
+
+    .panel button.overlayBtn:active {
+      opacity: 0.9;
+    }
+
+    .panel img.coverArt {
+      width: 100%;
+      height: 100%;
       object-fit: contain;
-      display:block;
-      background: rgba(0,0,0,0.10);
+      display: block;
+      background: rgba(0, 0, 0, 0.10);
       filter: saturate(1.02);
     }
-    .panel .hint{
-      position:absolute;
+
+    .panel .hint {
+      position: absolute;
       left: 10px;
       bottom: 10px;
       padding: 6px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.20);
-      background: rgba(20,22,30,0.88);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.32);
+      border: 1px solid rgba(255, 255, 255, 0.20);
+      background: rgba(20, 22, 30, 0.88);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.32);
       font-weight: 900;
       color: #f2f6ff;
       font-size: var(--small);
       pointer-events: none;
       animation: pulse 2s ease-in-out infinite;
     }
-    @keyframes pulse{
-      0%,100%{ opacity:0.8; }
-      50%{ opacity:1; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 1; }
     }
 
-    /* Scene wrapper */
-    .scene{
+    /* === SCENE (Book & Brew) === */
+    .scene {
       border-radius: 18px;
       border: 1px solid var(--scene-border);
       background: var(--scene-bg);
       box-shadow: var(--shadow2);
-      overflow:hidden;
+      overflow: hidden;
       position: relative;
+      animation: fadeIn 300ms ease;
     }
 
-    .sceneTopBar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .sceneTopBar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 10px;
-      padding: 9px 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.12);
-      background: rgba(15,18,26,0.62);
-      flex-wrap: wrap;
-    }
-    .topLeftBtns{
-      display:flex;
-      gap: 8px;
-      align-items:center;
+      padding: clamp(8px, 2vw, 12px) clamp(10px, 2.5vw, 14px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(15, 18, 26, 0.62);
       flex-wrap: wrap;
     }
 
-    .backBtn{
-      display:flex;
-      align-items:center;
+    .topLeftBtns {
+      display: flex;
       gap: 8px;
-      padding: 7px 9px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .backBtn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(20,22,30,0.72);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.32);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(20, 22, 30, 0.72);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.32);
       font-weight: 900;
       color: #f2f6ff;
       font-size: var(--small);
       cursor: pointer;
+      transition: all 120ms ease;
     }
-    .backBtn:hover{
-      background: rgba(30,35,50,0.82);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.40);
-    }
-    .backBtn img{ width: 16px; height: 16px; opacity: 0.92; filter: brightness(1.2); }
 
-    /* Book layout */
-    .bookWrap{
-      position: relative;
-      width:100%;
-      height: min(86vh, 800px);
-      min-height: 560px;
-      background: rgba(0,0,0,0.10);
+    .backBtn:hover {
+      background: rgba(30, 35, 50, 0.82);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.40);
     }
-    .bookBg{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
+
+    .backBtn img {
+      width: 16px;
+      height: 16px;
+      opacity: 0.92;
+      filter: brightness(1.2);
+    }
+
+    /* === BOOK LAYOUT === */
+    .bookWrap {
+      position: relative;
+      width: 100%;
+      height: clamp(400px, 80vh, 800px);
+      min-height: 500px;
+      background: rgba(0, 0, 0, 0.10);
+    }
+
+    .bookBg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       object-fit: contain;
       opacity: 0.98;
-      pointer-events:none;
-      user-select:none;
-      background: rgba(0,0,0,0.05);
+      pointer-events: none;
+      user-select: none;
+      background: rgba(0, 0, 0, 0.05);
     }
 
-    .bookPages{
-      position:absolute;
+    .bookPages {
+      position: absolute;
       top: var(--book-top);
       bottom: var(--book-bottom);
       left: var(--book-left);
       right: var(--book-right);
-      display:grid;
+      display: grid;
       grid-template-columns: 1fr 1fr;
       gap: var(--book-gap);
       align-items: stretch;
@@ -298,116 +336,95 @@
     }
 
     /* Force all book text black */
-    .bookPages, .bookPages *{
-      color:#000 !important;
-      -webkit-text-fill-color:#000 !important;
+    .bookPages, .bookPages * {
+      color: #000 !important;
+      -webkit-text-fill-color: #000 !important;
     }
-    .bookPages .muted{
+
+    .bookPages .muted {
       opacity: 1 !important;
-      color:#000 !important;
-      -webkit-text-fill-color:#000 !important;
+      color: #000 !important;
+      -webkit-text-fill-color: #000 !important;
     }
 
-    @media (max-width: 760px){
-      :root{
-        --book-top: 21.5%;
-        --book-bottom: 12%;
-        --book-left: 4.5%;
-        --book-right: 10%;
-        --book-gap: 10px;
-        --book-ui: 0.88;
-        --page-content-width: 90%;
-        --line-width: 90%;
-        --right-box-width: 98%;
-        --right-page-shift: 0px;
-      }
-      .bookWrap{
-        height: auto;
-        min-height: 920px;
-      }
-      .bookPages{
+    @media (max-width: 720px) {
+      .bookPages {
         grid-template-columns: 1fr;
-        gap: 12px;
+        gap: clamp(12px, 2vw, 16px);
       }
+      .bookWrap { min-height: 600px; }
     }
 
-    /* Page alignment */
-    .page{
+    .page {
       border-radius: 14px;
       padding: var(--book-pad);
-      background: rgba(255,255,255,0.00);
+      background: rgba(255, 255, 255, 0.00);
       overflow: hidden;
       min-height: 0;
-      display:flex;
-      justify-content:flex-start;
+      display: flex;
       flex-direction: column;
-      align-items: stretch;
+      align-items: center; /* left page stays perfect with this */
     }
-    .pageInner{
+
+    .pageInner {
       height: 100%;
-      overflow:auto;
+      overflow: auto;
       padding-right: 6px;
-      width: var(--page-content-width);
+      width: 100%;
       max-width: var(--page-content-width);
-      margin-left: 0;
-      margin-right: auto;
       scrollbar-width: thin;
-      scrollbar-color: rgba(0,0,0,0.2) transparent;
+      scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
     }
-    .pageInner::-webkit-scrollbar{ width: 4px; }
-    .pageInner::-webkit-scrollbar-track{ background: transparent; }
-    .pageInner::-webkit-scrollbar-thumb{ background: rgba(0,0,0,0.2); border-radius: 2px; }
 
-    /* Right page: shift left (ONLY affects How-To + Known Recipes pages) */
-    .pageRight{
-      justify-content: center;
-      align-items: flex-start; /* stop centering */
-    }
-    .pageRight .pageInner{
-      width: var(--right-box-width);
-      max-width: var(--right-box-width);
-      margin-left: 0;     /* anchor left */
-      margin-right: auto; /* keep inside page */
+    .pageInner::-webkit-scrollbar { width: 4px; }
+    .pageInner::-webkit-scrollbar-track { background: transparent; }
+    .pageInner::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); border-radius: 2px; }
+
+    /* Right page: move content LEFT by anchoring it to the left edge of the right page.
+       This avoids negative margins (which caused clipping). */
+    .pageRight { justify-content: flex-start; align-items: flex-start; }
+    .pageRight .pageInner {
+      max-width: none;
+      width: 92%;
+      margin: 0;
+      padding-left: 0;
       padding-right: 10px;
-      transform: translateX(calc(-1 * var(--right-page-shift)));
     }
 
-    .leftCentered{
-      width: var(--line-width);
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .page h2{
-      margin: 0 0 6px 0;
-      font-size: 13.5px;
+    .page h2 {
+      margin: 0 0 8px 0;
+      font-size: var(--h2);
       font-weight: 950;
       width: 100%;
+      text-align: center;
     }
-    .page h3{
+
+    .page h3 {
       margin: 10px 0 6px 0;
-      font-size: 12px;
+      font-size: var(--h3);
       font-weight: 950;
       width: 100%;
     }
-    .hr{
-      height:1px;
-      background: rgba(0,0,0,0.35);
-      margin: 9px auto;
-      width: var(--line-width);
+
+    .hr {
+      height: 1px;
+      background: rgba(0, 0, 0, 0.35);
+      margin: 9px 0;
+      width: 100%;
     }
 
-    .bookPages button, .bookPages input, .bookPages select, .bookPages textarea{
+    .bookPages button, .bookPages input, .bookPages select, .bookPages textarea {
       font-size: var(--small);
-      padding: 7px 8px;
+      padding: clamp(6px, 1.2vw, 8px) clamp(7px, 1.5vw, 9px);
       border-radius: 12px;
-      color:#000 !important;
-      -webkit-text-fill-color:#000 !important;
+      color: #000 !important;
+      -webkit-text-fill-color: #000 !important;
     }
+
     .bookPages textarea::placeholder,
-    .bookPages input::placeholder{
+    .bookPages input::placeholder {
       opacity: 0.55 !important;
-      -webkit-text-fill-color: rgba(0,0,0,0.55) !important;
+      -webkit-text-fill-color: rgba(0, 0, 0, 0.55) !important;
     }
 
     .bookPages .btn-quiet,
@@ -415,341 +432,384 @@
     .bookPages button.smallBtn,
     .bookPages button.qtyBtn,
     .bookPages button#revealRandomBtn,
-    .bookPages button#resetRevealsBtn{
-      background: rgba(255,255,255,0.20);
+    .bookPages button#resetRevealsBtn {
+      background: rgba(255, 255, 255, 0.20);
       box-shadow: none;
-      border: 1px solid rgba(0,0,0,0.18);
+      border: 1px solid rgba(0, 0, 0, 0.18);
     }
 
-    /* Index rows */
-    .indexRow{
-      display:grid;
+    /* === INDEX LIST === */
+    .indexRow {
+      display: grid;
       grid-template-columns: 1fr auto;
       gap: 8px;
-      align-items:center;
-      padding: 7px 8px;
+      align-items: center;
+      padding: clamp(6px, 1.2vw, 8px) clamp(7px, 1.5vw, 9px);
       border-radius: 12px;
-      border: 1px solid rgba(0,0,0,0.22);
-      background: rgba(255,255,255,0.00);
+      border: 1px solid rgba(0, 0, 0, 0.22);
+      background: rgba(255, 255, 255, 0.00);
       box-shadow: none;
       margin: 0 auto 6px auto;
-      width: var(--line-width);
+      width: 100%;
       transition: background 150ms ease;
     }
-    .indexRow:hover{ background: rgba(0,0,0,0.04); }
 
-    @media (max-width: 420px){
-      .indexRow{ grid-template-columns: 1fr; width: 100%; }
-      .inventoryBox{ justify-content:flex-start; }
-      .hr{ width: 100%; }
+    .indexRow:hover { background: rgba(0, 0, 0, 0.04); }
+
+    @media (max-width: 420px) {
+      .indexRow { grid-template-columns: 1fr; }
+      .inventoryBox { justify-content: flex-start; }
     }
 
-    .ingNameBtn{
+    .ingNameBtn {
       all: unset;
-      cursor:pointer;
+      cursor: pointer;
       font-weight: 950;
       padding: 2px 3px;
-      font-size: 12.5px;
+      font-size: var(--h3);
       transition: opacity 120ms ease;
       text-decoration: underline;
       text-decoration-thickness: 2px;
       text-underline-offset: 2px;
-      opacity: 0.85;
+      opacity: 0.8;
     }
-    .ingNameBtn:hover{ opacity: 1; }
 
-    .inventoryBox{
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
+    .ingNameBtn:hover { opacity: 1; }
+
+    .inventoryBox {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
       gap: 4px;
       flex-wrap: nowrap;
     }
-    .count{
+
+    .count {
       min-width: 28px;
-      text-align:center;
+      text-align: center;
       font-weight: 950;
       padding: 4px 8px;
       border-radius: 999px;
-      border: 1px solid rgba(0,0,0,0.22);
-      background: rgba(255,255,255,0.00);
+      border: 1px solid rgba(0, 0, 0, 0.22);
+      background: rgba(255, 255, 255, 0.00);
       font-size: var(--small);
     }
-    .qtyBtn{
+
+    .qtyBtn {
       padding: 4px 6px;
       border-radius: 10px;
       font-weight: 950;
       min-width: 28px;
-      background: rgba(255,255,255,0.00);
-      box-shadow:none;
-      border: 1px solid rgba(0,0,0,0.22);
+      background: rgba(255, 255, 255, 0.00);
+      box-shadow: none;
+      border: 1px solid rgba(0, 0, 0, 0.22);
       font-size: var(--small);
     }
 
-    /* Ingredient page */
-    .noteBox{
+    /* === INGREDIENT PAGE === */
+    .ingredientGrid { display: grid; gap: clamp(8px, 2vw, 12px); width: 100%; }
+
+    .noteBox {
       border-radius: 12px;
-      border: 1px dashed rgba(0,0,0,0.28);
-      background: rgba(255,255,255,0.18);
-      padding: 8px 9px;
+      border: 1px dashed rgba(0, 0, 0, 0.28);
+      background: rgba(255, 255, 255, 0.18);
+      padding: clamp(6px, 1.5vw, 9px) clamp(7px, 1.5vw, 10px);
       font-size: var(--small);
-      line-height: 1.2;
+      line-height: 1.4;
       white-space: pre-wrap;
       word-break: break-word;
       width: 100%;
-      color:#000 !important;
-      -webkit-text-fill-color:#000 !important;
+      color: #000 !important;
+      -webkit-text-fill-color: #000 !important;
       max-height: 200px;
       overflow-y: auto;
     }
 
-    .plantImg{
-      width:100%;
-      max-width: 250px;
+    .plantImg {
+      width: 100%;
+      max-width: 240px;
       border-radius: 12px;
-      border: 1px solid rgba(0,0,0,0.22);
-      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(0, 0, 0, 0.22);
+      background: rgba(255, 255, 255, 0.12);
       box-shadow: none;
-      display:block;
+      display: block;
       margin: 0 auto;
     }
 
-    .pill{
-      display:inline-flex;
-      gap:6px;
-      align-items:center;
+    .pill {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
       padding: 4px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(0,0,0,0.22);
-      background: rgba(255,255,255,0.00);
+      border: 1px solid rgba(0, 0, 0, 0.22);
+      background: rgba(255, 255, 255, 0.00);
       font-size: var(--small);
       font-weight: 950;
-      box-shadow:none;
+      box-shadow: none;
     }
-    .pill-rare{ border-color: rgba(31,122,58,0.40); }
-    .pill-common{ border-color: rgba(122,62,31,0.40); }
-    .pill-unknown{ border-color: rgba(0,0,0,0.22); }
 
-    .effects{
-      display:grid;
-      gap: 7px;
-      margin-top: 9px;
-      width: var(--line-width);
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .effect-line{
-      display:grid;
+    .pill-rare { border-color: rgba(31, 122, 58, 0.40); }
+    .pill-common { border-color: rgba(122, 62, 31, 0.40); }
+    .pill-unknown { border-color: rgba(0, 0, 0, 0.22); }
+
+    .effects { display: grid; gap: 6px; margin-top: 8px; width: 100%; }
+
+    .effect-line {
+      display: grid;
       grid-template-columns: auto 1fr auto;
       gap: 6px;
       align-items: stretch;
     }
-    .effect-text{
-      padding: 7px 8px;
+
+    .effect-text {
+      padding: clamp(6px, 1.2vw, 8px) clamp(7px, 1.5vw, 9px);
       border-radius: 12px;
-      border: 1px dashed rgba(0,0,0,0.28);
-      background: rgba(255,255,255,0.18);
+      border: 1px dashed rgba(0, 0, 0, 0.28);
+      background: rgba(255, 255, 255, 0.18);
       box-shadow: none;
       min-height: 16px;
-      display:flex;
-      align-items:center;
+      display: flex;
+      align-items: center;
       font-size: var(--small);
       line-height: 1.15;
       word-break: break-word;
     }
-    .effect-hidden{
+
+    .effect-hidden {
       color: transparent !important;
       -webkit-text-fill-color: transparent !important;
-      text-shadow: 0 0 10px rgba(0,0,0,0.55);
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.55);
       user-select: none;
     }
-    .smallBtn{
+
+    .smallBtn {
       padding: 4px 8px;
       font-size: var(--small);
       border-radius: 10px;
       font-weight: 950;
-      background: rgba(255,255,255,0.00);
-      box-shadow:none;
-      border: 1px solid rgba(0,0,0,0.22);
+      background: rgba(255, 255, 255, 0.00);
+      box-shadow: none;
+      border: 1px solid rgba(0, 0, 0, 0.22);
       white-space: nowrap;
     }
 
-    /* Brewing UI */
-    .brewPage{
+    /* === BREWING UI === */
+    .brewPage {
       max-width: var(--brew-maxw);
       margin: 0 auto;
-      padding: 12px;
-      display:flex;
+      padding: clamp(10px, 3vw, 16px);
+      display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: clamp(10px, 3vw, 16px);
     }
-    .brewImageFrame{
+
+    .brewImageFrame {
       border-radius: 18px;
-      overflow:hidden;
+      overflow: hidden;
       border: 1px solid var(--scene-border);
-      background: rgba(0,0,0,0.15);
+      background: rgba(0, 0, 0, 0.15);
       box-shadow: var(--shadow2);
     }
-    .brewBgImg{
-      width:100%;
-      height: min(52vh, 520px);
-      min-height: 300px;
+
+    .brewBgImg {
+      width: 100%;
+      height: clamp(250px, 45vh, 500px);
       object-fit: contain;
-      background: rgba(0,0,0,0.10);
-      display:block;
+      background: rgba(0, 0, 0, 0.10);
+      display: block;
     }
-    .brewControls{
+
+    .brewControls {
       border-radius: 18px;
       border: 1px solid var(--scene-border);
       background: rgba(18, 22, 30, 0.72);
       box-shadow: var(--shadow);
-      padding: 12px;
-      color:#f2f6ff;
+      padding: clamp(10px, 2.5vw, 14px);
+      color: #f2f6ff;
     }
-    .brewControls .muted{ color: rgba(233,237,246,0.78); }
 
-    .brewTopRow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
+    .brewControls .muted { color: rgba(233, 237, 246, 0.78); }
+
+    .brewTopRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 10px;
       flex-wrap: wrap;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
-    .themeBtn{
-      display:flex;
-      align-items:center;
-      gap: 8px;
-      padding: 7px 9px;
+    .themeBtn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(20,22,30,0.72);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.32);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(20, 22, 30, 0.72);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.32);
       font-weight: 950;
       color: #f2f6ff;
       font-size: var(--small);
       cursor: pointer;
+      transition: all 120ms ease;
     }
-    .themeBtn:hover{
-      background: rgba(30,35,50,0.82);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.40);
-    }
-    .themeBtn img{ width: 16px; height: 16px; opacity: 0.92; filter: brightness(1.2); }
 
-    .brewGrid{
-      display:grid;
+    .themeBtn:hover {
+      background: rgba(30, 35, 50, 0.82);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.40);
+    }
+
+    .themeBtn img {
+      width: 16px;
+      height: 16px;
+      opacity: 0.92;
+      filter: brightness(1.2);
+    }
+
+    .brewGrid {
+      display: grid;
       grid-template-columns: 1fr;
-      gap: 10px;
+      gap: clamp(8px, 2vw, 12px);
     }
-    @media (min-width: 760px){
-      .brewGrid{ grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-    }
-    .slotTitle{ font-weight: 950; margin-bottom: 6px; font-size: var(--small); color:#f2f6ff; }
-    .slotBox{
-      border-radius: 14px;
-      border: 1px dashed rgba(255,255,255,0.20);
-      background: rgba(255,255,255,0.06);
-      padding: 10px;
-    }
-    .slotBox select{ width: 100%; }
 
-    .discoveredList{
+    @media (min-width: 760px) {
+      .brewGrid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    }
+
+    .slotTitle {
+      font-weight: 950;
+      margin-bottom: 6px;
+      font-size: var(--small);
+      color: #f2f6ff;
+    }
+
+    .slotBox {
+      border-radius: 14px;
+      border: 1px dashed rgba(255, 255, 255, 0.20);
+      background: rgba(255, 255, 255, 0.06);
+      padding: clamp(8px, 2vw, 12px);
+    }
+
+    .slotBox select { width: 100%; }
+
+    .discoveredList {
       margin-top: 8px;
-      display:flex;
+      display: flex;
       flex-wrap: wrap;
       gap: 6px;
     }
-    .discoveredPill{
+
+    .discoveredPill {
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.18);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       padding: 4px 8px;
-      background: rgba(255,255,255,0.10);
+      background: rgba(255, 255, 255, 0.10);
       font-weight: 950;
       color: #f2f6ff;
       font-size: var(--small);
+      animation: glow 2s ease-in-out infinite;
     }
 
-    .resultBox{
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.1); }
+      50% { box-shadow: 0 0 8px 0 rgba(255, 255, 255, 0.2); }
+    }
+
+    .resultBox {
       margin-top: 10px;
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.08);
-      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.08);
+      padding: clamp(8px, 2vw, 12px);
       font-size: var(--small);
-      line-height: 1.2;
+      line-height: 1.4;
       color: #f2f6ff;
       min-height: 40px;
-      display:flex;
-      align-items:center;
+      display: flex;
+      align-items: center;
     }
 
-    select{
-      background: rgba(255,255,255,0.86);
-      color:#000;
-      border: 1px solid rgba(255,255,255,0.25);
+    select {
+      background: rgba(255, 255, 255, 0.86);
+      color: #000;
+      border: 1px solid rgba(255, 255, 255, 0.25);
     }
 
-    /* Toast */
-    .toast{
+    /* === TOAST === */
+    .toast {
       position: fixed;
       left: 50%;
       bottom: 16px;
       transform: translateX(-50%);
-      background: rgba(20,22,30,0.95);
-      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(20, 22, 30, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       color: #f2f6ff;
       border-radius: 999px;
-      padding: 9px 12px;
+      padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 16px);
       box-shadow: var(--shadow);
       max-width: calc(100vw - 32px);
-      display:none;
+      display: none;
       z-index: 50;
       font-size: var(--small);
       font-weight: 950;
+      animation: slideUp 300ms ease;
     }
-    .toast.good{ border-color: rgba(31,122,58,0.40); }
-    .toast.bad{ border-color: rgba(139,29,44,0.45); }
 
-    /* Collapsible */
-    details{
-      border: 1px dashed rgba(0,0,0,0.25);
-      border-radius: 14px;
-      background: rgba(255,255,255,0.12);
-      padding: 10px;
-      margin-top: 12px;
-      width: var(--line-width);
-      margin-left: auto;
-      margin-right: auto;
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
     }
-    details summary{
+
+    .toast.good { border-color: rgba(31, 122, 58, 0.40); }
+    .toast.bad { border-color: rgba(139, 29, 44, 0.45); }
+
+    /* === COLLAPSIBLE === */
+    details {
+      border: 1px dashed rgba(0, 0, 0, 0.25);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.12);
+      padding: clamp(8px, 2vw, 12px);
+      margin-top: 12px;
+      width: 100%;
+    }
+
+    details summary {
       cursor: pointer;
       font-weight: 950;
       list-style: none;
       font-size: var(--small);
+      transition: opacity 120ms ease;
     }
-    details summary::-webkit-details-marker{ display:none; }
-    .sigil{
+
+    details summary:hover { opacity: 0.8; }
+    details summary::-webkit-details-marker { display: none; }
+
+    .sigil {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       letter-spacing: 0.4px;
       font-size: 10px;
       opacity: 0.7;
     }
 
-    /* Loading dot */
-    .loading{
-      display:inline-block;
+    /* === LOADING STATE === */
+    .loading {
+      display: inline-block;
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.3);
+      border: 2px solid rgba(255, 255, 255, 0.3);
       border-top-color: #f2f6ff;
       animation: spin 800ms linear infinite;
     }
-    @keyframes spin{ to{ transform: rotate(360deg); } }
 
-    @media (max-width: 480px){
-      .title{ flex-direction: column; align-items: flex-start; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 480px) {
+      .title { flex-direction: column; align-items: flex-start; }
+      .wrap { padding: clamp(10px, 2vw, 14px); }
     }
   </style>
 </head>
@@ -815,27 +875,21 @@
         <div class="bookPages" id="spreadIndex">
           <div class="page">
             <div class="pageInner">
-              <div class="leftCentered">
-                <h2 style="text-align:center;">Index</h2>
-                <div class="muted" style="text-align:center; margin-bottom:8px;">Tap a name to open its page.</div>
+              <h2>Index</h2>
+              <div class="muted" style="text-align:center; margin-bottom:8px;">Tap a name to open its page.</div>
+
+              <div class="hr"></div>
+
+              <h3>Record Ingredient</h3>
+              <div class="muted">Write the mark you were given.</div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; width:100%;">
+                <input id="markInput" inputmode="numeric" placeholder="Mark" aria-label="Mark" />
+                <button class="btn-primary" id="recordBtn" type="button">Record</button>
               </div>
 
               <div class="hr"></div>
 
-              <div class="leftCentered">
-                <h3>Record Ingredient</h3>
-                <div class="muted">Write the mark you were given.</div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; width:100%;">
-                  <input id="markInput" inputmode="numeric" placeholder="Mark" aria-label="Mark" />
-                  <button class="btn-primary" id="recordBtn" type="button">Record</button>
-                </div>
-              </div>
-
-              <div class="hr"></div>
-
-              <div class="leftCentered">
-                <h3 style="text-align:center;">Inventory</h3>
-              </div>
+              <h3 style="text-align:center;">Inventory</h3>
 
               <div id="indexList"></div>
 
@@ -881,29 +935,31 @@ Use the rules your table follows. Write the DC here as a quick reminder.
         <div class="bookPages hidden" id="spreadIngredient">
           <div class="page">
             <div class="pageInner">
-              <div style="width:var(--line-width); margin: 0 auto;">
-                <h2 id="ingName" style="margin:0;">Ingredient</h2>
-              </div>
+              <div class="ingredientGrid">
+                <div>
+                  <h2 id="ingName" style="margin:0;">Ingredient</h2>
+                </div>
 
-              <div style="margin-top:8px; width:var(--line-width); margin-left:auto; margin-right:auto; text-align:center;">
-                <span class="pill" id="rarityPill">Unknown</span>
-              </div>
+                <div style="text-align:center;">
+                  <span class="pill" id="rarityPill">Unknown</span>
+                </div>
 
-              <div style="margin-top:8px; width:var(--line-width); margin-left:auto; margin-right:auto;">
-                <img class="plantImg" id="ingImage" alt="Ingredient" />
-              </div>
+                <div style="text-align:center;">
+                  <img class="plantImg" id="ingImage" alt="Ingredient" />
+                </div>
 
-              <div style="margin-top:9px; width:var(--line-width); margin-left:auto; margin-right:auto;">
-                <h3 style="margin:0 0 6px 0;">Description</h3>
-                <div class="noteBox" id="ingNotes"></div>
-              </div>
+                <div>
+                  <h3 style="margin:0 0 6px 0;">Description</h3>
+                  <div class="noteBox" id="ingNotes"></div>
+                </div>
 
-              <div style="margin-top:9px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center; width:var(--line-width); margin-left:auto; margin-right:auto;">
-                <button id="revealRandomBtn" type="button">Reveal a Property</button>
-                <button id="resetRevealsBtn" type="button" class="btn-quiet">Forget Properties</button>
-              </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+                  <button id="revealRandomBtn" type="button">Reveal a Property</button>
+                  <button id="resetRevealsBtn" type="button" class="btn-quiet">Forget Properties</button>
+                </div>
 
-              <div class="effects" id="effectsList"></div>
+                <div class="effects" id="effectsList"></div>
+              </div>
             </div>
           </div>
 
@@ -911,12 +967,11 @@ Use the rules your table follows. Write the DC here as a quick reminder.
             <div class="pageInner">
               <h2>Known Recipes</h2>
               <div class="muted">What you have learned so far.</div>
-              <div class="hr" style="width:100%;"></div>
-              <div id="recipesList" class="noteBox" style="max-height: 320px;"></div>
+              <div class="hr"></div>
+              <div id="recipesList" class="noteBox"></div>
             </div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -1123,7 +1178,6 @@ Use the rules your table follows. Write the DC here as a quick reminder.
   async function fetchAllIngredients() {
     if (isFetching) return;
     isFetching = true;
-
     el("refreshBtn").disabled = true;
     el("refreshText").innerHTML = '<span class="loading"></span>';
 
@@ -1321,7 +1375,6 @@ Use the rules your table follows. Write the DC here as a quick reminder.
     el("ingImage").onerror = () => {
       el("ingImage").src = placeholderImageDataUri(row.name);
     };
-
     el("ingNotes").textContent = row.notes ? String(row.notes) : "No notes written yet.";
 
     const effects = [row.effect_1,row.effect_2,row.effect_3,row.effect_4].map(v => v || "");
@@ -1454,7 +1507,9 @@ Use the rules your table follows. Write the DC here as a quick reminder.
 
     const cDefault = ids.find(x => x !== a.value && x !== b.value) || ids[0];
     c.value = ids.includes(prevC) ? prevC : cDefault;
-    if (el("useThird").checked && (c.value === a.value || c.value === b.value)) c.value = cDefault;
+    if (el("useThird").checked && (c.value === a.value || c.value === b.value)) {
+      c.value = cDefault;
+    }
 
     renderBrewDiscovered();
   }
@@ -1572,11 +1627,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
   function recordRecipe(ids, shared) {
     const norm = ids.map(String).slice().sort((a,b) => Number(a) - Number(b));
     const key = norm.join("+") + "::" + shared.slice().sort().join("|");
-    const exists = RECIPES.some(r =>
-      (Array.isArray(r.ids) ? r.ids.slice().sort((a,b)=>Number(a)-Number(b)).join("+") : "") +
-      "::" +
-      (Array.isArray(r.effects)? r.effects.slice().sort().join("|"):"") === key
-    );
+    const exists = RECIPES.some(r => (Array.isArray(r.ids) ? r.ids.slice().sort((a,b)=>Number(a)-Number(b)).join("+") : "") + "::" + (Array.isArray(r.effects)? r.effects.slice().sort().join("|"):"") === key);
     if (exists) return;
     RECIPES.push({ ids: norm, effects: shared.slice(), at: Date.now() });
     saveLocal();

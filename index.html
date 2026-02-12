@@ -47,7 +47,10 @@
       --right-box-width: 96%;
 
       /* Right page shift: moves How-To + Known Recipes left without touching Index page */
-      --right-page-shift: 150px;
+      --right-page-shift: 60px;
+
+      /* NEW: Right-page note box width (How-To + Known Recipes only) */
+      --right-notebox-width: 84%;
 
       --brew-maxw: 1000px;
     }
@@ -320,6 +323,9 @@
         --line-width: 90%;
         --right-box-width: 98%;
         --right-page-shift: 0px;
+
+        /* On mobile, keep the right note box wide so it stays readable */
+        --right-notebox-width: 96%;
       }
       .bookWrap{
         height: auto;
@@ -361,24 +367,23 @@
     /* Right page: shift left (ONLY affects How-To + Known Recipes pages) */
     .pageRight{
       justify-content: center;
-      align-items: flex-start; /* stop centering */
-      overflow: visible;       /* allow shifted content to be visible */
+      align-items: flex-start;
+      overflow: visible;
     }
     .pageRight .pageInner{
       width: var(--right-box-width);
       max-width: var(--right-box-width);
-      margin-left: 0;     /* anchor left */
-      margin-right: auto; /* keep inside page */
+      margin-left: 0;
+      margin-right: auto;
       padding-right: 10px;
+      transform: translateX(calc(-1 * var(--right-page-shift)));
+    }
 
-      /* Critical: do not let the scroll container clip horizontally */
-      overflow-y: auto;
-      overflow-x: visible;
-
-      /* Shift using positioning (more reliable than transform for scroll containers) */
-      position: relative;
-      left: calc(-1 * var(--right-page-shift));
-      transform: none;
+    /* NEW: shrink ONLY the right-page text boxes (How-To + Known Recipes) */
+    .pageRight .noteBox{
+      width: var(--right-notebox-width);
+      margin-left: 0;
+      margin-right: auto;
     }
 
     .leftCentered{

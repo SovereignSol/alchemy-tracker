@@ -7,7 +7,7 @@
 
   <style>
     * { box-sizing: border-box; }
-
+    
     :root {
       --ink: #000000;
       --app-bg-1: #0a1020;
@@ -33,7 +33,7 @@
       /* Book UI scale */
       --book-ui: clamp(0.80, 95vw / 980px, 0.95);
 
-      /* Book overlay placement (do not change, Index placement depends on this) */
+      /* Book overlay placement */
       --book-top: clamp(15%, 8vh + 2%, 24%);
       --book-bottom: clamp(8%, 5vh, 14%);
       --book-left: clamp(2%, 3vw, 5%);
@@ -45,6 +45,9 @@
       --page-content-width: min(88%, 280px);
       --right-box-width: min(92%, 300px);
       --brew-maxw: 1000px;
+
+      /* Right page nudge (Option A) */
+      --right-nudge: clamp(22px, 2.4vw, 34px);
     }
 
     html, body {
@@ -352,7 +355,10 @@
         grid-template-columns: 1fr;
         gap: clamp(12px, 2vw, 16px);
       }
-      .bookWrap { min-height: 600px; }
+
+      .bookWrap {
+        min-height: 600px;
+      }
     }
 
     .page {
@@ -363,7 +369,7 @@
       min-height: 0;
       display: flex;
       flex-direction: column;
-      align-items: center; /* left page stays perfect with this */
+      align-items: center;
     }
 
     .pageInner {
@@ -376,19 +382,43 @@
       scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
     }
 
-    .pageInner::-webkit-scrollbar { width: 4px; }
-    .pageInner::-webkit-scrollbar-track { background: transparent; }
-    .pageInner::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); border-radius: 2px; }
+    .pageInner::-webkit-scrollbar {
+      width: 4px;
+    }
 
-    /* Right page: move content LEFT by anchoring it to the left edge of the right page.
-       This avoids negative margins (which caused clipping). */
-    .pageRight { justify-content: flex-start; align-items: flex-start; }
+    .pageInner::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .pageInner::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 2px;
+    }
+
+    /* Right page: wider content box */
+    .pageRight {
+      justify-content: center;
+    }
+
     .pageRight .pageInner {
-      max-width: none;
-      width: 92%;
-      margin: 0;
-      padding-left: 0;
-      padding-right: 10px;
+      max-width: var(--right-box-width);
+    }
+
+    /* ===== OPTION A FIX: move RIGHT content left, without clipping =====
+       - Do NOT touch left page placement.
+       - Only right pages allow horizontal overflow and apply a safe nudge.
+    */
+    .page.pageRight {
+      overflow: visible;
+    }
+
+    .page.pageRight .pageInner {
+      position: relative;
+      overflow-y: auto;
+      overflow-x: visible;
+      transform: translateX(calc(-1 * var(--right-nudge)));
+      padding-left: var(--right-nudge);
+      padding-right: 6px;
     }
 
     .page h2 {
@@ -454,11 +484,18 @@
       transition: background 150ms ease;
     }
 
-    .indexRow:hover { background: rgba(0, 0, 0, 0.04); }
+    .indexRow:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
 
     @media (max-width: 420px) {
-      .indexRow { grid-template-columns: 1fr; }
-      .inventoryBox { justify-content: flex-start; }
+      .indexRow {
+        grid-template-columns: 1fr;
+      }
+
+      .inventoryBox {
+        justify-content: flex-start;
+      }
     }
 
     .ingNameBtn {
@@ -474,7 +511,9 @@
       opacity: 0.8;
     }
 
-    .ingNameBtn:hover { opacity: 1; }
+    .ingNameBtn:hover {
+      opacity: 1;
+    }
 
     .inventoryBox {
       display: flex;
@@ -507,7 +546,11 @@
     }
 
     /* === INGREDIENT PAGE === */
-    .ingredientGrid { display: grid; gap: clamp(8px, 2vw, 12px); width: 100%; }
+    .ingredientGrid {
+      display: grid;
+      gap: clamp(8px, 2vw, 12px);
+      width: 100%;
+    }
 
     .noteBox {
       border-radius: 12px;
@@ -553,7 +596,12 @@
     .pill-common { border-color: rgba(122, 62, 31, 0.40); }
     .pill-unknown { border-color: rgba(0, 0, 0, 0.22); }
 
-    .effects { display: grid; gap: 6px; margin-top: 8px; width: 100%; }
+    .effects {
+      display: grid;
+      gap: 6px;
+      margin-top: 8px;
+      width: 100%;
+    }
 
     .effect-line {
       display: grid;
@@ -675,7 +723,9 @@
     }
 
     @media (min-width: 760px) {
-      .brewGrid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+      .brewGrid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
     }
 
     .slotTitle {
@@ -692,7 +742,9 @@
       padding: clamp(8px, 2vw, 12px);
     }
 
-    .slotBox select { width: 100%; }
+    .slotBox select {
+      width: 100%;
+    }
 
     .discoveredList {
       margin-top: 8px;
@@ -1134,675 +1186,4 @@ Use the rules your table follows. Write the DC here as a quick reminder.
     spreadIndex.classList.add("hidden");
     spreadIngredient.classList.add("hidden");
     el("backToIndexTopBtn").classList.toggle("hidden", which !== "ingredient");
-    if (which === "index") spreadIndex.classList.remove("hidden");
-    if (which === "ingredient") spreadIngredient.classList.remove("hidden");
-  }
-
-  function getImageUrl(image_path) {
-    if (!image_path) return "";
-    return `${PUBLIC_STORAGE_BASE}${image_path}?t=${Date.now()}`;
-  }
-
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, (c) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      "\"": "&quot;",
-      "'": "&#39;"
-    }[c]));
-  }
-
-  function placeholderImageDataUri(label) {
-    const svg =
-      `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='800'>` +
-      `<rect width='100%' height='100%' fill='%23ffffff'/>` +
-      `<rect x='20' y='20' width='760' height='760' rx='38' ry='38' fill='%23f6f0e3' stroke='%23d9c8aa' stroke-width='6'/>` +
-      `<text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%23000' font-size='42' font-family='Segoe Print,Bradley Hand,cursive'>${escapeHtml(label)}</text>` +
-      `</svg>`;
-    return "data:image/svg+xml," + encodeURIComponent(svg);
-  }
-
-  function rarityClass(r) {
-    const v = String(r || "").trim().toLowerCase();
-    if (!v) return "pill-unknown";
-    if (v.includes("rare") || v.includes("uncommon") || v.includes("legend")) return "pill-rare";
-    return "pill-common";
-  }
-
-  function rarityLabel(r) {
-    const v = String(r || "").trim();
-    return v ? v : "Unknown";
-  }
-
-  async function fetchAllIngredients() {
-    if (isFetching) return;
-    isFetching = true;
-    el("refreshBtn").disabled = true;
-    el("refreshText").innerHTML = '<span class="loading"></span>';
-
-    el("bookStatus").textContent = "Turning pages...";
-    el("brewStatus").textContent = "Stirring embers...";
-
-    try {
-      const res = await fetch(INGREDIENTS_ENDPOINT, { headers: headers() });
-      if (!res.ok) throw new Error(await res.text());
-      const rows = await res.json();
-
-      ING_BY_ID = {};
-      for (const r of rows) {
-        const idStr = String(r.id);
-        ING_BY_ID[idStr] = r;
-        if (!REVEALS[idStr]) REVEALS[idStr] = [false,false,false,false];
-      }
-
-      for (const idStr of Object.keys(INDEX)) {
-        if (!ING_BY_ID[idStr]) delete INDEX[idStr];
-      }
-
-      saveLocal();
-      renderIndex();
-      fillBrewChoices();
-      renderBrewDiscovered();
-      el("bookStatus").textContent = "Ready.";
-      el("brewStatus").textContent = "Choose your ingredients.";
-      toast("Notes updated.", "good");
-    } catch (e) {
-      el("bookStatus").textContent = "Could not update.";
-      el("brewStatus").textContent = "Could not update.";
-      toast("The ink smudged. Try again.", "bad");
-      console.error(e);
-    } finally {
-      isFetching = false;
-      el("refreshBtn").disabled = false;
-      el("refreshText").textContent = "Update Notes";
-    }
-  }
-
-  async function fetchOne(mark) {
-    const res = await fetch(INGREDIENT_BY_MARK(mark), { headers: headers() });
-    if (!res.ok) throw new Error(await res.text());
-    const rows = await res.json();
-    return rows?.[0] || null;
-  }
-
-  function sortedIndexIds() {
-    const ids = Object.keys(INDEX).filter(id => ING_BY_ID[id]);
-    ids.sort((a,b) => Number(a) - Number(b));
-    return ids;
-  }
-
-  function setQty(idStr, qty) {
-    const q = Math.max(0, Math.floor(Number(qty) || 0));
-    INDEX[String(idStr)] = q;
-    saveLocal();
-  }
-
-  function renderIndex() {
-    const wrap = el("indexList");
-    wrap.innerHTML = "";
-
-    const ids = sortedIndexIds();
-    if (ids.length === 0) {
-      const d = document.createElement("div");
-      d.className = "muted";
-      d.textContent = "No entries yet.";
-      wrap.appendChild(d);
-      return;
-    }
-
-    for (const idStr of ids) {
-      const row = ING_BY_ID[idStr];
-      const name = row?.name || "Unknown";
-      const qty = Number(INDEX[idStr]) || 0;
-
-      const line = document.createElement("div");
-      line.className = "indexRow";
-
-      const left = document.createElement("div");
-      const nameBtn = document.createElement("button");
-      nameBtn.type = "button";
-      nameBtn.className = "ingNameBtn";
-      nameBtn.textContent = name;
-      nameBtn.addEventListener("click", () => {
-        playSfx("sfxPage");
-        openIngredient(idStr);
-      });
-      left.appendChild(nameBtn);
-
-      const right = document.createElement("div");
-      right.className = "inventoryBox";
-
-      const minus = document.createElement("button");
-      minus.type = "button";
-      minus.className = "qtyBtn";
-      minus.textContent = "−";
-      minus.addEventListener("click", () => {
-        setQty(idStr, qty - 1);
-        renderIndex();
-        fillBrewChoices();
-        renderBrewDiscovered();
-      });
-
-      const count = document.createElement("div");
-      count.className = "count";
-      count.textContent = String(qty);
-
-      const plus = document.createElement("button");
-      plus.type = "button";
-      plus.className = "qtyBtn";
-      plus.textContent = "+";
-      plus.addEventListener("click", () => {
-        setQty(idStr, qty + 1);
-        renderIndex();
-        fillBrewChoices();
-        renderBrewDiscovered();
-      });
-
-      right.appendChild(minus);
-      right.appendChild(count);
-      right.appendChild(plus);
-
-      line.appendChild(left);
-      line.appendChild(right);
-      wrap.appendChild(line);
-    }
-  }
-
-  async function recordIngredientFromMark(mark) {
-    const clean = String(mark || "").replace(/\D/g, "");
-    if (!clean) {
-      toast("Enter a mark.", "bad");
-      return;
-    }
-
-    if (ING_BY_ID[clean]) {
-      if (INDEX[clean] === undefined) INDEX[clean] = 0;
-      saveLocal();
-      renderIndex();
-      fillBrewChoices();
-      renderBrewDiscovered();
-      toast("Recorded.", "good");
-      el("markInput").value = "";
-      return;
-    }
-
-    try {
-      el("recordBtn").disabled = true;
-      const row = await fetchOne(clean);
-      if (!row) {
-        toast("That mark is unknown.", "bad");
-        el("recordBtn").disabled = false;
-        return;
-      }
-      ING_BY_ID[clean] = row;
-      if (!REVEALS[clean]) REVEALS[clean] = [false,false,false,false];
-      if (INDEX[clean] === undefined) INDEX[clean] = 0;
-      saveLocal();
-      renderIndex();
-      fillBrewChoices();
-      renderBrewDiscovered();
-      toast("Recorded.", "good");
-      el("markInput").value = "";
-      el("recordBtn").disabled = false;
-    } catch {
-      toast("Could not read that mark.", "bad");
-      el("recordBtn").disabled = false;
-    }
-  }
-
-  function openIngredient(idStr) {
-    currentIngredientId = idStr;
-    showBookSpread("ingredient");
-    renderIngredient(idStr);
-  }
-
-  function renderIngredient(idStr) {
-    const row = ING_BY_ID[idStr];
-    if (!row) {
-      toast("That page is missing.", "bad");
-      showBookSpread("index");
-      return;
-    }
-
-    el("ingName").textContent = row.name || "Unknown Ingredient";
-    const pill = el("rarityPill");
-    pill.className = "pill " + rarityClass(row?.rarity);
-    pill.textContent = rarityLabel(row?.rarity);
-
-    const imgUrl = getImageUrl(row.image_path);
-    el("ingImage").src = imgUrl || placeholderImageDataUri("No sketch");
-    el("ingImage").onerror = () => {
-      el("ingImage").src = placeholderImageDataUri(row.name);
-    };
-    el("ingNotes").textContent = row.notes ? String(row.notes) : "No notes written yet.";
-
-    const effects = [row.effect_1,row.effect_2,row.effect_3,row.effect_4].map(v => v || "");
-    const revealed = REVEALS[idStr] || [false,false,false,false];
-
-    const list = el("effectsList");
-    list.innerHTML = "";
-
-    effects.forEach((eff, idx) => {
-      const line = document.createElement("div");
-      line.className = "effect-line";
-
-      const label = document.createElement("div");
-      label.className = "pill";
-      label.textContent = `Property ${idx + 1}`;
-
-      const text = document.createElement("div");
-      text.className = "effect-text";
-      text.textContent = eff || "(blank)";
-      if (!revealed[idx]) text.classList.add("effect-hidden");
-
-      const btn = document.createElement("button");
-      btn.className = "smallBtn";
-      btn.textContent = revealed[idx] ? "Known" : "Reveal";
-      btn.disabled = revealed[idx];
-      btn.addEventListener("click", () => {
-        REVEALS[idStr][idx] = true;
-        saveLocal();
-        renderIngredient(idStr);
-        toast("Noted.", "good");
-      });
-
-      line.appendChild(label);
-      line.appendChild(text);
-      line.appendChild(btn);
-      list.appendChild(line);
-    });
-
-    el("revealRandomBtn").onclick = () => {
-      const hidden = [];
-      for (let i = 0; i < 4; i++) if (!REVEALS[idStr][i]) hidden.push(i);
-      if (hidden.length === 0) {
-        toast("Nothing more to learn here.", "good");
-        return;
-      }
-      const pick = hidden[Math.floor(Math.random() * hidden.length)];
-      REVEALS[idStr][pick] = true;
-      saveLocal();
-      renderIngredient(idStr);
-      toast("Noted.", "good");
-    };
-
-    el("resetRevealsBtn").onclick = () => {
-      REVEALS[idStr] = [false,false,false,false];
-      saveLocal();
-      renderIngredient(idStr);
-      toast("Forgotten.", "bad");
-    };
-
-    renderRecipesForIngredient(idStr);
-  }
-
-  function renderRecipesForIngredient(idStr) {
-    const box = el("recipesList");
-    const nameOf = (iid) => ING_BY_ID[iid]?.name || `Ingredient ${iid}`;
-
-    const related = RECIPES.filter(r => Array.isArray(r.ids) && r.ids.includes(idStr));
-    if (related.length === 0) {
-      box.textContent = "No recipes recorded yet.";
-      return;
-    }
-
-    const lines = related.map(r => {
-      const parts = r.ids.map(x => nameOf(String(x)));
-      const effects = Array.isArray(r.effects) ? r.effects : [];
-      const effText = effects.length ? effects.join(", ") : "Unknown";
-      return `• ${parts.join(" + ")} = Concoction of ${effText}`;
-    });
-
-    box.textContent = lines.join("\n");
-  }
-
-  function setTheme(next) {
-    theme = next;
-    if (theme === "wilderness") {
-      el("brewBg").src = "assets/themes/wilderness_bg.webp?t=" + Date.now();
-      el("themeIcon").src = "assets/icons/theme_wilderness.webp?t=" + Date.now();
-      el("themeLabel").textContent = "Wilderness";
-    } else {
-      el("brewBg").src = "assets/themes/town_bg.webp?t=" + Date.now();
-      el("themeIcon").src = "assets/icons/theme_town.webp?t=" + Date.now();
-      el("themeLabel").textContent = "Town";
-    }
-  }
-
-  function availableForBrewIds() {
-    const ids = Object.keys(INDEX).filter(id => ING_BY_ID[id] && (Number(INDEX[id]) || 0) > 0);
-    ids.sort((a,b) => Number(a) - Number(b));
-    return ids;
-  }
-
-  function fillBrewChoices() {
-    const a = el("mixA"), b = el("mixB"), c = el("mixC");
-    const ids = availableForBrewIds();
-
-    if (ids.length < 2) {
-      a.innerHTML = "";
-      b.innerHTML = "";
-      c.innerHTML = "";
-      el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your Inventory to brew.</div>`;
-      renderBrewDiscovered();
-      return;
-    }
-
-    const opts = ids.map(idStr => {
-      const name = ING_BY_ID[idStr]?.name || "Unknown";
-      const qty = Number(INDEX[idStr]) || 0;
-      return `<option value="${escapeHtml(idStr)}">${escapeHtml(name)} (${qty})</option>`;
-    }).join("");
-
-    const prevA = a.value, prevB = b.value, prevC = c.value;
-
-    a.innerHTML = opts;
-    b.innerHTML = opts;
-    c.innerHTML = opts;
-
-    a.value = ids.includes(prevA) ? prevA : ids[0];
-    const bCandidate = ids.includes(prevB) ? prevB : ids.find(x => x !== a.value);
-    b.value = (bCandidate && bCandidate !== a.value) ? bCandidate : (ids.find(x => x !== a.value) || ids[0]);
-
-    const cDefault = ids.find(x => x !== a.value && x !== b.value) || ids[0];
-    c.value = ids.includes(prevC) ? prevC : cDefault;
-    if (el("useThird").checked && (c.value === a.value || c.value === b.value)) {
-      c.value = cDefault;
-    }
-
-    renderBrewDiscovered();
-  }
-
-  function enforceDistinctMixing() {
-    const a = el("mixA"), b = el("mixB"), c = el("mixC");
-    const ids = availableForBrewIds();
-
-    if (a.value && b.value && a.value === b.value) {
-      const next = ids.find(x => x !== a.value);
-      if (next) b.value = next;
-    }
-
-    if (el("useThird").checked) {
-      if (c.value === a.value || c.value === b.value) {
-        const nextC = ids.find(x => x !== a.value && x !== b.value);
-        if (nextC) c.value = nextC;
-      }
-      if (a.value === c.value) {
-        const nextA = ids.find(x => x !== c.value && x !== b.value);
-        if (nextA) a.value = nextA;
-      }
-      if (b.value === c.value) {
-        const nextB = ids.find(x => x !== c.value && x !== a.value);
-        if (nextB) b.value = nextB;
-      }
-    }
-
-    renderBrewDiscovered();
-  }
-
-  function discoveredEffectsFor(idStr) {
-    const row = ING_BY_ID[idStr];
-    if (!row) return [];
-    const effs = [row.effect_1,row.effect_2,row.effect_3,row.effect_4];
-    const revealed = REVEALS[idStr] || [false,false,false,false];
-    const known = [];
-    for (let i = 0; i < 4; i++) {
-      if (revealed[i] && effs[i]) known.push(String(effs[i]));
-    }
-    return known;
-  }
-
-  function renderDiscoveredInto(containerId, effects) {
-    const wrap = el(containerId);
-    wrap.innerHTML = "";
-    if (!effects.length) {
-      const s = document.createElement("div");
-      s.className = "muted";
-      s.textContent = "None yet.";
-      wrap.appendChild(s);
-      return;
-    }
-    effects.forEach(e => {
-      const p = document.createElement("div");
-      p.className = "discoveredPill";
-      p.textContent = e;
-      wrap.appendChild(p);
-    });
-  }
-
-  function renderBrewDiscovered() {
-    const aId = el("mixA").value;
-    const bId = el("mixB").value;
-    const useThird = el("useThird").checked;
-    const cId = useThird ? el("mixC").value : "";
-
-    renderDiscoveredInto("discA", aId ? discoveredEffectsFor(aId) : []);
-    renderDiscoveredInto("discB", bId ? discoveredEffectsFor(bId) : []);
-    if (useThird) renderDiscoveredInto("discC", cId ? discoveredEffectsFor(cId) : []);
-  }
-
-  function computeShared(ids) {
-    const rows = ids.map(id => ING_BY_ID[id]).filter(Boolean);
-    if (rows.length < 2) return [];
-    const sets = rows.map(r => new Set([r.effect_1,r.effect_2,r.effect_3,r.effect_4].filter(Boolean)));
-    let shared = sets[0];
-    for (let i = 1; i < sets.length; i++) {
-      shared = new Set([...shared].filter(x => sets[i].has(x)));
-    }
-    return [...shared];
-  }
-
-  function canSpend(ids) {
-    const needed = {};
-    for (const id of ids) needed[id] = (needed[id] || 0) + 1;
-    for (const [id, n] of Object.entries(needed)) {
-      const have = Number(INDEX[id]) || 0;
-      if (have < n) return false;
-    }
-    return true;
-  }
-
-  function spend(ids) {
-    const needed = {};
-    for (const id of ids) needed[id] = (needed[id] || 0) + 1;
-    for (const [id, n] of Object.entries(needed)) {
-      setQty(id, (Number(INDEX[id]) || 0) - n);
-    }
-  }
-
-  function revealSharedAutomatically(ids, shared) {
-    for (const idStr of ids) {
-      const row = ING_BY_ID[idStr];
-      if (!row) continue;
-      const effs = [row.effect_1,row.effect_2,row.effect_3,row.effect_4];
-      if (!REVEALS[idStr]) REVEALS[idStr] = [false,false,false,false];
-      for (let i = 0; i < 4; i++) {
-        if (shared.includes(effs[i])) REVEALS[idStr][i] = true;
-      }
-    }
-    saveLocal();
-  }
-
-  function recordRecipe(ids, shared) {
-    const norm = ids.map(String).slice().sort((a,b) => Number(a) - Number(b));
-    const key = norm.join("+") + "::" + shared.slice().sort().join("|");
-    const exists = RECIPES.some(r => (Array.isArray(r.ids) ? r.ids.slice().sort((a,b)=>Number(a)-Number(b)).join("+") : "") + "::" + (Array.isArray(r.effects)? r.effects.slice().sort().join("|"):"") === key);
-    if (exists) return;
-    RECIPES.push({ ids: norm, effects: shared.slice(), at: Date.now() });
-    saveLocal();
-  }
-
-  function brew() {
-    const aId = el("mixA").value;
-    const bId = el("mixB").value;
-    const useThird = el("useThird").checked;
-    const cId = useThird ? el("mixC").value : "";
-
-    if (aId && bId && aId === bId) {
-      toast("Choose two different ingredients.", "bad");
-      el("mixResult").innerHTML = `<div style="color:var(--warn); font-weight:950;">Choose two different ingredients.</div>`;
-      enforceDistinctMixing();
-      return;
-    }
-    if (useThird) {
-      if ((aId && cId && aId === cId) || (bId && cId && bId === cId)) {
-        toast("Each ingredient must be different.", "bad");
-        el("mixResult").innerHTML = `<div style="color:var(--warn); font-weight:950;">Each ingredient must be different.</div>`;
-        enforceDistinctMixing();
-        return;
-      }
-    }
-
-    const ids = [aId,bId].filter(Boolean);
-    if (useThird && cId) ids.push(cId);
-
-    if (ids.length < 2) {
-      el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your Inventory to brew.</div>`;
-      return;
-    }
-
-    if (!canSpend(ids)) {
-      el("mixResult").innerHTML = `
-        <div style="color:var(--warn); font-weight:950;">Not enough in the Inventory.</div>
-        <div class="muted" style="margin-top:6px;">You are missing one of the chosen ingredients.</div>
-      `;
-      toast("Not enough in the Inventory.", "bad");
-      return;
-    }
-
-    const shared = computeShared(ids);
-
-    spend(ids);
-    renderIndex();
-    fillBrewChoices();
-    enforceDistinctMixing();
-
-    if (shared.length === 0) {
-      el("mixResult").innerHTML = `
-        <div style="color:var(--warn); font-weight:950;">The mixture fizzles.</div>
-        <div class="muted" style="margin-top:6px;">Nothing in common, nothing takes hold.</div>
-      `;
-      toast("Fizzled.", "bad");
-      return;
-    }
-
-    revealSharedAutomatically(ids, shared);
-    recordRecipe(ids, shared);
-
-    playSfx("sfxSuccess");
-
-    const effectText = shared.join(", ");
-    el("mixResult").innerHTML = `
-      <div style="color:rgba(120,255,170,0.95); font-weight:1000;">Made Concoction of ${escapeHtml(effectText)}</div>
-      <div class="muted" style="margin-top:6px;">The shared nature has been noted.</div>
-    `;
-    toast("A concoction is born.", "good");
-  }
-
-  function exportNotes() {
-    el("saveBox").value = JSON.stringify({ reveals: REVEALS, index: INDEX, recipes: RECIPES }, null, 2);
-    toast("Copied to the box.", "good");
-  }
-
-  function importNotes() {
-    try {
-      const parsed = JSON.parse(el("saveBox").value);
-      if (!parsed || typeof parsed !== "object") throw new Error("bad");
-      REVEALS = (parsed.reveals && typeof parsed.reveals === "object") ? parsed.reveals : {};
-      const idx = (parsed.index && typeof parsed.index === "object") ? parsed.index : {};
-      const clean = {};
-      for (const [k,v] of Object.entries(idx)) {
-        const n = Number(v);
-        if (Number.isFinite(n) && n >= 0) clean[String(k)] = Math.floor(n);
-      }
-      INDEX = clean;
-      RECIPES = Array.isArray(parsed.recipes) ? parsed.recipes : [];
-      saveLocal();
-      renderIndex();
-      fillBrewChoices();
-      enforceDistinctMixing();
-      toast("Restored.", "good");
-    } catch {
-      toast("Those notes do not make sense.", "bad");
-    }
-  }
-
-  function burnAll() {
-    if (!confirm("Burn all notes on this device?")) return;
-    REVEALS = {};
-    INDEX = {};
-    RECIPES = [];
-    saveLocal();
-    renderIndex();
-    fillBrewChoices();
-    enforceDistinctMixing();
-    showOnly("main");
-    toast("Ashes and silence.", "bad");
-  }
-
-  el("refreshBtn").addEventListener("click", fetchAllIngredients);
-
-  el("openBookBtn").addEventListener("click", () => {
-    playSfx("sfxPage");
-    showOnly("book");
-    showBookSpread("index");
-    renderIndex();
-  });
-
-  el("openBrewBtn").addEventListener("click", () => {
-    showOnly("brew");
-    fillBrewChoices();
-    enforceDistinctMixing();
-  });
-
-  el("closeBookBtn").addEventListener("click", () => {
-    playSfx("sfxPage");
-    showOnly("main");
-  });
-
-  el("backToIndexTopBtn").addEventListener("click", () => {
-    playSfx("sfxPage");
-    currentIngredientId = null;
-    showBookSpread("index");
-    renderIndex();
-  });
-
-  el("backFromBrewBtn").addEventListener("click", () => {
-    showOnly("main");
-  });
-
-  el("recordBtn").addEventListener("click", () => {
-    recordIngredientFromMark(el("markInput").value);
-  });
-
-  el("markInput").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") recordIngredientFromMark(el("markInput").value);
-  });
-
-  el("themeToggleBtn").addEventListener("click", () => {
-    setTheme(theme === "wilderness" ? "town" : "wilderness");
-  });
-
-  el("useThird").addEventListener("change", () => {
-    const on = el("useThird").checked;
-    el("thirdSlot").classList.toggle("hidden", !on);
-    fillBrewChoices();
-    enforceDistinctMixing();
-  });
-
-  el("mixA").addEventListener("change", enforceDistinctMixing);
-  el("mixB").addEventListener("change", enforceDistinctMixing);
-  el("mixC").addEventListener("change", enforceDistinctMixing);
-  el("brewBtn").addEventListener("click", brew);
-
-  el("exportBtn").addEventListener("click", exportNotes);
-  el("importBtn").addEventListener("click", importNotes);
-  el("wipeBtn").addEventListener("click", burnAll);
-
-  setTheme("wilderness");
-  showOnly("main");
-  fetchAllIngredients();
-</script>
-</body>
-</html>
+    if (which === "index") spreadIndex

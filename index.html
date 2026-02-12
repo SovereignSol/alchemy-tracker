@@ -379,6 +379,26 @@
       transform: translateX(calc(-1 * var(--right-page-shift)));
     }
 
+    /* Make right-page content stack vertically, then let the note box grow down */
+.pageRight .pageInner{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Let right-page note boxes extend downward instead of being capped */
+.pageRight .noteBox{
+  flex: 1 1 auto;
+  max-height: none;           /* overrides the global 200px cap */
+  min-height: 360px;          /* tweak this if you want */
+}
+
+/* Override the inline max-height on the Known Recipes box */
+.pageRight #recipesList.noteBox{
+  max-height: none !important;
+}
+
+
     /* NEW: shrink ONLY the right-page text boxes (How-To + Known Recipes) */
     .pageRight .noteBox{
       width: var(--right-notebox-width);

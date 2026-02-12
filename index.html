@@ -46,7 +46,7 @@
       --line-width: 78%;
       --right-box-width: 96%;
 
-      /* Right page shift (NEW): moves How-To + Known Recipes left without touching Index page */
+      /* Right page shift: moves How-To + Known Recipes left without touching Index page */
       --right-page-shift: 60px;
 
       --brew-maxw: 1000px;
@@ -362,7 +362,7 @@
     .pageRight{
       justify-content: center;
       align-items: flex-start; /* stop centering */
-      overflow: visible;
+      overflow: visible;       /* allow shifted content to be visible */
     }
     .pageRight .pageInner{
       width: var(--right-box-width);
@@ -370,7 +370,15 @@
       margin-left: 0;     /* anchor left */
       margin-right: auto; /* keep inside page */
       padding-right: 10px;
-      transform: translateX(calc(-1 * var(--right-page-shift)));
+
+      /* Critical: do not let the scroll container clip horizontally */
+      overflow-y: auto;
+      overflow-x: visible;
+
+      /* Shift using positioning (more reliable than transform for scroll containers) */
+      position: relative;
+      left: calc(-1 * var(--right-page-shift));
+      transform: none;
     }
 
     .leftCentered{

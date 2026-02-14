@@ -46,7 +46,7 @@
       --line-width: 78%;
       --right-box-width: 96%;
 
-      /* Right page shift: moves right page content left without touching Index page */
+      /* Right page shift */
       --right-page-shift: 150px;
 
       /* Right-page note box width */
@@ -57,11 +57,11 @@
       /* Bag UI */
       --bag-maxw: 1040px;
 
-      /* Trim/padding inside Backpack_UI.webp before placing tiles (tweak if needed) */
+      /* Trim/padding inside Backpack_UI.webp before placing tiles */
       --bag-trim: 34px;
       --bag-trim-mobile: 18px;
 
-      /* NEW: push bag items downward inside Backpack_UI.webp */
+      /* Push bag items downward inside Backpack_UI.webp */
       --bag-top-offset: 70px;
     }
 
@@ -131,6 +131,14 @@
     }
     .btn-primary:hover:not(:disabled){
       box-shadow: 0 14px 28px rgba(0,0,0,0.32);
+    }
+
+    .btn-bad{
+      background: linear-gradient(180deg, rgba(139,29,44,0.92), rgba(139,29,44,0.78));
+      color: #fff7ee;
+      border-color: rgba(139,29,44,0.45);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.28);
+      font-weight: 900;
     }
 
     .btn-quiet{
@@ -338,7 +346,6 @@
         --right-page-shift: 0px;
         --right-notebox-width: 96%;
 
-        /* NEW: smaller bag drop on mobile */
         --bag-top-offset: 40px;
       }
       .bookWrap{
@@ -715,6 +722,16 @@
       align-items:center;
     }
 
+    .brewBtnRow{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .brewBtnRow button{
+      width: 100%;
+      font-weight: 950;
+    }
+
     /* Concentrate crafting controls on Brewing page */
     .concControls{
       display:flex;
@@ -823,7 +840,6 @@
       pointer-events: none;
     }
 
-    /* IMPORTANT: left stays the same, we only push DOWN with padding-top */
     .bagOverlay{
       position:absolute;
       inset: 0;
@@ -845,7 +861,7 @@
       width: 100%;
       height: 100%;
       display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 10px;
       align-content: start;
       overflow: auto;
@@ -884,10 +900,23 @@
       line-height: 1.15;
       text-align:center;
       word-break: break-word;
-      min-height: 32px;
+      min-height: 34px;
       display:flex;
       align-items:center;
       justify-content:center;
+    }
+    .bagMeta{
+      font-size: 11px;
+      line-height: 1.2;
+      color: rgba(233,237,246,0.86);
+      text-shadow: 0 1px 0 rgba(0,0,0,0.35);
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 28px;
+      padding: 2px 4px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.10);
+      border: 1px solid rgba(255,255,255,0.10);
     }
     .bagQtyRow{
       display:flex;
@@ -905,6 +934,102 @@
       border-color: rgba(255,255,255,0.18);
       color: #f2f6ff;
       background: rgba(0,0,0,0.14);
+    }
+
+    /* Brew success overlay */
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.58);
+      z-index: 80;
+      display:none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+    .overlayCard{
+      width: min(760px, 100%);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(18, 22, 30, 0.92);
+      box-shadow: var(--shadow);
+      padding: 12px;
+      color: #f2f6ff;
+    }
+    .overlayTitle{
+      font-weight: 950;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+    .overlaySub{
+      font-size: 12px;
+      color: rgba(233,237,246,0.78);
+      margin-bottom: 10px;
+      line-height: 1.25;
+    }
+    .overlayGrid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      max-height: min(62vh, 520px);
+      overflow:auto;
+      padding-right: 6px;
+    }
+    .overlayRow{
+      border-radius: 14px;
+      border: 1px dashed rgba(255,255,255,0.20);
+      background: rgba(255,255,255,0.06);
+      padding: 10px;
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .overlayRowTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .overlayEffectName{
+      font-weight: 950;
+      font-size: 13px;
+    }
+    .overlayHint{
+      font-size: 12px;
+      color: rgba(233,237,246,0.78);
+      line-height: 1.25;
+    }
+    .overlayInputRow{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+    .overlayInputRow input{
+      flex: 1 1 180px;
+      min-width: 160px;
+    }
+    .overlayFooter{
+      margin-top: 10px;
+      display:flex;
+      gap: 8px;
+      justify-content:flex-end;
+      flex-wrap: wrap;
+    }
+    .overlayFooter button{
+      font-weight: 950;
+      white-space: nowrap;
+    }
+    .pillMini{
+      display:inline-flex;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.08);
+      font-size: 11px;
+      font-weight: 950;
+      color: rgba(245,248,255,0.95);
     }
   </style>
 </head>
@@ -1129,7 +1254,16 @@
 
             <div class="slotBox">
               <div class="slotTitle">Brew</div>
-              <button class="btn-primary" id="brewBtn" type="button" style="width:100%;">Brew</button>
+
+              <div class="muted" id="brewDc" style="margin-bottom:8px;">
+                DC: (choose ingredients)
+              </div>
+
+              <div class="brewBtnRow">
+                <button class="btn-primary" id="brewSuccessBtn" type="button">Brew (Success)</button>
+                <button class="btn-bad" id="brewFailBtn" type="button">Brew (Failure)</button>
+              </div>
+
               <div class="resultBox" id="mixResult" style="margin-top:9px;">
                 <div class="muted">No mixture yet.</div>
               </div>
@@ -1179,6 +1313,23 @@
     </section>
   </div>
 
+  <!-- Success overlay -->
+  <div class="overlay" id="brewOverlay" role="dialog" aria-modal="true" aria-label="Record potion results">
+    <div class="overlayCard">
+      <div class="overlayTitle">Record Your Concoction</div>
+      <div class="overlaySub" id="overlaySub">
+        Enter the bonus roll for each shared property. The base dice are shown as a reminder.
+      </div>
+
+      <div class="overlayGrid" id="overlayGrid"></div>
+
+      <div class="overlayFooter">
+        <button class="btn-quiet" id="overlayCancelBtn" type="button">Cancel</button>
+        <button class="btn-primary" id="overlaySaveBtn" type="button">Save to Bag</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <audio id="sfxPage" src="assets/sfx/page_turn.mp3" preload="auto"></audio>
@@ -1205,6 +1356,8 @@
   let currentIngredientId = null;
   let theme = "wilderness";
   let isFetching = false;
+
+  let pendingBrew = null; // used for overlay save
 
   const viewMain = document.getElementById("viewMain");
   const viewBook = document.getElementById("viewBook");
@@ -1334,6 +1487,71 @@
     return v ? v : "Unknown";
   }
 
+  function normKey(s) {
+    return String(s || "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .toLowerCase();
+  }
+
+  function rarityTier(r) {
+    const v = normKey(r);
+    if (v.includes("legend")) return "legendary";
+    if (v.includes("rare")) return "rare";
+    if (v.includes("uncommon")) return "uncommon";
+    return "common";
+  }
+
+  function rarityRank(tier) {
+    const t = normKey(tier);
+    if (t === "legendary") return 3;
+    if (t === "rare") return 2;
+    if (t === "uncommon") return 1;
+    return 0;
+  }
+
+  function dcForRarityTier(tier) {
+    const t = normKey(tier);
+    if (t === "legendary") return 18;
+    if (t === "rare") return 15;
+    if (t === "uncommon") return 12;
+    return 10;
+  }
+
+  function formatCoins(c) {
+    const gp = Number(c?.gp) || 0;
+    const sp = Number(c?.sp) || 0;
+    const cp = Number(c?.cp) || 0;
+    const parts = [];
+    if (gp) parts.push(`${gp} gp`);
+    if (sp) parts.push(`${sp} sp`);
+    if (cp) parts.push(`${cp} cp`);
+    return parts.length ? parts.join(", ") : "0 gp";
+  }
+
+  function addCoins(a, b) {
+    return {
+      gp: (Number(a?.gp) || 0) + (Number(b?.gp) || 0),
+      sp: (Number(a?.sp) || 0) + (Number(b?.sp) || 0),
+      cp: (Number(a?.cp) || 0) + (Number(b?.cp) || 0),
+    };
+  }
+
+  function normalizeCoins(c) {
+    let gp = Number(c?.gp) || 0;
+    let sp = Number(c?.sp) || 0;
+    let cp = Number(c?.cp) || 0;
+
+    if (cp >= 10) { sp += Math.floor(cp / 10); cp = cp % 10; }
+    if (sp >= 10) { gp += Math.floor(sp / 10); sp = sp % 10; }
+
+    if (cp < 0) cp = 0;
+    if (sp < 0) sp = 0;
+    if (gp < 0) gp = 0;
+
+    return { gp, sp, cp };
+  }
+
   async function fetchAllIngredients() {
     if (isFetching) return;
     isFetching = true;
@@ -1364,10 +1582,12 @@
       saveLocal();
       renderIndex();
       fillBrewChoices();
+      enforceDistinctMixing();
       renderBrewDiscovered();
       renderConcentratesInventory();
       fillConcentrateCraftChoices();
       renderBag();
+      updateBrewDcDisplay();
 
       el("bookStatus").textContent = "Ready.";
       el("brewStatus").textContent = "Choose your ingredients.";
@@ -1565,40 +1785,160 @@
     }
   }
 
+  function craftConcentrate() {
+    const baseSel = el("concBaseSelect");
+    const effSel = el("concEffectSelect");
+    if (!baseSel || !effSel) return;
+
+    const idStr = String(baseSel.value || "");
+    const effect = String(effSel.value || "").trim();
+    if (!idStr || !effect) {
+      toast("Choose an ingredient and a property.", "bad");
+      return;
+    }
+
+    const qty = Number(INDEX[idStr]) || 0;
+    if (qty < 3) {
+      toast("Not enough of that ingredient.", "bad");
+      fillConcentrateCraftChoices();
+      renderIndex();
+      fillBrewChoices();
+      renderBrewDiscovered();
+      renderConcentratesInventory();
+      updateBrewDcDisplay();
+      return;
+    }
+
+    const revealed = revealedEffectsForIngredient(idStr);
+    if (!revealed.includes(effect)) {
+      toast("That property is not revealed.", "bad");
+      fillConcentrateCraftChoices();
+      return;
+    }
+
+    // Spend 3, gain 1 concentrate
+    setQty(idStr, qty - 3);
+
+    const key = concKey(idStr, effect);
+    const haveConc = Number(CONCENTRATES[key]) || 0;
+    CONCENTRATES[key] = haveConc + 1;
+
+    saveLocal();
+
+    // Add to bag (minimal)
+    addPotion({
+      type: "concentrate",
+      rarity: rarityTier(ING_BY_ID[idStr]?.rarity),
+      effects: [{ name: effect, kind: "numeric", bonus: null, baseNote: null, bonusDice: null }],
+      price: { gp: 0, sp: 0, cp: 0 }
+    }, 1);
+
+    renderIndex();
+    fillBrewChoices();
+    renderBrewDiscovered();
+    renderConcentratesInventory();
+    fillConcentrateCraftChoices();
+    updateBrewDcDisplay();
+
+    toast("Concentrate bottled.", "good");
+  }
+
   /* =========================
      Bag inventory (potions)
      ========================= */
-  function potionKey(type, effectsArr) {
-    const t = String(type || "").trim().toLowerCase();
-    const effects = (Array.isArray(effectsArr) ? effectsArr : [])
-      .map(x => String(x || "").trim())
-      .filter(Boolean)
-      .sort((a,b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
-    return `p:${encodeURIComponent(t)}:${encodeURIComponent(effects.join("|"))}`;
+  function stableStringify(obj) {
+    return JSON.stringify(obj, Object.keys(obj).sort());
+  }
+
+  function potionKeyFromMeta(meta) {
+    const type = normKey(meta?.type || "");
+    const rarity = normKey(meta?.rarity || "");
+    const effects = Array.isArray(meta?.effects) ? meta.effects.slice() : [];
+
+    effects.sort((a,b) => {
+      const na = normKey(a?.name);
+      const nb = normKey(b?.name);
+      if (na < nb) return -1;
+      if (na > nb) return 1;
+      return 0;
+    });
+
+    const packed = effects.map(e => ({
+      name: String(e?.name || ""),
+      kind: String(e?.kind || ""),
+      bonus: (e?.bonus === null || e?.bonus === undefined) ? null : Number(e?.bonus),
+      baseNote: e?.baseNote ? String(e.baseNote) : null,
+      bonusDice: e?.bonusDice ? String(e.bonusDice) : null
+    }));
+
+    const keyObj = {
+      t: type,
+      r: rarity,
+      e: packed,
+      p: normalizeCoins(meta?.price || { gp:0, sp:0, cp:0 })
+    };
+
+    return "p:" + encodeURIComponent(stableStringify(keyObj));
   }
 
   function parsePotionKey(key) {
     const s = String(key || "");
     if (!s.startsWith("p:")) return null;
-    const parts = s.split(":");
-    if (parts.length < 3) return null;
-    const type = decodeURIComponent(parts[1] || "");
-    const effectsJoined = decodeURIComponent(parts.slice(2).join(":") || "");
-    const effects = effectsJoined ? effectsJoined.split("|").filter(Boolean) : [];
-    return { type, effects };
+    try{
+      const json = decodeURIComponent(s.slice(2));
+      const obj = JSON.parse(json);
+      return obj;
+    } catch {
+      return null;
+    }
   }
 
-  function potionLabel(meta) {
-    const type = (meta?.type || "").toLowerCase();
-    const effects = Array.isArray(meta?.effects) ? meta.effects : [];
-    const effText = effects.length ? effects.join(", ") : "Unknown";
-    if (type === "concentrate") return `Concentrate of ${effText}`;
-    return `Concoction of ${effText}`;
+  function potionLabelFromKeyObj(obj) {
+    const t = normKey(obj?.t);
+    const rarity = String(obj?.r || "");
+    const effects = Array.isArray(obj?.e) ? obj.e : [];
+    const names = effects.map(x => String(x?.name || "")).filter(Boolean);
+    const effText = names.length ? names.join(", ") : "Unknown";
+
+    const typeLabel = (t === "concentrate") ? "Concentrate" : "Concoction";
+    const rarityLabelText = rarity ? (rarity.charAt(0).toUpperCase() + rarity.slice(1)) : "Common";
+
+    return `${typeLabel} (${rarityLabelText}) of ${effText}`;
   }
 
-  function potionIconPath(meta) {
-    const type = (meta?.type || "").toLowerCase();
-    if (type === "concentrate") return "assets/icons/Generic_Concentrate.webp";
+  function potionMetaTextFromKeyObj(obj) {
+    const effects = Array.isArray(obj?.e) ? obj.e : [];
+    const lines = [];
+
+    for (const e of effects) {
+      const name = String(e?.name || "").trim();
+      if (!name) continue;
+
+      const baseNote = e?.baseNote ? String(e.baseNote) : "";
+      const bonusDice = e?.bonusDice ? String(e.bonusDice) : "";
+      const bonus = (e?.bonus === null || e?.bonus === undefined || !Number.isFinite(Number(e.bonus))) ? null : Number(e.bonus);
+
+      if (bonus !== null) {
+        const parts = [];
+        if (baseNote) parts.push(`Base ${baseNote}`);
+        if (bonusDice) parts.push(`Bonus ${bonusDice}`);
+        const hint = parts.length ? ` (${parts.join(", ")})` : "";
+        lines.push(`${name}: +${bonus}${hint}`);
+      } else {
+        const hint = baseNote || bonusDice ? ` (Base ${baseNote || "?"}, Bonus ${bonusDice || "?"})` : "";
+        lines.push(`${name}${hint}`);
+      }
+    }
+
+    const price = normalizeCoins(obj?.p || { gp:0, sp:0, cp:0 });
+    lines.push(`Value: ${formatCoins(price)}`);
+
+    return lines.join("\n");
+  }
+
+  function potionIconPath(type) {
+    const t = normKey(type);
+    if (t === "concentrate") return "assets/icons/Generic_Concentrate.webp";
     return "assets/icons/Generic_Potion.webp";
   }
 
@@ -1612,8 +1952,8 @@
     saveLocal();
   }
 
-  function addPotion(type, effectsArr, amount = 1) {
-    const key = potionKey(type, effectsArr);
+  function addPotion(meta, amount = 1) {
+    const key = potionKeyFromMeta(meta);
     const have = Number(POTIONS[key]) || 0;
     POTIONS[key] = Math.max(0, have + (Number(amount) || 0));
     saveLocal();
@@ -1625,8 +1965,8 @@
     if (!wrap) return;
 
     const entries = Object.entries(POTIONS || {})
-      .map(([k,v]) => ({ key: k, qty: Number(v) || 0, meta: parsePotionKey(k) }))
-      .filter(x => x.qty > 0 && x.meta);
+      .map(([k,v]) => ({ key: k, qty: Number(v) || 0, obj: parsePotionKey(k) }))
+      .filter(x => x.qty > 0 && x.obj);
 
     if (!entries.length) {
       wrap.innerHTML = `
@@ -1637,12 +1977,9 @@
       return;
     }
 
-    const typeRank = (t) => (String(t || "").toLowerCase() === "concentrate" ? 1 : 0);
     entries.sort((a,b) => {
-      const ra = typeRank(a.meta.type), rb = typeRank(b.meta.type);
-      if (ra !== rb) return ra - rb;
-      const la = potionLabel(a.meta).toLowerCase();
-      const lb = potionLabel(b.meta).toLowerCase();
+      const la = potionLabelFromKeyObj(a.obj).toLowerCase();
+      const lb = potionLabelFromKeyObj(b.obj).toLowerCase();
       if (la < lb) return -1;
       if (la > lb) return 1;
       return 0;
@@ -1658,7 +1995,7 @@
 
       const img = document.createElement("img");
       img.className = "bagIcon";
-      img.src = potionIconPath(e.meta) + "?t=" + Date.now();
+      img.src = potionIconPath(e.obj?.t) + "?t=" + Date.now();
       img.alt = "Potion";
       img.onerror = () => { img.src = placeholderImageDataUri("Potion"); };
 
@@ -1666,7 +2003,11 @@
 
       const label = document.createElement("div");
       label.className = "bagLabel";
-      label.textContent = potionLabel(e.meta);
+      label.textContent = potionLabelFromKeyObj(e.obj);
+
+      const meta = document.createElement("div");
+      meta.className = "bagMeta";
+      meta.textContent = potionMetaTextFromKeyObj(e.obj);
 
       const qtyRow = document.createElement("div");
       qtyRow.className = "bagQtyRow";
@@ -1699,63 +2040,16 @@
 
       tile.appendChild(top);
       tile.appendChild(label);
+      tile.appendChild(meta);
       tile.appendChild(qtyRow);
 
       wrap.appendChild(tile);
     }
   }
 
-  function craftConcentrate() {
-    const baseSel = el("concBaseSelect");
-    const effSel = el("concEffectSelect");
-    if (!baseSel || !effSel) return;
-
-    const idStr = String(baseSel.value || "");
-    const effect = String(effSel.value || "").trim();
-    if (!idStr || !effect) {
-      toast("Choose an ingredient and a property.", "bad");
-      return;
-    }
-
-    const qty = Number(INDEX[idStr]) || 0;
-    if (qty < 3) {
-      toast("Not enough of that ingredient.", "bad");
-      fillConcentrateCraftChoices();
-      renderIndex();
-      fillBrewChoices();
-      renderBrewDiscovered();
-      renderConcentratesInventory();
-      return;
-    }
-
-    const revealed = revealedEffectsForIngredient(idStr);
-    if (!revealed.includes(effect)) {
-      toast("That property is not revealed.", "bad");
-      fillConcentrateCraftChoices();
-      return;
-    }
-
-    // Spend 3, gain 1 concentrate
-    setQty(idStr, qty - 3);
-
-    const key = concKey(idStr, effect);
-    const haveConc = Number(CONCENTRATES[key]) || 0;
-    CONCENTRATES[key] = haveConc + 1;
-
-    saveLocal();
-
-    // Add to bag
-    addPotion("concentrate", [effect], 1);
-
-    renderIndex();
-    fillBrewChoices();
-    renderBrewDiscovered();
-    renderConcentratesInventory();
-    fillConcentrateCraftChoices();
-
-    toast("Concentrate bottled.", "good");
-  }
-
+  /* =========================
+     Index rendering
+     ========================= */
   function renderIndex() {
     const wrap = el("indexList");
     wrap.innerHTML = "";
@@ -1802,6 +2096,7 @@
         fillBrewChoices();
         renderBrewDiscovered();
         fillConcentrateCraftChoices();
+        updateBrewDcDisplay();
       });
 
       const count = document.createElement("div");
@@ -1818,6 +2113,7 @@
         fillBrewChoices();
         renderBrewDiscovered();
         fillConcentrateCraftChoices();
+        updateBrewDcDisplay();
       });
 
       right.appendChild(minus);
@@ -1846,6 +2142,7 @@
       fillBrewChoices();
       renderBrewDiscovered();
       fillConcentrateCraftChoices();
+      updateBrewDcDisplay();
       toast("Recorded.", "good");
       el("markInput").value = "";
       return;
@@ -1867,6 +2164,7 @@
       fillBrewChoices();
       renderBrewDiscovered();
       fillConcentrateCraftChoices();
+      updateBrewDcDisplay();
       toast("Recorded.", "good");
       el("markInput").value = "";
       el("recordBtn").disabled = false;
@@ -1930,8 +2228,6 @@
         REVEALS[idStr][idx] = true;
         saveLocal();
         renderIngredient(idStr);
-        renderConcentratesInventory();
-        fillConcentrateCraftChoices();
         toast("Noted.", "good");
       });
 
@@ -1952,8 +2248,6 @@
       REVEALS[idStr][pick] = true;
       saveLocal();
       renderIngredient(idStr);
-      renderConcentratesInventory();
-      fillConcentrateCraftChoices();
       toast("Noted.", "good");
     };
 
@@ -1961,8 +2255,6 @@
       REVEALS[idStr] = [false,false,false,false];
       saveLocal();
       renderIngredient(idStr);
-      renderConcentratesInventory();
-      fillConcentrateCraftChoices();
       toast("Forgotten.", "bad");
     };
 
@@ -2018,6 +2310,7 @@
       c.innerHTML = "";
       el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your Inventory to brew.</div>`;
       renderBrewDiscovered();
+      updateBrewDcDisplay();
       return;
     }
 
@@ -2042,6 +2335,7 @@
     if (el("useThird").checked && (c.value === a.value || c.value === b.value)) c.value = cDefault;
 
     renderBrewDiscovered();
+    updateBrewDcDisplay();
   }
 
   function enforceDistinctMixing() {
@@ -2069,6 +2363,7 @@
     }
 
     renderBrewDiscovered();
+    updateBrewDcDisplay();
   }
 
   function discoveredEffectsFor(idStr) {
@@ -2167,30 +2462,195 @@
     saveLocal();
   }
 
-  function brew() {
+  function selectedBrewIds() {
     const aId = el("mixA").value;
     const bId = el("mixB").value;
     const useThird = el("useThird").checked;
     const cId = useThird ? el("mixC").value : "";
 
-    if (aId && bId && aId === bId) {
-      toast("Choose two different ingredients.", "bad");
-      el("mixResult").innerHTML = `<div style="color:var(--warn); font-weight:950;">Choose two different ingredients.</div>`;
-      enforceDistinctMixing();
-      return;
-    }
-    if (useThird) {
-      if ((aId && cId && aId === cId) || (bId && cId && bId === cId)) {
-        toast("Each ingredient must be different.", "bad");
-        el("mixResult").innerHTML = `<div style="color:var(--warn); font-weight:950;">Each ingredient must be different.</div>`;
-        enforceDistinctMixing();
-        return;
-      }
-    }
-
     const ids = [aId,bId].filter(Boolean);
     if (useThird && cId) ids.push(cId);
+    return ids;
+  }
 
+  function brewRarityTierFromIds(ids) {
+    const tiers = ids.map(id => rarityTier(ING_BY_ID[id]?.rarity));
+    let best = "common";
+    for (const t of tiers) {
+      if (rarityRank(t) > rarityRank(best)) best = t;
+    }
+    return best;
+  }
+
+  function computeDcFromSelection() {
+    const ids = selectedBrewIds();
+    if (ids.length < 2) return null;
+    const tier = brewRarityTierFromIds(ids);
+    let dc = dcForRarityTier(tier);
+    if (el("useThird").checked && ids.length === 3) dc += 2;
+    return { dc, tier };
+  }
+
+  function updateBrewDcDisplay() {
+    const out = el("brewDc");
+    if (!out) return;
+
+    const ids = selectedBrewIds();
+    if (ids.length < 2) {
+      out.textContent = "DC: (choose ingredients)";
+      return;
+    }
+
+    const info = computeDcFromSelection();
+    if (!info) {
+      out.textContent = "DC: (choose ingredients)";
+      return;
+    }
+
+    const rarityText = info.tier.charAt(0).toUpperCase() + info.tier.slice(1);
+    const plus = (el("useThird").checked && ids.length === 3) ? " (+2 for 3 ingredients)" : "";
+    out.textContent = `DC: ${info.dc} (Base ${rarityText})${plus}`;
+  }
+
+  function effectConfigForName(effectName) {
+    const key = normKey(effectName);
+    const direct = EFFECTS_CONFIG[key];
+    if (direct) return direct;
+
+    // Try exact raw key fallback (in case user stores original capitalization)
+    for (const [k,v] of Object.entries(EFFECTS_CONFIG)) {
+      if (normKey(k) === key) return v;
+    }
+    return null;
+  }
+
+  function valueForEffectAtRarity(effectName, rarityTierStr) {
+    const cfg = effectConfigForName(effectName);
+    const tier = normKey(rarityTierStr);
+    const fallback = { gp:0, sp:0, cp:0 };
+    const c = cfg?.valueByRarity?.[tier];
+    return c ? normalizeCoins(c) : fallback;
+  }
+
+  function baseNoteForEffectAtRarity(effectName, rarityTierStr) {
+    const cfg = effectConfigForName(effectName);
+    const tier = normKey(rarityTierStr);
+    return cfg?.baseNoteByRarity?.[tier] || "";
+  }
+
+  function bonusDiceForEffectAtRarity(effectName, rarityTierStr) {
+    const cfg = effectConfigForName(effectName);
+    const tier = normKey(rarityTierStr);
+    return cfg?.bonusDiceByRarity?.[tier] || "";
+  }
+
+  function kindForEffect(effectName) {
+    const cfg = effectConfigForName(effectName);
+    const t = normKey(cfg?.type || "numeric");
+    return (t === "non_numeric") ? "non_numeric" : "numeric";
+  }
+
+  function openBrewOverlay(payload) {
+    pendingBrew = payload;
+    const overlay = el("brewOverlay");
+    const grid = el("overlayGrid");
+
+    const rarityText = payload.rarity.charAt(0).toUpperCase() + payload.rarity.slice(1);
+    const coinText = formatCoins(payload.price);
+    el("overlaySub").textContent =
+      `Quality: ${rarityText}. Value (rarity-only): ${coinText}. Enter the BONUS roll for each shared property.`;
+
+    grid.innerHTML = "";
+
+    for (const eff of payload.effects) {
+      const row = document.createElement("div");
+      row.className = "overlayRow";
+
+      const top = document.createElement("div");
+      top.className = "overlayRowTop";
+
+      const left = document.createElement("div");
+      const name = document.createElement("div");
+      name.className = "overlayEffectName";
+      name.textContent = eff.name;
+
+      const pills = document.createElement("div");
+      pills.style.display = "flex";
+      pills.style.gap = "6px";
+      pills.style.flexWrap = "wrap";
+
+      const kindP = document.createElement("div");
+      kindP.className = "pillMini";
+      kindP.textContent = (eff.kind === "non_numeric") ? "Non-numeric" : "Numeric";
+
+      const baseP = document.createElement("div");
+      baseP.className = "pillMini";
+      baseP.textContent = eff.baseNote ? `Base ${eff.baseNote}` : "Base (none)";
+
+      const bonusP = document.createElement("div");
+      bonusP.className = "pillMini";
+      bonusP.textContent = eff.bonusDice ? `Bonus ${eff.bonusDice}` : "Bonus (none)";
+
+      pills.appendChild(kindP);
+      pills.appendChild(baseP);
+      pills.appendChild(bonusP);
+
+      left.appendChild(name);
+      left.appendChild(pills);
+
+      const right = document.createElement("div");
+      right.className = "overlayHint";
+      right.textContent = (eff.kind === "non_numeric")
+        ? "Later: non-numeric. For now, you may leave blank."
+        : "Enter the bonus result you rolled.";
+
+      top.appendChild(left);
+      top.appendChild(right);
+
+      const inputRow = document.createElement("div");
+      inputRow.className = "overlayInputRow";
+
+      const input = document.createElement("input");
+      input.inputMode = "numeric";
+      input.placeholder = (eff.kind === "non_numeric") ? "Bonus (optional)" : "Bonus roll result";
+      input.dataset.effectKey = eff.key;
+      inputRow.appendChild(input);
+
+      row.appendChild(top);
+      row.appendChild(inputRow);
+
+      grid.appendChild(row);
+    }
+
+    overlay.style.display = "flex";
+  }
+
+  function closeBrewOverlay() {
+    pendingBrew = null;
+    const overlay = el("brewOverlay");
+    overlay.style.display = "none";
+    el("overlayGrid").innerHTML = "";
+  }
+
+  function gatherOverlayInputs() {
+    const grid = el("overlayGrid");
+    const inputs = grid.querySelectorAll("input[data-effect-key]");
+    const map = {};
+    inputs.forEach(i => {
+      const k = String(i.dataset.effectKey || "");
+      const raw = String(i.value || "").trim();
+      if (!raw) {
+        map[k] = null;
+        return;
+      }
+      const n = Number(raw);
+      map[k] = Number.isFinite(n) ? Math.floor(n) : null;
+    });
+    return map;
+  }
+
+  function brewFailure() {
+    const ids = selectedBrewIds();
     if (ids.length < 2) {
       el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your Inventory to brew.</div>`;
       return;
@@ -2205,13 +2665,66 @@
       return;
     }
 
-    const shared = computeShared(ids);
-
     spend(ids);
     renderIndex();
     fillBrewChoices();
     enforceDistinctMixing();
+    renderBrewDiscovered();
     fillConcentrateCraftChoices();
+    updateBrewDcDisplay();
+
+    el("mixResult").innerHTML = `
+      <div style="color:rgba(255,190,120,0.95); font-weight:1000;">The brew fails.</div>
+      <div class="muted" style="margin-top:6px;">Ingredients were consumed.</div>
+    `;
+    toast("Failed, ingredients consumed.", "bad");
+  }
+
+  function brewSuccess() {
+    const ids = selectedBrewIds();
+    const useThird = el("useThird").checked;
+
+    if (ids.length < 2) {
+      el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your Inventory to brew.</div>`;
+      return;
+    }
+
+    // UI already prevents duplicates, keep guards
+    if (ids.length >= 2 && ids[0] === ids[1]) {
+      toast("Choose two different ingredients.", "bad");
+      el("mixResult").innerHTML = `<div style="color:var(--warn); font-weight:950;">Choose two different ingredients.</div>`;
+      enforceDistinctMixing();
+      return;
+    }
+    if (useThird && ids.length === 3) {
+      if (ids[2] === ids[0] || ids[2] === ids[1]) {
+        toast("Each ingredient must be different.", "bad");
+        el("mixResult").innerHTML = `<div style="color:var(--warn); font-weight:950;">Each ingredient must be different.</div>`;
+        enforceDistinctMixing();
+        return;
+      }
+    }
+
+    if (!canSpend(ids)) {
+      el("mixResult").innerHTML = `
+        <div style="color:var(--warn); font-weight:950;">Not enough in the Inventory.</div>
+        <div class="muted" style="margin-top:6px;">You are missing one of the chosen ingredients.</div>
+      `;
+      toast("Not enough in the Inventory.", "bad");
+      return;
+    }
+
+    const shared = computeShared(ids);
+    const rarity = brewRarityTierFromIds(ids);
+
+    // Consume ingredients on success press
+    spend(ids);
+    renderIndex();
+    fillBrewChoices();
+    enforceDistinctMixing();
+    renderBrewDiscovered();
+    fillConcentrateCraftChoices();
+    updateBrewDcDisplay();
 
     if (shared.length === 0) {
       el("mixResult").innerHTML = `
@@ -2222,20 +2735,78 @@
       return;
     }
 
+    // Learn the shared properties (reveals)
     revealSharedAutomatically(ids, shared);
     recordRecipe(ids, shared);
 
-    // Add to bag: 1 concoction per successful brew
-    addPotion("concoction", shared, 1);
+    // Build overlay payload
+    const effects = shared.map(name => {
+      const kind = kindForEffect(name);
+      const baseNote = baseNoteForEffectAtRarity(name, rarity);
+      const bonusDice = bonusDiceForEffectAtRarity(name, rarity);
+      const key = normKey(name);
+      return { name, key, kind, baseNote, bonusDice };
+    });
+
+    // Price is sum of effect values at potion rarity
+    let price = { gp:0, sp:0, cp:0 };
+    for (const name of shared) {
+      price = addCoins(price, valueForEffectAtRarity(name, rarity));
+    }
+    price = normalizeCoins(price);
+
+    pendingBrew = {
+      type: "concoction",
+      rarity,
+      effects,
+      price
+    };
+
+    el("mixResult").innerHTML = `
+      <div style="color:rgba(120,255,170,0.95); font-weight:1000;">Concoction possible.</div>
+      <div class="muted" style="margin-top:6px;">Record your bonus rolls to store it in the bag.</div>
+    `;
+    toast("Success, record the result.", "good");
+
+    openBrewOverlay(pendingBrew);
+  }
+
+  function saveOverlayToBag() {
+    if (!pendingBrew) {
+      closeBrewOverlay();
+      return;
+    }
+
+    const inputs = gatherOverlayInputs();
+
+    const effectsWithValues = pendingBrew.effects.map(e => {
+      const bonus = inputs[e.key];
+      return {
+        name: e.name,
+        kind: e.kind,
+        bonus: (e.kind === "numeric") ? bonus : bonus, // placeholder, non-numeric later
+        baseNote: e.baseNote || null,
+        bonusDice: e.bonusDice || null
+      };
+    });
+
+    addPotion({
+      type: pendingBrew.type,
+      rarity: pendingBrew.rarity,
+      effects: effectsWithValues,
+      price: pendingBrew.price
+    }, 1);
 
     playSfx("sfxSuccess");
 
-    const effectText = shared.join(", ");
+    const effText = effectsWithValues.map(x => x.name).join(", ");
     el("mixResult").innerHTML = `
-      <div style="color:rgba(120,255,170,0.95); font-weight:1000;">Made Concoction of ${escapeHtml(effectText)}</div>
-      <div class="muted" style="margin-top:6px;">The shared nature has been noted.</div>
+      <div style="color:rgba(120,255,170,0.95); font-weight:1000;">Stored: Concoction of ${escapeHtml(effText)}</div>
+      <div class="muted" style="margin-top:6px;">Added to Bag. Value: ${escapeHtml(formatCoins(pendingBrew.price))}</div>
     `;
-    toast("A concoction is born.", "good");
+
+    closeBrewOverlay();
+    toast("Added to bag.", "good");
   }
 
   function exportNotes() {
@@ -2283,9 +2854,11 @@
       renderIndex();
       fillBrewChoices();
       enforceDistinctMixing();
+      renderBrewDiscovered();
       renderConcentratesInventory();
       fillConcentrateCraftChoices();
       renderBag();
+      updateBrewDcDisplay();
       toast("Restored.", "good");
     } catch {
       toast("Those notes do not make sense.", "bad");
@@ -2303,9 +2876,11 @@
     renderIndex();
     fillBrewChoices();
     enforceDistinctMixing();
+    renderBrewDiscovered();
     renderConcentratesInventory();
     fillConcentrateCraftChoices();
     renderBag();
+    updateBrewDcDisplay();
     showOnly("main");
     toast("Ashes and silence.", "bad");
   }
@@ -2325,7 +2900,9 @@
     showOnly("brew");
     fillBrewChoices();
     enforceDistinctMixing();
+    renderBrewDiscovered();
     fillConcentrateCraftChoices();
+    updateBrewDcDisplay();
   });
 
   el("openBagBtn").addEventListener("click", () => {
@@ -2371,12 +2948,15 @@
     el("thirdSlot").classList.toggle("hidden", !on);
     fillBrewChoices();
     enforceDistinctMixing();
+    updateBrewDcDisplay();
   });
 
-  el("mixA").addEventListener("change", enforceDistinctMixing);
-  el("mixB").addEventListener("change", enforceDistinctMixing);
-  el("mixC").addEventListener("change", enforceDistinctMixing);
-  el("brewBtn").addEventListener("click", brew);
+  el("mixA").addEventListener("change", () => { enforceDistinctMixing(); fillBrewChoices(); });
+  el("mixB").addEventListener("change", () => { enforceDistinctMixing(); fillBrewChoices(); });
+  el("mixC").addEventListener("change", () => { enforceDistinctMixing(); fillBrewChoices(); });
+
+  el("brewSuccessBtn").addEventListener("click", brewSuccess);
+  el("brewFailBtn").addEventListener("click", brewFailure);
 
   el("exportBtn").addEventListener("click", exportNotes);
   el("importBtn").addEventListener("click", importNotes);
@@ -2386,8 +2966,86 @@
   el("concEffectSelect").addEventListener("change", fillConcentrateCraftChoices);
   el("concCraftBtn").addEventListener("click", craftConcentrate);
 
+  // Overlay buttons
+  el("overlayCancelBtn").addEventListener("click", () => {
+    closeBrewOverlay();
+    toast("Canceled recording.", "bad");
+  });
+  el("overlaySaveBtn").addEventListener("click", saveOverlayToBag);
+
+  // Clicking outside closes overlay
+  el("brewOverlay").addEventListener("click", (e) => {
+    if (e.target === el("brewOverlay")) closeBrewOverlay();
+  });
+
   setTheme("wilderness");
   showOnly("main");
+
+  /* =========================================================
+     POTION EFFECT CONFIG (EDIT ME)
+     - Add new effects by copying the template below.
+     - Keys are normalized internally (trim, collapse spaces,
+       lowercase), so "restore health" matches "Restore Health".
+     ========================================================= */
+
+  /*
+  TEMPLATE:
+
+  "Effect Name Here": {
+    type: "numeric", // "numeric" | "non_numeric"
+    bonusDiceByRarity: {
+      common: "1d6",
+      uncommon: "1d8",
+      rare: "1d12",
+      legendary: "2d20"
+    },
+    baseNoteByRarity: {           // shown as reminder text only
+      common: "2d4",
+      uncommon: "4d4",
+      rare: "8d4",
+      legendary: "10d4"
+    },
+    valueByRarity: {              // rarity-only value for this effect
+      common:    { gp: 0, sp: 5,  cp: 0 },
+      uncommon:  { gp: 1, sp: 0,  cp: 0 },
+      rare:      { gp: 5, sp: 0,  cp: 0 },
+      legendary: { gp: 25, sp: 0, cp: 0 }
+    }
+  },
+  */
+
+  const EFFECTS_CONFIG = (() => {
+    const cfg = {
+      "Restore Health": {
+        type: "numeric",
+        bonusDiceByRarity: {
+          common: "1d6",
+          uncommon: "1d8",
+          rare: "1d12",
+          legendary: "2d20"
+        },
+        baseNoteByRarity: {
+          common: "2d4",
+          uncommon: "4d4",
+          rare: "8d4",
+          legendary: "10d4"
+        },
+        valueByRarity: {
+          common:    { gp: 0, sp: 5,  cp: 0 },
+          uncommon:  { gp: 1, sp: 0,  cp: 0 },
+          rare:      { gp: 5, sp: 0,  cp: 0 },
+          legendary: { gp: 25, sp: 0, cp: 0 }
+        }
+      }
+    };
+
+    // Normalize keys into a lookup table
+    const out = {};
+    for (const [k,v] of Object.entries(cfg)) out[normKey(k)] = v;
+    return out;
+  })();
+
+  // Start after config is ready
   fetchAllIngredients();
 </script>
 </body>

@@ -46,23 +46,25 @@
       --line-width: 78%;
       --right-box-width: 96%;
 
-      /* Right page shift */
+      /* Right page shift: moves right page content left without touching left page */
       --right-page-shift: 150px;
-
-      /* Right-page note box width */
-      --right-notebox-width: 84%;
 
       --brew-maxw: 1000px;
 
       /* Bag UI */
-      --bag-maxw: 1040px;
+      --bag-maxw: 1100px;
+      --bag-grid-min: 140px;
 
-      /* Trim/padding inside Backpack_UI.webp before placing tiles */
-      --bag-trim: 34px;
-      --bag-trim-mobile: 18px;
+      /* Rarity colors */
+      --rar-common: #2f9e44;   /* green */
+      --rar-uncommon: #2b74ff; /* blue */
+      --rar-rare: #9b59ff;     /* purple */
+      --rar-legend: #ff8a00;   /* orange */
 
-      /* Push bag items downward inside Backpack_UI.webp */
-      --bag-top-offset: 70px;
+      /* Coin colors */
+      --coin-gp: #d4af37; /* gold */
+      --coin-sp: #c0c0c0; /* silver */
+      --coin-cp: #b87333; /* copper */
     }
 
     html, body {
@@ -88,7 +90,7 @@
     }
 
     .wrap{
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 12px;
     }
@@ -133,14 +135,6 @@
       box-shadow: 0 14px 28px rgba(0,0,0,0.32);
     }
 
-    .btn-bad{
-      background: linear-gradient(180deg, rgba(139,29,44,0.92), rgba(139,29,44,0.78));
-      color: #fff7ee;
-      border-color: rgba(139,29,44,0.45);
-      box-shadow: 0 10px 22px rgba(0,0,0,0.28);
-      font-weight: 900;
-    }
-
     .btn-quiet{
       background: rgba(255,255,255,0.70);
       color: #000;
@@ -180,7 +174,7 @@
       align-items: stretch;
     }
     @media (min-width: 860px){
-      .main-grid{ grid-template-columns: repeat(3, 1fr); }
+      .main-grid{ grid-template-columns: 1fr 1fr; }
     }
 
     .panel{
@@ -341,8 +335,6 @@
         --line-width: 90%;
         --right-box-width: 98%;
         --right-page-shift: 0px;
-        --right-notebox-width: 96%;
-        --bag-top-offset: 40px;
       }
       .bookWrap{
         height: auto;
@@ -381,7 +373,7 @@
     .pageInner::-webkit-scrollbar-track{ background: transparent; }
     .pageInner::-webkit-scrollbar-thumb{ background: rgba(0,0,0,0.2); border-radius: 2px; }
 
-    /* Right page: shift left */
+    /* Right page: shift left (only right page) */
     .pageRight{
       justify-content: center;
       align-items: flex-start;
@@ -394,16 +386,9 @@
       margin-right: auto;
       padding-right: 10px;
       transform: translateX(calc(-1 * var(--right-page-shift)));
-      display: flex;
+      display:flex;
       flex-direction: column;
       height: 100%;
-    }
-
-    /* Shrink ONLY the right-page note boxes */
-    .pageRight .noteBox{
-      width: var(--right-notebox-width);
-      margin-left: 0;
-      margin-right: auto;
     }
 
     .leftCentered{
@@ -533,7 +518,7 @@
       width: 100%;
       color:#000 !important;
       -webkit-text-fill-color:#000 !important;
-      max-height: 200px;
+      max-height: 220px;
       overflow-y: auto;
     }
 
@@ -718,32 +703,267 @@
       align-items:center;
     }
 
-    .brewBtnRow{
-      display:flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .brewBtnRow button{
-      width: 100%;
+    .dcLine{
+      margin-top: 8px;
       font-weight: 950;
-    }
-
-    /* Concentrate crafting controls on Brewing page */
-    .concControls{
-      display:flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .concControls button{
-      width: 100%;
-      font-weight: 950;
-      white-space: nowrap;
+      color: #f2f6ff;
+      font-size: var(--small);
     }
 
     select{
       background: rgba(255,255,255,0.86);
       color:#000;
       border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    /* Bag UI */
+    .bagPage{
+      max-width: var(--bag-maxw);
+      margin: 0 auto;
+      padding: 12px;
+      display:flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .bagFrame{
+      border-radius: 18px;
+      overflow:hidden;
+      border: 1px solid var(--scene-border);
+      background: rgba(0,0,0,0.15);
+      box-shadow: var(--shadow2);
+      position: relative;
+    }
+    .bagBgImg{
+      width:100%;
+      height: min(60vh, 620px);
+      min-height: 360px;
+      object-fit: contain;
+      background: rgba(0,0,0,0.10);
+      display:block;
+    }
+
+    .bagOverlay{
+      position:absolute;
+      inset: 0;
+      padding: 34px 44px 40px 44px;
+      display:flex;
+      align-items: stretch;
+      justify-content: center;
+      pointer-events: none;
+    }
+    @media (max-width: 760px){
+      .bagOverlay{ padding: 26px 18px 26px 18px; }
+    }
+
+    .bagInner{
+      width: min(980px, 100%);
+      height: 100%;
+      pointer-events: auto;
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .bagHeader{
+      display:flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .bagTitle{
+      font-weight: 1000;
+      font-size: 14px;
+      color:#f2f6ff;
+    }
+
+    .bagGrid{
+      flex: 1 1 auto;
+      overflow:auto;
+      padding: 8px;
+      border-radius: 16px;
+      background: rgba(0,0,0,0.14);
+      border: 1px solid rgba(255,255,255,0.10);
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(var(--bag-grid-min), 1fr));
+      gap: 10px;
+    }
+
+    .bagItem{
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.08);
+      padding: 10px;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.22);
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bagTop{
+      display:flex;
+      align-items:center;
+      justify-content: center;
+      gap: 8px;
+      flex-direction: column;
+    }
+    .bagIcon{
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));
+    }
+
+    .bagLines{
+      text-align:center;
+      color:#f2f6ff;
+      line-height: 1.12;
+      display:flex;
+      flex-direction: column;
+      gap: 4px;
+      min-height: 90px;
+      justify-content: center;
+    }
+    .bagKind{
+      font-weight: 1000;
+      font-size: 13px;
+    }
+    .bagOf{
+      font-weight: 950;
+      font-size: 12.5px;
+      opacity: 0.98;
+    }
+    .bagRarity{
+      font-weight: 1000;
+      font-size: 11px;
+      opacity: 0.95;
+    }
+    .bagFormula{
+      font-weight: 950;
+      font-size: 12px;
+      opacity: 0.95;
+    }
+    .bagValue{
+      font-weight: 950;
+      font-size: 11.5px;
+      opacity: 0.95;
+    }
+
+    .qtyRow{
+      display:flex;
+      align-items:center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .qtyRow .count{
+      background: rgba(255,255,255,0.10);
+      border-color: rgba(255,255,255,0.20);
+      color:#f2f6ff;
+      min-width: 30px;
+    }
+    .qtyRow .qtyBtn{
+      border-color: rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.08);
+      color:#f2f6ff;
+    }
+
+    /* Rarity helpers */
+    .rar-common{ color: var(--rar-common) !important; }
+    .rar-uncommon{ color: var(--rar-uncommon) !important; }
+    .rar-rare{ color: var(--rar-rare) !important; }
+    .rar-legendary{ color: var(--rar-legend) !important; }
+
+    /* Coin helpers */
+    .coin-gp{ color: var(--coin-gp) !important; font-weight: 1000; }
+    .coin-sp{ color: var(--coin-sp) !important; font-weight: 1000; }
+    .coin-cp{ color: var(--coin-cp) !important; font-weight: 1000; }
+
+    /* Mixing UI */
+    .mixPage{
+      max-width: var(--brew-maxw);
+      margin: 0 auto;
+      padding: 12px;
+      display:flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mixControls{
+      border-radius: 18px;
+      border: 1px solid var(--scene-border);
+      background: rgba(18, 22, 30, 0.72);
+      box-shadow: var(--shadow);
+      padding: 12px;
+      color:#f2f6ff;
+    }
+
+    /* Modal overlay (brew success/fail entry, and mixing result confirmation) */
+    .modalShade{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.64);
+      display:none;
+      z-index: 80;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+    .modal{
+      width: min(720px, 100%);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(20,22,30,0.96);
+      box-shadow: var(--shadow);
+      padding: 12px;
+      color:#f2f6ff;
+    }
+    .modalHead{
+      display:flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 6px 4px 10px 4px;
+      border-bottom: 1px solid rgba(255,255,255,0.14);
+      margin-bottom: 10px;
+    }
+    .modalTitle{
+      font-weight: 1000;
+      font-size: 14px;
+    }
+    .modalBody{
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 4px;
+    }
+    .rollRow{
+      border-radius: 14px;
+      border: 1px dashed rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      padding: 10px;
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .rollRow .label{
+      font-weight: 950;
+      line-height: 1.15;
+    }
+    .rollRow input{
+      width: 120px;
+      text-align: center;
+      font-weight: 1000;
+    }
+    .modalBtns{
+      display:flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.14);
     }
 
     /* Toast */
@@ -760,7 +980,7 @@
       box-shadow: var(--shadow);
       max-width: calc(100vw - 32px);
       display:none;
-      z-index: 50;
+      z-index: 90;
       font-size: var(--small);
       font-weight: 950;
     }
@@ -807,226 +1027,6 @@
     @media (max-width: 480px){
       .title{ flex-direction: column; align-items: flex-start; }
     }
-
-    /* Bag view */
-    .bagPage{
-      max-width: var(--bag-maxw);
-      margin: 0 auto;
-      padding: 12px;
-      display:flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .bagFrame{
-      border-radius: 18px;
-      overflow:hidden;
-      border: 1px solid var(--scene-border);
-      background: rgba(0,0,0,0.15);
-      box-shadow: var(--shadow2);
-      position: relative;
-    }
-    .bagBgImg{
-      width:100%;
-      height: min(72vh, 740px);
-      min-height: 520px;
-      object-fit: contain;
-      display:block;
-      background: rgba(0,0,0,0.10);
-      user-select: none;
-      pointer-events: none;
-    }
-
-    .bagOverlay{
-      position:absolute;
-      inset: 0;
-      padding: var(--bag-trim);
-      padding-top: calc(var(--bag-trim) + var(--bag-top-offset));
-      display:flex;
-      align-items: stretch;
-      justify-content: center;
-    }
-
-    @media (max-width: 760px){
-      .bagOverlay{
-        padding: var(--bag-trim-mobile);
-        padding-top: calc(var(--bag-trim-mobile) + var(--bag-top-offset));
-      }
-    }
-
-    .bagSlots{
-      width: 100%;
-      height: 100%;
-      display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 10px;
-      align-content: start;
-      overflow: auto;
-      padding: 8px;
-    }
-    .bagTile{
-      border-radius: 14px;
-      border: 1px solid rgba(0,0,0,0.25);
-      background: rgba(255,255,255,0.10);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.18);
-      padding: 10px;
-      display:flex;
-      flex-direction: column;
-      gap: 8px;
-      backdrop-filter: blur(2px);
-    }
-    .bagTileTop{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      min-height: 86px;
-    }
-    .bagIcon{
-      width: 72px;
-      height: 72px;
-      object-fit: contain;
-      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));
-      user-select: none;
-      pointer-events: none;
-    }
-    .bagLabel{
-      font-weight: 950;
-      color: rgba(245,248,255,0.95);
-      text-shadow: 0 1px 0 rgba(0,0,0,0.45);
-      font-size: 12px;
-      line-height: 1.15;
-      text-align:center;
-      word-break: break-word;
-      min-height: 34px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .bagMeta{
-      font-size: 11px;
-      line-height: 1.2;
-      color: rgba(233,237,246,0.86);
-      text-shadow: 0 1px 0 rgba(0,0,0,0.35);
-      white-space: pre-wrap;
-      word-break: break-word;
-      min-height: 28px;
-      padding: 2px 4px;
-      border-radius: 10px;
-      background: rgba(0,0,0,0.10);
-      border: 1px solid rgba(255,255,255,0.10);
-    }
-    .bagQtyRow{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap: 6px;
-      flex-wrap: nowrap;
-    }
-    .bagQtyRow .count{
-      border-color: rgba(255,255,255,0.18);
-      color: #f2f6ff;
-      background: rgba(0,0,0,0.12);
-    }
-    .bagQtyRow .qtyBtn{
-      border-color: rgba(255,255,255,0.18);
-      color: #f2f6ff;
-      background: rgba(0,0,0,0.14);
-    }
-
-    /* Brew success overlay */
-    .overlay{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.58);
-      z-index: 80;
-      display:none;
-      align-items: center;
-      justify-content: center;
-      padding: 14px;
-    }
-    .overlayCard{
-      width: min(760px, 100%);
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(18, 22, 30, 0.92);
-      box-shadow: var(--shadow);
-      padding: 12px;
-      color: #f2f6ff;
-    }
-    .overlayTitle{
-      font-weight: 950;
-      font-size: 14px;
-      margin-bottom: 6px;
-    }
-    .overlaySub{
-      font-size: 12px;
-      color: rgba(233,237,246,0.78);
-      margin-bottom: 10px;
-      line-height: 1.25;
-    }
-    .overlayGrid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      max-height: min(62vh, 520px);
-      overflow:auto;
-      padding-right: 6px;
-    }
-    .overlayRow{
-      border-radius: 14px;
-      border: 1px dashed rgba(255,255,255,0.20);
-      background: rgba(255,255,255,0.06);
-      padding: 10px;
-      display:flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .overlayRowTop{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .overlayEffectName{
-      font-weight: 950;
-      font-size: 13px;
-    }
-    .overlayHint{
-      font-size: 12px;
-      color: rgba(233,237,246,0.78);
-      line-height: 1.25;
-    }
-    .overlayInputRow{
-      display:flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items:center;
-    }
-    .overlayInputRow input{
-      flex: 1 1 180px;
-      min-width: 160px;
-    }
-    .overlayFooter{
-      margin-top: 10px;
-      display:flex;
-      gap: 8px;
-      justify-content:flex-end;
-      flex-wrap: wrap;
-    }
-    .overlayFooter button{
-      font-weight: 950;
-      white-space: nowrap;
-    }
-    .pillMini{
-      display:inline-flex;
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.08);
-      font-size: 11px;
-      font-weight: 950;
-      color: rgba(245,248,255,0.95);
-    }
   </style>
 </head>
 
@@ -1058,6 +1058,13 @@
           <button class="overlayBtn" id="openBrewBtn" aria-label="Open brewing">
             <img class="coverArt" src="assets/ui/cauldron_main.webp" alt="Brewing cauldron" />
             <div class="hint">Brewing</div>
+          </button>
+        </div>
+
+        <div class="panel" title="Mixing">
+          <button class="overlayBtn" id="openMixBtn" aria-label="Open mixing">
+            <img class="coverArt" src="assets/ui/Mixer.webp" alt="Mixing kit" />
+            <div class="hint">Mixing</div>
           </button>
         </div>
 
@@ -1141,15 +1148,13 @@
             </div>
           </div>
 
+          <!-- Right page is now Concentrates inventory -->
           <div class="page pageRight">
             <div class="pageInner">
               <h2>Concentrates</h2>
-              <div class="muted">Your bottled effects, tracked here.</div>
+              <div class="muted">Track what you carry. Crafting happens in Brewing.</div>
               <div class="hr" style="width:100%;"></div>
-              <div id="concList" class="noteBox" style="max-height: 320px;"></div>
-              <div class="muted" style="margin-top:8px;">
-                Brew concentrates from the Brewing screen.
-              </div>
+              <div id="concIndexList"></div>
             </div>
           </div>
         </div>
@@ -1189,7 +1194,7 @@
               <h2>Known Recipes</h2>
               <div class="muted">What you have learned so far.</div>
               <div class="hr" style="width:100%;"></div>
-              <div id="recipesList" class="noteBox" style="max-height: 320px;"></div>
+              <div id="recipesList" class="noteBox" style="max-height: 340px;"></div>
             </div>
           </div>
         </div>
@@ -1215,7 +1220,6 @@
         <div class="brewControls">
           <div class="brewTopRow">
             <button class="themeBtn" id="themeToggleBtn" type="button" aria-label="Switch theme">
-              <!-- Placeholder icons, replace later -->
               <img id="themeIcon" src="assets/icons/theme_wilderness.webp" alt="" />
               <span id="themeLabel">Wilderness</span>
             </button>
@@ -1250,35 +1254,94 @@
 
             <div class="slotBox">
               <div class="slotTitle">Brew</div>
-
-              <div class="muted" id="brewDc" style="margin-bottom:8px;">
-                DC: (choose ingredients)
-              </div>
-
-              <div class="brewBtnRow">
-                <button class="btn-primary" id="brewSuccessBtn" type="button">Brew (Success)</button>
-                <button class="btn-bad" id="brewFailBtn" type="button">Brew (Failure)</button>
-              </div>
-
+              <button class="btn-primary" id="brewBtn" type="button" style="width:100%;">Brew</button>
+              <div class="dcLine" id="brewDcLine">DC: —</div>
               <div class="resultBox" id="mixResult" style="margin-top:9px;">
                 <div class="muted">No mixture yet.</div>
               </div>
             </div>
+          </div>
+
+          <div class="hr" style="width:100%; margin-top:12px; margin-bottom:12px; background: rgba(255,255,255,0.14);"></div>
+
+          <div class="brewGrid">
+            <div class="slotBox">
+              <div class="slotTitle">Make a concentrate (cost: 4)</div>
+              <div class="muted">Choose an ingredient you have, then choose a discovered property.</div>
+
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+                <select id="concFromIng" style="flex:1 1 220px;"></select>
+                <select id="concEffect" style="flex:1 1 220px;"></select>
+              </div>
+
+              <div class="dcLine" id="concInfoLine" style="margin-top:10px;">Concentrate: —</div>
+
+              <button class="btn-primary" id="makeConcBtn" type="button" style="width:100%; margin-top:10px;">
+                Create Concentrate
+              </button>
+
+              <div class="muted" style="margin-top:10px;">
+                Concentrates appear in the book (Concentrates page) and in your Bag.
+              </div>
+            </div>
 
             <div class="slotBox">
-              <div class="slotTitle">Concentrate</div>
-              <div class="muted" style="margin-bottom:8px;">Spend 3 of the same ingredient to bottle a revealed property.</div>
-              <div class="concControls">
-                <select id="concBaseSelect" aria-label="Choose ingredient"></select>
-                <select id="concEffectSelect" aria-label="Choose property"></select>
-                <button class="btn-primary" id="concCraftBtn" type="button">Concentrate (Spend 3)</button>
+              <div class="slotTitle">Notes</div>
+              <div class="muted" style="margin-top:6px; line-height:1.25;">
+                Brewing consumes ingredients either way. If a shared property exists and you succeed, you create a potion and note the shared property.
               </div>
-              <div class="muted" style="margin-top:8px;">Result appears in the Field Notes concentrates inventory, and in the Bag.</div>
+              <div class="muted" style="margin-top:10px; line-height:1.25;">
+                Base is always <b>2d4</b>. You roll only the bonus and record it as <b>2d4+X</b>.
+              </div>
             </div>
           </div>
 
           <div class="muted" style="margin-top:10px;">
             Brewing draws from your Inventory. If you lack an ingredient, the attempt is refused.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MIXING -->
+    <section id="viewMix" class="scene hidden">
+      <div class="sceneTopBar">
+        <button class="backBtn" id="backFromMixBtn" type="button" aria-label="Back to main">
+          <img src="assets/icons/arrow_back.webp" alt="" />
+          Back
+        </button>
+        <div class="muted" id="mixStatus">Pick from your Bag and Concentrates.</div>
+      </div>
+
+      <div class="mixPage">
+        <div class="mixControls">
+          <div class="brewGrid">
+            <div class="slotBox">
+              <div class="slotTitle">First</div>
+              <select id="mixItemA"></select>
+              <div class="muted" style="margin-top:7px;">Details</div>
+              <div class="resultBox" id="mixItemADetail"><div class="muted">—</div></div>
+            </div>
+
+            <div class="slotBox">
+              <div class="slotTitle">Second</div>
+              <select id="mixItemB"></select>
+              <div class="muted" style="margin-top:7px;">Details</div>
+              <div class="resultBox" id="mixItemBDetail"><div class="muted">—</div></div>
+            </div>
+
+            <div class="slotBox">
+              <div class="slotTitle">Mix</div>
+              <button class="btn-primary" id="mixBtn" type="button" style="width:100%;">Mix</button>
+              <div class="dcLine" id="mixDcLine">DC: —</div>
+              <div class="resultBox" id="mixOut" style="margin-top:9px;">
+                <div class="muted">No mixture yet.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="muted" style="margin-top:10px;">
+            Rules: Potion + Potion and Potion + Concentrate are allowed. Final potion is capped at 3 effects. Mixed potions cannot be mixed again.
           </div>
         </div>
       </div>
@@ -1291,42 +1354,41 @@
           <img src="assets/icons/arrow_back.webp" alt="" />
           Back
         </button>
-        <div class="muted" id="bagStatus">Your bag.</div>
+        <div class="muted" id="bagStatus">Inventory.</div>
       </div>
 
       <div class="bagPage">
         <div class="bagFrame">
-          <img class="bagBgImg" src="assets/ui/Backpack_UI.webp" alt="Bag UI" />
-          <div class="bagOverlay" aria-label="Bag slots overlay">
-            <div class="bagSlots" id="bagSlots"></div>
-          </div>
-        </div>
+          <img class="bagBgImg" src="assets/ui/Backpack_UI.webp" alt="Bag" />
 
-        <div class="muted">
-          Honor system: adjust counts freely.
+          <div class="bagOverlay">
+            <div class="bagInner">
+              <div class="bagHeader">
+                <div class="bagTitle">Bag</div>
+                <div class="muted">Honor system, adjust counts as needed.</div>
+              </div>
+
+              <div id="bagGrid" class="bagGrid"></div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
-  </div>
 
-  <!-- Success overlay -->
-  <div class="overlay" id="brewOverlay" role="dialog" aria-modal="true" aria-label="Record potion results">
-    <div class="overlayCard">
-      <div class="overlayTitle">Record Your Potion</div>
-      <div class="overlaySub" id="overlaySub">
-        Enter the bonus roll for each shared effect.
-      </div>
-
-      <div class="overlayGrid" id="overlayGrid"></div>
-
-      <div class="overlayFooter">
-        <button class="btn-quiet" id="overlayCancelBtn" type="button">Cancel</button>
-        <button class="btn-primary" id="overlaySaveBtn" type="button">Save to Bag</button>
-      </div>
-    </div>
   </div>
 
   <div class="toast" id="toast"></div>
+
+  <div class="modalShade" id="modalShade">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modalHead">
+        <div class="modalTitle" id="modalTitle">Record</div>
+        <button id="modalCloseBtn" type="button">Close</button>
+      </div>
+      <div class="modalBody" id="modalBody"></div>
+      <div class="modalBtns" id="modalBtns"></div>
+    </div>
+  </div>
 
   <audio id="sfxPage" src="assets/sfx/page_turn.mp3" preload="auto"></audio>
   <audio id="sfxSuccess" src="assets/sfx/brew_success.mp3" preload="auto"></audio>
@@ -1342,22 +1404,26 @@
 
   const LOCAL_KEY = "field_notes_v2";
   let LOCAL = loadLocal();
+
   let REVEALS = LOCAL.reveals;
   let INDEX = LOCAL.index;
   let RECIPES = LOCAL.recipes;
-  let CONCENTRATES = LOCAL.concentrates;
+
+  // New inventories
+  // POTIONS: array of items with individual keys so different 2d4+X variants can coexist
+  // CONCS: map keyed by concKey -> { key, effect, rarity, formula, value, qty }
   let POTIONS = LOCAL.potions;
+  let CONCS = LOCAL.concentrates;
 
   let ING_BY_ID = {};
   let currentIngredientId = null;
   let theme = "wilderness";
   let isFetching = false;
 
-  let pendingBrew = null;
-
   const viewMain = document.getElementById("viewMain");
   const viewBook = document.getElementById("viewBook");
   const viewBrew = document.getElementById("viewBrew");
+  const viewMix = document.getElementById("viewMix");
   const viewBag = document.getElementById("viewBag");
   const spreadIndex = document.getElementById("spreadIndex");
   const spreadIngredient = document.getElementById("spreadIngredient");
@@ -1369,20 +1435,25 @@
   }
 
   function saveLocal() {
-    LOCAL = { reveals: REVEALS, index: INDEX, recipes: RECIPES, concentrates: CONCENTRATES, potions: POTIONS };
+    LOCAL = {
+      reveals: REVEALS,
+      index: INDEX,
+      recipes: RECIPES,
+      potions: POTIONS,
+      concentrates: CONCS
+    };
     localStorage.setItem(LOCAL_KEY, JSON.stringify(LOCAL));
   }
 
   function loadLocal() {
     const raw = localStorage.getItem(LOCAL_KEY);
-    if (!raw) return { reveals: {}, index: {}, recipes: [], concentrates: {}, potions: {} };
+    if (!raw) return { reveals: {}, index: {}, recipes: [], potions: [], concentrates: {} };
     try {
       const parsed = JSON.parse(raw);
+
       const reveals = (parsed && typeof parsed.reveals === "object" && parsed.reveals) ? parsed.reveals : {};
       const index = (parsed && typeof parsed.index === "object" && parsed.index) ? parsed.index : {};
       const recipes = Array.isArray(parsed?.recipes) ? parsed.recipes : [];
-      const concentrates = (parsed && typeof parsed.concentrates === "object" && parsed.concentrates) ? parsed.concentrates : {};
-      const potions = (parsed && typeof parsed.potions === "object" && parsed.potions) ? parsed.potions : {};
 
       const cleanIndex = {};
       for (const [k,v] of Object.entries(index)) {
@@ -1390,21 +1461,12 @@
         if (Number.isFinite(n) && n >= 0) cleanIndex[String(k)] = Math.floor(n);
       }
 
-      const cleanConcs = {};
-      for (const [k,v] of Object.entries(concentrates)) {
-        const n = Number(v);
-        if (Number.isFinite(n) && n >= 0) cleanConcs[String(k)] = Math.floor(n);
-      }
+      const potions = Array.isArray(parsed?.potions) ? parsed.potions : [];
+      const concentrates = (parsed && typeof parsed.concentrates === "object" && parsed.concentrates) ? parsed.concentrates : {};
 
-      const cleanPotions = {};
-      for (const [k,v] of Object.entries(potions)) {
-        const n = Number(v);
-        if (Number.isFinite(n) && n >= 0) cleanPotions[String(k)] = Math.floor(n);
-      }
-
-      return { reveals, index: cleanIndex, recipes, concentrates: cleanConcs, potions: cleanPotions };
+      return { reveals, index: cleanIndex, recipes, potions, concentrates };
     } catch {
-      return { reveals: {}, index: {}, recipes: [], concentrates: {}, potions: {} };
+      return { reveals: {}, index: {}, recipes: [], potions: [], concentrates: {} };
     }
   }
 
@@ -1430,11 +1492,12 @@
     viewMain.classList.add("hidden");
     viewBook.classList.add("hidden");
     viewBrew.classList.add("hidden");
+    viewMix.classList.add("hidden");
     viewBag.classList.add("hidden");
-
     if (which === "main") viewMain.classList.remove("hidden");
     if (which === "book") viewBook.classList.remove("hidden");
     if (which === "brew") viewBrew.classList.remove("hidden");
+    if (which === "mix") viewMix.classList.remove("hidden");
     if (which === "bag") viewBag.classList.remove("hidden");
   }
 
@@ -1474,7 +1537,8 @@
   function rarityClass(r) {
     const v = String(r || "").trim().toLowerCase();
     if (!v) return "pill-unknown";
-    if (v.includes("rare") || v.includes("uncommon") || v.includes("legend")) return "pill-rare";
+    if (v.includes("legend")) return "pill-rare";
+    if (v.includes("rare") || v.includes("uncommon")) return "pill-rare";
     return "pill-common";
   }
 
@@ -1483,92 +1547,115 @@
     return v ? v : "Unknown";
   }
 
-  function normKey(s) {
-    return String(s || "")
-      .trim()
-      .replace(/\s+/g, " ")
-      .toLowerCase();
-  }
-
   function rarityTier(r) {
-    const v = normKey(r);
+    const v = String(r || "").trim().toLowerCase();
     if (v.includes("legend")) return "legendary";
     if (v.includes("rare")) return "rare";
     if (v.includes("uncommon")) return "uncommon";
     return "common";
   }
 
-  function rarityRank(tier) {
-    const t = normKey(tier);
-    if (t === "legendary") return 3;
-    if (t === "rare") return 2;
-    if (t === "uncommon") return 1;
-    return 0;
+  function rarityCssClass(tier) {
+    if (tier === "legendary") return "rar-legendary";
+    if (tier === "rare") return "rar-rare";
+    if (tier === "uncommon") return "rar-uncommon";
+    return "rar-common";
   }
 
-  function dcForRarityTier(tier) {
-    const t = normKey(tier);
-    if (t === "legendary") return 18;
-    if (t === "rare") return 15;
-    if (t === "uncommon") return 12;
+  function rarityDcBase(tier) {
+    if (tier === "legendary") return 18;
+    if (tier === "rare") return 15;
+    if (tier === "uncommon") return 12;
     return 10;
   }
 
-  function formatCoins(c) {
-    const gp = Number(c?.gp) || 0;
-    const sp = Number(c?.sp) || 0;
-    const cp = Number(c?.cp) || 0;
-    const parts = [];
-    if (gp) parts.push(`${gp} gp`);
-    if (sp) parts.push(`${sp} sp`);
-    if (cp) parts.push(`${cp} cp`);
-    return parts.length ? parts.join(", ") : "0 gp";
+  function tierRank(tier) {
+    if (tier === "legendary") return 4;
+    if (tier === "rare") return 3;
+    if (tier === "uncommon") return 2;
+    return 1;
   }
 
-  function addCoins(a, b) {
+  function bestTier(a, b) {
+    return tierRank(a) >= tierRank(b) ? a : b;
+  }
+
+  function formatCoins(value) {
+    const gp = Number(value?.gp) || 0;
+    const sp = Number(value?.sp) || 0;
+    const cp = Number(value?.cp) || 0;
+    const parts = [];
+    if (gp) parts.push(`<span class="coin-gp">${gp}gp</span>`);
+    if (sp) parts.push(`<span class="coin-sp">${sp}sp</span>`);
+    if (cp) parts.push(`<span class="coin-cp">${cp}cp</span>`);
+    if (!parts.length) return `<span class="muted">0</span>`;
+    return parts.join(" ");
+  }
+
+  function effectConfig(effectName) {
+    const key = String(effectName || "").trim().toLowerCase();
+    return POTION_EFFECTS[key] || null;
+  }
+
+  function valueForEffect(effectName, tier) {
+    const cfg = effectConfig(effectName);
+    const byTier = cfg?.value?.[tier];
+    if (!byTier) return { gp: 0, sp: 0, cp: 0 };
     return {
-      gp: (Number(a?.gp) || 0) + (Number(b?.gp) || 0),
-      sp: (Number(a?.sp) || 0) + (Number(b?.sp) || 0),
-      cp: (Number(a?.cp) || 0) + (Number(b?.cp) || 0),
+      gp: Number(byTier.gp) || 0,
+      sp: Number(byTier.sp) || 0,
+      cp: Number(byTier.cp) || 0
     };
   }
 
-  function normalizeCoins(c) {
-    let gp = Number(c?.gp) || 0;
-    let sp = Number(c?.sp) || 0;
-    let cp = Number(c?.cp) || 0;
-
-    if (cp >= 10) { sp += Math.floor(cp / 10); cp = cp % 10; }
-    if (sp >= 10) { gp += Math.floor(sp / 10); sp = sp % 10; }
-
-    if (cp < 0) cp = 0;
-    if (sp < 0) sp = 0;
-    if (gp < 0) gp = 0;
-
-    return { gp, sp, cp };
+  function addCoinValues(a, b) {
+    return {
+      gp: (Number(a?.gp)||0) + (Number(b?.gp)||0),
+      sp: (Number(a?.sp)||0) + (Number(b?.sp)||0),
+      cp: (Number(a?.cp)||0) + (Number(b?.cp)||0)
+    };
   }
 
-  /* FIX: stable stringify without dropping nested keys */
-  function stableStringifyDeep(value) {
-    const seen = new WeakSet();
-
-    function sortify(v) {
-      if (v === null || v === undefined) return v;
-      if (typeof v !== "object") return v;
-
-      if (seen.has(v)) return null;
-      seen.add(v);
-
-      if (Array.isArray(v)) return v.map(sortify);
-
-      const out = {};
-      const keys = Object.keys(v).sort();
-      for (const k of keys) out[k] = sortify(v[k]);
-      return out;
-    }
-
-    return JSON.stringify(sortify(value));
+  function bonusDieLabelByTier(tier) {
+    if (tier === "legendary") return "2d20"; // kept as requested (rarity-only)
+    if (tier === "rare") return "d12";
+    if (tier === "uncommon") return "d8";
+    return "d6";
   }
+
+  function concentrateBoostByTier(tier) {
+    // Reward concentrates without extra DC (you asked not to punish concentrates).
+    // This is a fixed bonus added to the concentrate formula line and to the effect when applied via mixing.
+    // Tuned to feel meaningful without being absurd.
+    if (tier === "legendary") return 6;
+    if (tier === "rare") return 6;
+    if (tier === "uncommon") return 4;
+    return 3;
+  }
+
+  function modalHide() {
+    el("modalShade").style.display = "none";
+    el("modalBody").innerHTML = "";
+    el("modalBtns").innerHTML = "";
+  }
+
+  function modalShow({ title, bodyNodes, buttons }) {
+    el("modalTitle").textContent = title || "Record";
+    const body = el("modalBody");
+    const btns = el("modalBtns");
+    body.innerHTML = "";
+    btns.innerHTML = "";
+
+    (bodyNodes || []).forEach(n => body.appendChild(n));
+    (buttons || []).forEach(b => btns.appendChild(b));
+
+    el("modalShade").style.display = "flex";
+  }
+
+  el("modalCloseBtn").addEventListener("click", modalHide);
+  el("modalShade").addEventListener("click", (e) => {
+    if (e.target === el("modalShade")) modalHide();
+  });
 
   async function fetchAllIngredients() {
     if (isFetching) return;
@@ -1579,7 +1666,6 @@
 
     el("bookStatus").textContent = "Turning pages...";
     el("brewStatus").textContent = "Stirring embers...";
-    el("bagStatus").textContent = "Packing...";
 
     try {
       const res = await fetch(INGREDIENTS_ENDPOINT, { headers: headers() });
@@ -1599,22 +1685,21 @@
 
       saveLocal();
       renderIndex();
+      renderConcentratesIndex();
       fillBrewChoices();
-      enforceDistinctMixing();
       renderBrewDiscovered();
-      renderConcentratesInventory();
       fillConcentrateCraftChoices();
+      updateBrewDcLine();
       renderBag();
-      updateBrewDcDisplay();
+      fillMixChoices();
+      updateMixDcLine();
 
       el("bookStatus").textContent = "Ready.";
       el("brewStatus").textContent = "Choose your ingredients.";
-      el("bagStatus").textContent = "Your bag.";
       toast("Notes updated.", "good");
     } catch (e) {
       el("bookStatus").textContent = "Could not update.";
       el("brewStatus").textContent = "Could not update.";
-      el("bagStatus").textContent = "Could not update.";
       toast("The ink smudged. Try again.", "bad");
       console.error(e);
     } finally {
@@ -1643,423 +1728,6 @@
     saveLocal();
   }
 
-  /* =========================
-     Concentrates inventory (book right page)
-     ========================= */
-  function concKey(idStr, effectText) {
-    const cleanId = String(idStr);
-    const eff = String(effectText || "").trim();
-    return `c:${cleanId}:${encodeURIComponent(eff)}`;
-  }
-
-  function parseConcKey(key) {
-    const s = String(key || "");
-    if (!s.startsWith("c:")) return null;
-    const parts = s.split(":");
-    if (parts.length < 3) return null;
-    const idStr = parts[1];
-    const effEnc = parts.slice(2).join(":");
-    const effect = decodeURIComponent(effEnc || "");
-    return { idStr, effect };
-  }
-
-  function setConcQty(key, qty) {
-    const q = Math.max(0, Math.floor(Number(qty) || 0));
-    if (q <= 0) {
-      delete CONCENTRATES[String(key)];
-    } else {
-      CONCENTRATES[String(key)] = q;
-    }
-    saveLocal();
-  }
-
-  function revealedEffectsForIngredient(idStr) {
-    const row = ING_BY_ID[idStr];
-    if (!row) return [];
-    const effs = [row.effect_1,row.effect_2,row.effect_3,row.effect_4].map(v => (v ? String(v).trim() : ""));
-    const revealed = REVEALS[idStr] || [false,false,false,false];
-    const out = [];
-    for (let i = 0; i < 4; i++) {
-      if (revealed[i] && effs[i]) out.push(effs[i]);
-    }
-    return out;
-  }
-
-  function craftableIngredientIds() {
-    const ids = Object.keys(INDEX).filter(id => ING_BY_ID[id] && (Number(INDEX[id]) || 0) >= 3);
-    const craftable = [];
-    for (const idStr of ids) {
-      const effects = revealedEffectsForIngredient(idStr);
-      if (effects.length) craftable.push(String(idStr));
-    }
-    craftable.sort((a,b) => Number(a) - Number(b));
-    return craftable;
-  }
-
-  function fillConcentrateCraftChoices() {
-    const baseSel = el("concBaseSelect");
-    const effSel = el("concEffectSelect");
-    const craftBtn = el("concCraftBtn");
-    if (!baseSel || !effSel || !craftBtn) return;
-
-    const craftable = craftableIngredientIds();
-
-    if (!craftable.length) {
-      baseSel.innerHTML = `<option value="">No craftable ingredients</option>`;
-      effSel.innerHTML = `<option value="">No revealed properties</option>`;
-      craftBtn.disabled = true;
-      return;
-    }
-
-    const prevBase = baseSel.value;
-    baseSel.innerHTML = craftable.map(idStr => {
-      const name = ING_BY_ID[idStr]?.name || "Unknown";
-      const qty = Number(INDEX[idStr]) || 0;
-      return `<option value="${escapeHtml(idStr)}">${escapeHtml(name)} (${qty})</option>`;
-    }).join("");
-
-    baseSel.value = craftable.includes(prevBase) ? prevBase : craftable[0];
-
-    const effects = revealedEffectsForIngredient(baseSel.value);
-    const prevEff = effSel.value;
-
-    if (!effects.length) {
-      effSel.innerHTML = `<option value="">No revealed properties</option>`;
-      craftBtn.disabled = true;
-      return;
-    }
-
-    effSel.innerHTML = effects.map(e => `<option value="${escapeHtml(e)}">${escapeHtml(e)}</option>`).join("");
-    effSel.value = effects.includes(prevEff) ? prevEff : effects[0];
-
-    craftBtn.disabled = false;
-  }
-
-  function renderConcentratesInventory() {
-    const list = el("concList");
-    if (!list) return;
-
-    const entries = Object.entries(CONCENTRATES || {})
-      .map(([k,v]) => ({ key: k, qty: Number(v) || 0, meta: parseConcKey(k) }))
-      .filter(x => x.qty > 0 && x.meta && x.meta.effect);
-
-    if (!entries.length) {
-      list.innerHTML = `<div class="muted">No concentrates yet.</div>`;
-      return;
-    }
-
-    entries.sort((a,b) => {
-      const ea = a.meta.effect.toLowerCase();
-      const eb = b.meta.effect.toLowerCase();
-      if (ea < eb) return -1;
-      if (ea > eb) return 1;
-      return Number(a.meta.idStr) - Number(b.meta.idStr);
-    });
-
-    list.innerHTML = "";
-    for (const e of entries) {
-      const row = document.createElement("div");
-      row.className = "indexRow";
-      row.style.width = "100%";
-
-      const label = document.createElement("div");
-      label.style.fontWeight = "950";
-      label.style.fontSize = "12.5px";
-      label.style.opacity = "0.9";
-      label.textContent = `Concentrate of ${e.meta.effect}`;
-
-      const right = document.createElement("div");
-      right.className = "inventoryBox";
-
-      const minus = document.createElement("button");
-      minus.type = "button";
-      minus.className = "qtyBtn";
-      minus.textContent = "−";
-      minus.addEventListener("click", () => {
-        setConcQty(e.key, e.qty - 1);
-        renderConcentratesInventory();
-      });
-
-      const count = document.createElement("div");
-      count.className = "count";
-      count.textContent = String(e.qty);
-
-      const plus = document.createElement("button");
-      plus.type = "button";
-      plus.className = "qtyBtn";
-      plus.textContent = "+";
-      plus.addEventListener("click", () => {
-        setConcQty(e.key, e.qty + 1);
-        renderConcentratesInventory();
-      });
-
-      right.appendChild(minus);
-      right.appendChild(count);
-      right.appendChild(plus);
-
-      row.appendChild(label);
-      row.appendChild(right);
-      list.appendChild(row);
-    }
-  }
-
-  function craftConcentrate() {
-    const baseSel = el("concBaseSelect");
-    const effSel = el("concEffectSelect");
-    if (!baseSel || !effSel) return;
-
-    const idStr = String(baseSel.value || "");
-    const effect = String(effSel.value || "").trim();
-    if (!idStr || !effect) {
-      toast("Choose an ingredient and an effect.", "bad");
-      return;
-    }
-
-    const qty = Number(INDEX[idStr]) || 0;
-    if (qty < 3) {
-      toast("Not enough of that ingredient.", "bad");
-      fillConcentrateCraftChoices();
-      renderIndex();
-      fillBrewChoices();
-      renderBrewDiscovered();
-      renderConcentratesInventory();
-      updateBrewDcDisplay();
-      return;
-    }
-
-    const revealed = revealedEffectsForIngredient(idStr);
-    if (!revealed.includes(effect)) {
-      toast("That effect is not revealed.", "bad");
-      fillConcentrateCraftChoices();
-      return;
-    }
-
-    // Spend 3, gain 1 concentrate
-    setQty(idStr, qty - 3);
-
-    const key = concKey(idStr, effect);
-    const haveConc = Number(CONCENTRATES[key]) || 0;
-    CONCENTRATES[key] = haveConc + 1;
-
-    saveLocal();
-
-    playSfx("sfxSuccess");
-
-    // Add to bag (simple entry)
-    addPotion({
-      type: "concentrate",
-      rarity: rarityTier(ING_BY_ID[idStr]?.rarity),
-      effects: [{ name: effect, bonus: null, baseNote: null, bonusDice: null }],
-      price: { gp: 0, sp: 0, cp: 0 }
-    }, 1);
-
-    renderIndex();
-    fillBrewChoices();
-    renderBrewDiscovered();
-    renderConcentratesInventory();
-    fillConcentrateCraftChoices();
-    updateBrewDcDisplay();
-
-    toast("Concentrate bottled.", "good");
-  }
-
-  /* =========================
-     Bag inventory (potions)
-     ========================= */
-  function potionKeyFromMeta(meta) {
-    const type = normKey(meta?.type || "");
-    const rarity = normKey(meta?.rarity || "");
-    const effects = Array.isArray(meta?.effects) ? meta.effects.slice() : [];
-
-    effects.sort((a,b) => {
-      const na = normKey(a?.name);
-      const nb = normKey(b?.name);
-      if (na < nb) return -1;
-      if (na > nb) return 1;
-      return 0;
-    });
-
-    const packed = effects.map(e => ({
-      name: String(e?.name || ""),
-      bonus: (e?.bonus === null || e?.bonus === undefined || !Number.isFinite(Number(e?.bonus))) ? null : Number(e?.bonus),
-      baseNote: e?.baseNote ? String(e.baseNote) : null,
-      bonusDice: e?.bonusDice ? String(e.bonusDice) : null
-    }));
-
-    const keyObj = {
-      t: type,
-      r: rarity,
-      e: packed,
-      p: normalizeCoins(meta?.price || { gp:0, sp:0, cp:0 })
-    };
-
-    return "p:" + encodeURIComponent(stableStringifyDeep(keyObj));
-  }
-
-  function parsePotionKey(key) {
-    const s = String(key || "");
-    if (!s.startsWith("p:")) return null;
-    try{
-      const json = decodeURIComponent(s.slice(2));
-      const obj = JSON.parse(json);
-      return obj;
-    } catch {
-      return null;
-    }
-  }
-
-  function potionLabelFromKeyObj(obj) {
-    const t = normKey(obj?.t);
-    const rarity = String(obj?.r || "");
-    const effects = Array.isArray(obj?.e) ? obj.e : [];
-    const names = effects.map(x => String(x?.name || "")).filter(Boolean);
-    const effText = names.length ? names.join(", ") : "Unknown";
-
-    const typeLabel = (t === "concentrate") ? "Concentrate" : "Concoction";
-    const rarityLabelText = rarity ? (rarity.charAt(0).toUpperCase() + rarity.slice(1)) : "Common";
-
-    return `${typeLabel} (${rarityLabelText}) of ${effText}`;
-  }
-
-  function potionMetaTextFromKeyObj(obj) {
-    const effects = Array.isArray(obj?.e) ? obj.e : [];
-    const lines = [];
-
-    for (const e of effects) {
-      const name = String(e?.name || "").trim();
-      if (!name) continue;
-
-      const baseNote = e?.baseNote ? String(e.baseNote) : "";
-      const bonusDice = e?.bonusDice ? String(e.bonusDice) : "";
-      const bonus = (e?.bonus === null || e?.bonus === undefined || !Number.isFinite(Number(e.bonus))) ? null : Number(e.bonus);
-
-      const baseTxt = baseNote ? `Base ${baseNote}` : "Base 2d4";
-      const bonusTxt = bonusDice ? `Bonus ${bonusDice}` : "Bonus";
-      const rolled = (bonus !== null) ? `, Rolled ${bonus}` : "";
-
-      lines.push(`${name}: ${baseTxt}, ${bonusTxt}${rolled}`);
-    }
-
-    const price = normalizeCoins(obj?.p || { gp:0, sp:0, cp:0 });
-    lines.push(`Value: ${formatCoins(price)}`);
-
-    return lines.join("\n");
-  }
-
-  function potionIconPath(type) {
-    const t = normKey(type);
-    if (t === "concentrate") return "assets/icons/Generic_Concentrate.webp";
-    return "assets/icons/Generic_Potion.webp";
-  }
-
-  function setPotionQty(key, qty) {
-    const q = Math.max(0, Math.floor(Number(qty) || 0));
-    if (q <= 0) {
-      delete POTIONS[String(key)];
-    } else {
-      POTIONS[String(key)] = q;
-    }
-    saveLocal();
-  }
-
-  function addPotion(meta, amount = 1) {
-    const key = potionKeyFromMeta(meta);
-    const have = Number(POTIONS[key]) || 0;
-    POTIONS[key] = Math.max(0, have + (Number(amount) || 0));
-    saveLocal();
-    renderBag();
-  }
-
-  function renderBag() {
-    const wrap = el("bagSlots");
-    if (!wrap) return;
-
-    const entries = Object.entries(POTIONS || {})
-      .map(([k,v]) => ({ key: k, qty: Number(v) || 0, obj: parsePotionKey(k) }))
-      .filter(x => x.qty > 0 && x.obj);
-
-    if (!entries.length) {
-      wrap.innerHTML = `
-        <div class="muted" style="grid-column: 1 / -1; padding: 10px;">
-          Your bag is empty.
-        </div>
-      `;
-      return;
-    }
-
-    entries.sort((a,b) => {
-      const la = potionLabelFromKeyObj(a.obj).toLowerCase();
-      const lb = potionLabelFromKeyObj(b.obj).toLowerCase();
-      if (la < lb) return -1;
-      if (la > lb) return 1;
-      return 0;
-    });
-
-    wrap.innerHTML = "";
-    for (const e of entries) {
-      const tile = document.createElement("div");
-      tile.className = "bagTile";
-
-      const top = document.createElement("div");
-      top.className = "bagTileTop";
-
-      const img = document.createElement("img");
-      img.className = "bagIcon";
-      img.src = potionIconPath(e.obj?.t) + "?t=" + Date.now();
-      img.alt = "Potion";
-      img.onerror = () => { img.src = placeholderImageDataUri("Potion"); };
-
-      top.appendChild(img);
-
-      const label = document.createElement("div");
-      label.className = "bagLabel";
-      label.textContent = potionLabelFromKeyObj(e.obj);
-
-      const meta = document.createElement("div");
-      meta.className = "bagMeta";
-      meta.textContent = potionMetaTextFromKeyObj(e.obj);
-
-      const qtyRow = document.createElement("div");
-      qtyRow.className = "bagQtyRow";
-
-      const minus = document.createElement("button");
-      minus.type = "button";
-      minus.className = "qtyBtn";
-      minus.textContent = "−";
-      minus.addEventListener("click", () => {
-        setPotionQty(e.key, e.qty - 1);
-        renderBag();
-      });
-
-      const count = document.createElement("div");
-      count.className = "count";
-      count.textContent = String(e.qty);
-
-      const plus = document.createElement("button");
-      plus.type = "button";
-      plus.className = "qtyBtn";
-      plus.textContent = "+";
-      plus.addEventListener("click", () => {
-        setPotionQty(e.key, e.qty + 1);
-        renderBag();
-      });
-
-      qtyRow.appendChild(minus);
-      qtyRow.appendChild(count);
-      qtyRow.appendChild(plus);
-
-      tile.appendChild(top);
-      tile.appendChild(label);
-      tile.appendChild(meta);
-      tile.appendChild(qtyRow);
-
-      wrap.appendChild(tile);
-    }
-  }
-
-  /* =========================
-     Index rendering
-     ========================= */
   function renderIndex() {
     const wrap = el("indexList");
     wrap.innerHTML = "";
@@ -2070,7 +1738,6 @@
       d.className = "muted";
       d.textContent = "No entries yet.";
       wrap.appendChild(d);
-      renderConcentratesInventory();
       return;
     }
 
@@ -2106,7 +1773,7 @@
         fillBrewChoices();
         renderBrewDiscovered();
         fillConcentrateCraftChoices();
-        updateBrewDcDisplay();
+        updateBrewDcLine();
       });
 
       const count = document.createElement("div");
@@ -2123,7 +1790,7 @@
         fillBrewChoices();
         renderBrewDiscovered();
         fillConcentrateCraftChoices();
-        updateBrewDcDisplay();
+        updateBrewDcLine();
       });
 
       right.appendChild(minus);
@@ -2134,8 +1801,6 @@
       line.appendChild(right);
       wrap.appendChild(line);
     }
-
-    renderConcentratesInventory();
   }
 
   async function recordIngredientFromMark(mark) {
@@ -2152,7 +1817,7 @@
       fillBrewChoices();
       renderBrewDiscovered();
       fillConcentrateCraftChoices();
-      updateBrewDcDisplay();
+      updateBrewDcLine();
       toast("Recorded.", "good");
       el("markInput").value = "";
       return;
@@ -2174,7 +1839,7 @@
       fillBrewChoices();
       renderBrewDiscovered();
       fillConcentrateCraftChoices();
-      updateBrewDcDisplay();
+      updateBrewDcLine();
       toast("Recorded.", "good");
       el("markInput").value = "";
       el("recordBtn").disabled = false;
@@ -2293,21 +1958,19 @@
 
   function setTheme(next) {
     theme = next;
-
-    // Backgrounds (you already have these)
     if (theme === "wilderness") {
       el("brewBg").src = "assets/themes/wilderness_bg.webp?t=" + Date.now();
-      el("themeLabel").textContent = "Wilderness";
       el("themeIcon").src = "assets/icons/theme_wilderness.webp?t=" + Date.now();
+      el("themeLabel").textContent = "Wilderness";
     } else {
       el("brewBg").src = "assets/themes/town_bg.webp?t=" + Date.now();
-      el("themeLabel").textContent = "Town";
+      // Placeholder icon path, you can replace this asset later if you want a different image.
       el("themeIcon").src = "assets/icons/theme_town.webp?t=" + Date.now();
+      el("themeLabel").textContent = "Town";
     }
-
-    // Placeholder if icon files are missing, you can replace later
     el("themeIcon").onerror = () => {
-      el("themeIcon").src = placeholderImageDataUri(theme === "wilderness" ? "W" : "T");
+      // If the file doesn't exist yet, fall back to a generic placeholder.
+      el("themeIcon").src = placeholderImageDataUri("Theme");
     };
   }
 
@@ -2327,7 +1990,7 @@
       c.innerHTML = "";
       el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your Inventory to brew.</div>`;
       renderBrewDiscovered();
-      updateBrewDcDisplay();
+      updateBrewDcLine();
       return;
     }
 
@@ -2352,7 +2015,7 @@
     if (el("useThird").checked && (c.value === a.value || c.value === b.value)) c.value = cDefault;
 
     renderBrewDiscovered();
-    updateBrewDcDisplay();
+    updateBrewDcLine();
   }
 
   function enforceDistinctMixing() {
@@ -2380,7 +2043,8 @@
     }
 
     renderBrewDiscovered();
-    updateBrewDcDisplay();
+    updateBrewDcLine();
+    fillConcentrateCraftChoices();
   }
 
   function discoveredEffectsFor(idStr) {
@@ -2479,230 +2143,85 @@
     saveLocal();
   }
 
-  function selectedBrewIds() {
+  function highestRarityTierForIngredientIds(ids) {
+    let tier = "common";
+    for (const idStr of ids) {
+      const row = ING_BY_ID[idStr];
+      if (!row) continue;
+      tier = bestTier(tier, rarityTier(row.rarity));
+    }
+    return tier;
+  }
+
+  function updateBrewDcLine() {
+    const aId = el("mixA").value;
+    const bId = el("mixB").value;
+    const useThird = el("useThird").checked;
+    const cId = useThird ? el("mixC").value : "";
+    const ids = [aId,bId].filter(Boolean);
+    if (useThird && cId) ids.push(cId);
+
+    if (ids.length < 2) {
+      el("brewDcLine").textContent = "DC: —";
+      return;
+    }
+
+    const tier = highestRarityTierForIngredientIds(ids);
+    let dc = rarityDcBase(tier);
+    if (ids.length === 3) dc += 2;
+
+    el("brewDcLine").textContent = `DC: ${dc}`;
+  }
+
+  function makePotionKey({ kind, effects, isMixed }) {
+    const normEffects = (effects || [])
+      .map(e => ({
+        name: String(e.name || "").trim(),
+        bonus: Number(e.bonus) || 0,
+        base: "2d4",
+        tier: String(e.tier || "common")
+      }))
+      .sort((a,b) => (a.name.localeCompare(b.name) || a.bonus - b.bonus));
+
+    const signature = normEffects.map(e => `${e.name}::${e.tier}::${e.base}+${e.bonus}`).join("||");
+    return `${kind}::${isMixed ? "mixed" : "base"}::${signature}`;
+  }
+
+  function potionValue(effects) {
+    let total = { gp:0, sp:0, cp:0 };
+    for (const e of effects || []) {
+      total = addCoinValues(total, valueForEffect(e.name, e.tier));
+    }
+    return total;
+  }
+
+  function brew() {
     const aId = el("mixA").value;
     const bId = el("mixB").value;
     const useThird = el("useThird").checked;
     const cId = useThird ? el("mixC").value : "";
 
-    const ids = [aId,bId].filter(Boolean);
-    if (useThird && cId) ids.push(cId);
-    return ids;
-  }
-
-  function brewRarityTierFromIds(ids) {
-    const tiers = ids.map(id => rarityTier(ING_BY_ID[id]?.rarity));
-    let best = "common";
-    for (const t of tiers) {
-      if (rarityRank(t) > rarityRank(best)) best = t;
-    }
-    return best;
-  }
-
-  function computeDcFromSelection() {
-    const ids = selectedBrewIds();
-    if (ids.length < 2) return null;
-    const tier = brewRarityTierFromIds(ids);
-    let dc = dcForRarityTier(tier);
-    if (el("useThird").checked && ids.length === 3) dc += 2;
-    return { dc, tier };
-  }
-
-  function updateBrewDcDisplay() {
-    const out = el("brewDc");
-    if (!out) return;
-
-    const ids = selectedBrewIds();
-    if (ids.length < 2) {
-      out.textContent = "DC: (choose ingredients)";
-      return;
-    }
-
-    const info = computeDcFromSelection();
-    if (!info) {
-      out.textContent = "DC: (choose ingredients)";
-      return;
-    }
-
-    const rarityText = info.tier.charAt(0).toUpperCase() + info.tier.slice(1);
-    const plus = (el("useThird").checked && ids.length === 3) ? " (+2 for 3 ingredients)" : "";
-    out.textContent = `DC: ${info.dc} (Base ${rarityText})${plus}`;
-  }
-
-  function effectConfigForName(effectName) {
-    const key = normKey(effectName);
-    const direct = EFFECTS_CONFIG[key];
-    if (direct) return direct;
-
-    for (const [k,v] of Object.entries(EFFECTS_CONFIG)) {
-      if (normKey(k) === key) return v;
-    }
-    return null;
-  }
-
-  function valueForEffectAtRarity(effectName, rarityTierStr) {
-    const cfg = effectConfigForName(effectName);
-    const tier = normKey(rarityTierStr);
-    const fallback = { gp:0, sp:0, cp:0 };
-    const c = cfg?.valueByRarity?.[tier];
-    return c ? normalizeCoins(c) : fallback;
-  }
-
-  function baseNoteForEffectAtRarity(effectName, rarityTierStr) {
-    const cfg = effectConfigForName(effectName);
-    const tier = normKey(rarityTierStr);
-    return cfg?.baseNoteByRarity?.[tier] || "2d4";
-  }
-
-  function bonusDiceForEffectAtRarity(effectName, rarityTierStr) {
-    const cfg = effectConfigForName(effectName);
-    const tier = normKey(rarityTierStr);
-    return cfg?.bonusDiceByRarity?.[tier] || "";
-  }
-
-  function openBrewOverlay(payload) {
-    pendingBrew = payload;
-    const overlay = el("brewOverlay");
-    const grid = el("overlayGrid");
-
-    const coinText = formatCoins(payload.price);
-    el("overlaySub").textContent = `Value: ${coinText}. Enter the bonus roll result for each effect.`;
-
-    grid.innerHTML = "";
-
-    for (const eff of payload.effects) {
-      const row = document.createElement("div");
-      row.className = "overlayRow";
-
-      const top = document.createElement("div");
-      top.className = "overlayRowTop";
-
-      const left = document.createElement("div");
-      const name = document.createElement("div");
-      name.className = "overlayEffectName";
-      name.textContent = eff.name;
-
-      const pills = document.createElement("div");
-      pills.style.display = "flex";
-      pills.style.gap = "6px";
-      pills.style.flexWrap = "wrap";
-
-      const baseP = document.createElement("div");
-      baseP.className = "pillMini";
-      baseP.textContent = `Base ${eff.baseNote || "2d4"}`;
-
-      const bonusP = document.createElement("div");
-      bonusP.className = "pillMini";
-      bonusP.textContent = eff.bonusDice ? `Bonus ${eff.bonusDice}` : "Bonus";
-
-      pills.appendChild(baseP);
-      pills.appendChild(bonusP);
-
-      left.appendChild(name);
-      left.appendChild(pills);
-
-      const right = document.createElement("div");
-      right.className = "overlayHint";
-      right.textContent = "Enter the bonus result you rolled.";
-
-      top.appendChild(left);
-      top.appendChild(right);
-
-      const inputRow = document.createElement("div");
-      inputRow.className = "overlayInputRow";
-
-      const input = document.createElement("input");
-      input.inputMode = "numeric";
-      input.placeholder = "Bonus roll result";
-      input.dataset.effectKey = eff.key;
-      inputRow.appendChild(input);
-
-      row.appendChild(top);
-      row.appendChild(inputRow);
-
-      grid.appendChild(row);
-    }
-
-    overlay.style.display = "flex";
-  }
-
-  function closeBrewOverlay() {
-    pendingBrew = null;
-    const overlay = el("brewOverlay");
-    overlay.style.display = "none";
-    el("overlayGrid").innerHTML = "";
-  }
-
-  function gatherOverlayInputs() {
-    const grid = el("overlayGrid");
-    const inputs = grid.querySelectorAll("input[data-effect-key]");
-    const map = {};
-    inputs.forEach(i => {
-      const k = String(i.dataset.effectKey || "");
-      const raw = String(i.value || "").trim();
-      if (!raw) {
-        map[k] = null;
-        return;
-      }
-      const n = Number(raw);
-      map[k] = Number.isFinite(n) ? Math.floor(n) : null;
-    });
-    return map;
-  }
-
-  function brewFailure() {
-    const ids = selectedBrewIds();
-    if (ids.length < 2) {
-      el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your Inventory to brew.</div>`;
-      return;
-    }
-
-    if (!canSpend(ids)) {
-      el("mixResult").innerHTML = `
-        <div style="color:var(--warn); font-weight:950;">Not enough in the Inventory.</div>
-        <div class="muted" style="margin-top:6px;">You are missing one of the chosen ingredients.</div>
-      `;
-      toast("Not enough in the Inventory.", "bad");
-      return;
-    }
-
-    spend(ids);
-    renderIndex();
-    fillBrewChoices();
-    enforceDistinctMixing();
-    renderBrewDiscovered();
-    fillConcentrateCraftChoices();
-    updateBrewDcDisplay();
-
-    el("mixResult").innerHTML = `
-      <div style="color:rgba(255,190,120,0.95); font-weight:1000;">The brew fails.</div>
-      <div class="muted" style="margin-top:6px;">Ingredients were consumed.</div>
-    `;
-    toast("Failed, ingredients consumed.", "bad");
-  }
-
-  function brewSuccess() {
-    const ids = selectedBrewIds();
-    const useThird = el("useThird").checked;
-
-    if (ids.length < 2) {
-      el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your Inventory to brew.</div>`;
-      return;
-    }
-
-    if (ids.length >= 2 && ids[0] === ids[1]) {
+    if (aId && bId && aId === bId) {
       toast("Choose two different ingredients.", "bad");
       el("mixResult").innerHTML = `<div style="color:var(--warn); font-weight:950;">Choose two different ingredients.</div>`;
       enforceDistinctMixing();
       return;
     }
-    if (useThird && ids.length === 3) {
-      if (ids[2] === ids[0] || ids[2] === ids[1]) {
+    if (useThird) {
+      if ((aId && cId && aId === cId) || (bId && cId && bId === cId)) {
         toast("Each ingredient must be different.", "bad");
         el("mixResult").innerHTML = `<div style="color:var(--warn); font-weight:950;">Each ingredient must be different.</div>`;
         enforceDistinctMixing();
         return;
       }
+    }
+
+    const ids = [aId,bId].filter(Boolean);
+    if (useThird && cId) ids.push(cId);
+
+    if (ids.length < 2) {
+      el("mixResult").innerHTML = `<div class="muted">Keep at least two ingredients in your Inventory to brew.</div>`;
+      return;
     }
 
     if (!canSpend(ids)) {
@@ -2715,15 +2234,14 @@
     }
 
     const shared = computeShared(ids);
-    const rarity = brewRarityTierFromIds(ids);
 
+    // Spend immediately (your tabletop rule says ingredients are consumed either way)
     spend(ids);
     renderIndex();
     fillBrewChoices();
     enforceDistinctMixing();
-    renderBrewDiscovered();
     fillConcentrateCraftChoices();
-    updateBrewDcDisplay();
+    updateBrewDcLine();
 
     if (shared.length === 0) {
       el("mixResult").innerHTML = `
@@ -2734,76 +2252,866 @@
       return;
     }
 
+    // Determine rarity tier for potion (highest rarity among ingredients)
+    const tier = highestRarityTierForIngredientIds(ids);
+    const dc = rarityDcBase(tier) + (ids.length === 3 ? 2 : 0);
+
+    // Auto reveal shared on the ingredients
     revealSharedAutomatically(ids, shared);
     recordRecipe(ids, shared);
 
-    const effects = shared.map(name => {
-      const baseNote = baseNoteForEffectAtRarity(name, rarity);
-      const bonusDice = bonusDiceForEffectAtRarity(name, rarity);
-      const key = normKey(name);
-      return { name, key, baseNote, bonusDice };
+    // Prompt player for bonus roll values (one per shared effect)
+    const nodes = [];
+    const inputs = [];
+    const note = document.createElement("div");
+    note.className = "muted";
+    note.style.lineHeight = "1.25";
+    note.innerHTML = `DC: <b>${dc}</b> (Base by rarity, +2 if 3 ingredients).<br/>Base is <b>2d4</b>. Roll only the bonus (<b>${bonusDieLabelByTier(tier)}</b>) and record it as <b>2d4+X</b>.`;
+    nodes.push(note);
+
+    shared.forEach((eff) => {
+      const row = document.createElement("div");
+      row.className = "rollRow";
+
+      const label = document.createElement("div");
+      label.className = "label";
+      label.textContent = `Concoction of ${String(eff)}`;
+
+      const input = document.createElement("input");
+      input.type = "number";
+      input.inputMode = "numeric";
+      input.placeholder = "Bonus";
+      input.min = "0";
+      input.step = "1";
+      inputs.push({ effect: String(eff), input });
+
+      row.appendChild(label);
+      row.appendChild(input);
+      nodes.push(row);
     });
 
-    let price = { gp:0, sp:0, cp:0 };
-    for (const name of shared) {
-      price = addCoins(price, valueForEffectAtRarity(name, rarity));
-    }
-    price = normalizeCoins(price);
+    const btnSuccess = document.createElement("button");
+    btnSuccess.className = "btn-primary";
+    btnSuccess.type = "button";
+    btnSuccess.textContent = "Success, record potion";
+    btnSuccess.addEventListener("click", () => {
+      // Validate inputs
+      const effects = [];
+      for (const it of inputs) {
+        const n = Number(it.input.value);
+        if (!Number.isFinite(n) || n < 0) {
+          toast("Enter a bonus number for each effect.", "bad");
+          return;
+        }
+        effects.push({
+          name: it.effect,
+          tier,
+          base: "2d4",
+          bonus: Math.floor(n)
+        });
+      }
 
-    pendingBrew = { type: "concoction", rarity, effects, price };
+      const val = potionValue(effects);
+      const key = makePotionKey({ kind: "concoction", effects, isMixed: false });
 
-    el("mixResult").innerHTML = `
-      <div style="color:rgba(120,255,170,0.95); font-weight:1000;">Potion possible.</div>
-      <div class="muted" style="margin-top:6px;">Enter your bonus rolls to store it in the bag.</div>
-    `;
-    toast("Success, record the result.", "good");
+      // Store as distinct potion item
+      const existing = POTIONS.find(p => p.key === key);
+      if (existing) {
+        existing.qty = (Number(existing.qty)||0) + 1;
+      } else {
+        POTIONS.push({
+          key,
+          kind: "concoction",
+          isMixed: false,
+          effects,
+          tier,
+          value: val,
+          qty: 1,
+          at: Date.now()
+        });
+      }
 
-    openBrewOverlay(pendingBrew);
+      saveLocal();
+      playSfx("sfxSuccess");
+      renderBag();
+      fillMixChoices();
+
+      const effectText = shared.join(", ");
+      el("mixResult").innerHTML = `
+        <div style="color:rgba(120,255,170,0.95); font-weight:1000;">Concoction recorded: ${escapeHtml(effectText)}</div>
+        <div class="muted" style="margin-top:6px;">Open Bag to adjust counts anytime.</div>
+      `;
+      toast("A concoction is born.", "good");
+      modalHide();
+    });
+
+    const btnFail = document.createElement("button");
+    btnFail.type = "button";
+    btnFail.textContent = "Failure (consume, no potion)";
+    btnFail.addEventListener("click", () => {
+      toast("Failed brew recorded.", "bad");
+      el("mixResult").innerHTML = `
+        <div style="color:var(--warn); font-weight:950;">Failed brew.</div>
+        <div class="muted" style="margin-top:6px;">Ingredients consumed.</div>
+      `;
+      modalHide();
+    });
+
+    const btnCancel = document.createElement("button");
+    btnCancel.type = "button";
+    btnCancel.textContent = "Cancel";
+    btnCancel.addEventListener("click", modalHide);
+
+    modalShow({
+      title: "Record Brewing Result",
+      bodyNodes: nodes,
+      buttons: [btnCancel, btnFail, btnSuccess]
+    });
   }
 
-  function saveOverlayToBag() {
-    if (!pendingBrew) {
-      closeBrewOverlay();
+  // Concentrates
+  function concKey(effectName, tier) {
+    return `${String(effectName||"").trim().toLowerCase()}::${tier}`;
+  }
+
+  function renderConcentratesIndex() {
+    const wrap = el("concIndexList");
+    wrap.innerHTML = "";
+
+    const keys = Object.keys(CONCS || {});
+    keys.sort((a,b) => a.localeCompare(b));
+
+    if (!keys.length) {
+      const d = document.createElement("div");
+      d.className = "muted";
+      d.textContent = "No concentrates yet.";
+      wrap.appendChild(d);
       return;
     }
 
-    const inputs = gatherOverlayInputs();
+    for (const k of keys) {
+      const c = CONCS[k];
+      if (!c) continue;
 
-    const effectsWithValues = pendingBrew.effects.map(e => {
-      const bonus = inputs[e.key];
-      return {
-        name: e.name,
-        bonus: bonus,
-        baseNote: e.baseNote || "2d4",
-        bonusDice: e.bonusDice || ""
+      const qty = Number(c.qty) || 0;
+
+      const line = document.createElement("div");
+      line.className = "indexRow";
+      line.style.width = "100%";
+
+      const left = document.createElement("div");
+      left.style.fontWeight = "950";
+      left.innerHTML = `Concentrate of ${escapeHtml(c.effect)} <span class="${rarityCssClass(c.tier)}" style="font-weight:1000; margin-left:6px;">${escapeHtml(capTier(c.tier))}</span>`;
+
+      const right = document.createElement("div");
+      right.className = "inventoryBox";
+
+      const minus = document.createElement("button");
+      minus.type = "button";
+      minus.className = "qtyBtn";
+      minus.textContent = "−";
+      minus.addEventListener("click", () => {
+        c.qty = Math.max(0, qty - 1);
+        if (c.qty === 0) delete CONCS[k];
+        saveLocal();
+        renderConcentratesIndex();
+        renderBag();
+        fillMixChoices();
+      });
+
+      const count = document.createElement("div");
+      count.className = "count";
+      count.textContent = String(qty);
+
+      const plus = document.createElement("button");
+      plus.type = "button";
+      plus.className = "qtyBtn";
+      plus.textContent = "+";
+      plus.addEventListener("click", () => {
+        c.qty = qty + 1;
+        saveLocal();
+        renderConcentratesIndex();
+        renderBag();
+        fillMixChoices();
+      });
+
+      right.appendChild(minus);
+      right.appendChild(count);
+      right.appendChild(plus);
+
+      line.appendChild(left);
+      line.appendChild(right);
+      wrap.appendChild(line);
+    }
+  }
+
+  function fillConcentrateCraftChoices() {
+    const selIng = el("concFromIng");
+    const selEff = el("concEffect");
+
+    const ids = Object.keys(INDEX).filter(id => ING_BY_ID[id] && (Number(INDEX[id])||0) > 0);
+    ids.sort((a,b) => Number(a)-Number(b));
+
+    if (ids.length === 0) {
+      selIng.innerHTML = `<option value="">(No ingredients in inventory)</option>`;
+      selEff.innerHTML = `<option value="">(No properties)</option>`;
+      el("concInfoLine").textContent = "Concentrate: —";
+      el("makeConcBtn").disabled = true;
+      return;
+    }
+
+    const prev = selIng.value;
+    selIng.innerHTML = ids.map(idStr => {
+      const name = ING_BY_ID[idStr]?.name || "Unknown";
+      const qty = Number(INDEX[idStr])||0;
+      return `<option value="${escapeHtml(idStr)}">${escapeHtml(name)} (${qty})</option>`;
+    }).join("");
+
+    selIng.value = ids.includes(prev) ? prev : ids[0];
+    fillConcentrateEffectsForSelected();
+  }
+
+  function fillConcentrateEffectsForSelected() {
+    const selIng = el("concFromIng");
+    const selEff = el("concEffect");
+
+    const idStr = selIng.value;
+    const known = idStr ? discoveredEffectsFor(idStr) : [];
+
+    if (!known.length) {
+      selEff.innerHTML = `<option value="">(No discovered properties)</option>`;
+      el("concInfoLine").textContent = "Concentrate: Choose a discovered property.";
+      el("makeConcBtn").disabled = true;
+      return;
+    }
+
+    const prevEff = selEff.value;
+    selEff.innerHTML = known.map(e => `<option value="${escapeHtml(e)}">${escapeHtml(e)}</option>`).join("");
+    selEff.value = known.includes(prevEff) ? prevEff : known[0];
+
+    const tier = idStr ? rarityTier(ING_BY_ID[idStr]?.rarity) : "common";
+    const boost = concentrateBoostByTier(tier);
+    const effName = selEff.value;
+
+    const val = valueForEffect(effName, tier);
+    el("concInfoLine").innerHTML = `Concentrate of <b>${escapeHtml(effName)}</b> (<span class="${rarityCssClass(tier)}">${escapeHtml(capTier(tier))}</span>) | Formula: <b>2d4+${boost}</b> | Value: ${formatCoins(val)}`;
+
+    // Need 4 units of the selected ingredient
+    const have = Number(INDEX[idStr]) || 0;
+    el("makeConcBtn").disabled = !(have >= 4);
+  }
+
+  function capTier(tier) {
+    if (tier === "legendary") return "Legendary";
+    if (tier === "rare") return "Rare";
+    if (tier === "uncommon") return "Uncommon";
+    return "Common";
+  }
+
+  function makeConcentrate() {
+    const idStr = el("concFromIng").value;
+    const eff = el("concEffect").value;
+
+    if (!idStr || !ING_BY_ID[idStr]) {
+      toast("Choose an ingredient.", "bad");
+      return;
+    }
+    if (!eff) {
+      toast("Choose a discovered property.", "bad");
+      return;
+    }
+
+    const have = Number(INDEX[idStr]) || 0;
+    if (have < 4) {
+      toast("Need 4 of that ingredient.", "bad");
+      return;
+    }
+
+    const tier = rarityTier(ING_BY_ID[idStr]?.rarity);
+    const boost = concentrateBoostByTier(tier);
+    const key = concKey(eff, tier);
+
+    // Spend 4 units
+    setQty(idStr, have - 4);
+    renderIndex();
+    fillBrewChoices();
+    renderBrewDiscovered();
+    fillConcentrateCraftChoices();
+    updateBrewDcLine();
+
+    const val = valueForEffect(eff, tier);
+    if (!CONCS[key]) {
+      CONCS[key] = {
+        key,
+        effect: String(eff),
+        tier,
+        boost,
+        base: "2d4",
+        value: val,
+        qty: 0,
+        at: Date.now()
       };
+    }
+    CONCS[key].qty = (Number(CONCS[key].qty)||0) + 1;
+
+    saveLocal();
+    playSfx("sfxSuccess"); // requested: concentrate should use brew success sound
+    renderConcentratesIndex();
+    renderBag();
+    fillMixChoices();
+
+    toast("Concentrate created.", "good");
+  }
+
+  // Bag rendering
+  function potionDisplayName(p) {
+    // Centered "Concoction" then "of X" etc
+    const effectNames = (p.effects || []).map(e => String(e.name));
+    if (!effectNames.length) return "Unknown";
+    if (effectNames.length === 1) return effectNames[0];
+    return effectNames.join(" + ");
+  }
+
+  function potionRarityTier(p) {
+    // Use stored tier if present
+    return String(p.tier || "common");
+  }
+
+  function potionFormulaLine(p) {
+    // For a potion with multiple effects, show one per effect separated by " | " as 2d4+X
+    // For concentrates, same.
+    const parts = (p.effects || []).map(e => `2d4+${Number(e.bonus)||0}`);
+    return parts.join(" | ");
+  }
+
+  function valueLineForPotion(p) {
+    const v = p.value || potionValue(p.effects||[]);
+    return formatCoins(v);
+  }
+
+  function renderBag() {
+    const grid = el("bagGrid");
+    grid.innerHTML = "";
+
+    const items = [];
+
+    // Potions
+    for (const p of (POTIONS || [])) {
+      const qty = Number(p.qty) || 0;
+      if (qty <= 0) continue;
+      items.push({ type: "potion", data: p });
+    }
+
+    // Concentrates in bag
+    for (const k of Object.keys(CONCS || {})) {
+      const c = CONCS[k];
+      const qty = Number(c?.qty) || 0;
+      if (!c || qty <= 0) continue;
+      items.push({ type: "conc", data: c });
+    }
+
+    // Sort for stable viewing
+    items.sort((a,b) => {
+      const an = a.type === "potion" ? potionDisplayName(a.data) : a.data.effect;
+      const bn = b.type === "potion" ? potionDisplayName(b.data) : b.data.effect;
+      return an.localeCompare(bn);
     });
 
-    addPotion({
-      type: pendingBrew.type,
-      rarity: pendingBrew.rarity,
-      effects: effectsWithValues,
-      price: pendingBrew.price
-    }, 1);
+    if (!items.length) {
+      const d = document.createElement("div");
+      d.className = "muted";
+      d.style.padding = "10px";
+      d.textContent = "Bag is empty.";
+      grid.appendChild(d);
+      return;
+    }
 
-    playSfx("sfxSuccess");
+    items.forEach((it) => {
+      const card = document.createElement("div");
+      card.className = "bagItem";
 
-    const effText = effectsWithValues.map(x => x.name).join(", ");
-    el("mixResult").innerHTML = `
-      <div style="color:rgba(120,255,170,0.95); font-weight:1000;">Stored: Concoction of ${escapeHtml(effText)}</div>
-      <div class="muted" style="margin-top:6px;">Added to Bag. Value: ${escapeHtml(formatCoins(pendingBrew.price))}</div>
+      const top = document.createElement("div");
+      top.className = "bagTop";
+
+      const icon = document.createElement("img");
+      icon.className = "bagIcon";
+      if (it.type === "conc") icon.src = "assets/icons/Generic_Concentrate.webp";
+      else icon.src = "assets/icons/Generic_Potion.webp";
+      icon.alt = "";
+      icon.onerror = () => { icon.src = placeholderImageDataUri("Item"); };
+
+      const lines = document.createElement("div");
+      lines.className = "bagLines";
+
+      if (it.type === "conc") {
+        const c = it.data;
+        const tier = c.tier || "common";
+        const rarityCls = rarityCssClass(tier);
+        const kind = document.createElement("div");
+        kind.className = "bagKind";
+        kind.textContent = "Concentrate";
+
+        const of = document.createElement("div");
+        of.className = "bagOf";
+        of.textContent = `of ${c.effect}`;
+
+        const rar = document.createElement("div");
+        rar.className = "bagRarity " + rarityCls;
+        rar.textContent = capTier(tier);
+
+        const formula = document.createElement("div");
+        formula.className = "bagFormula";
+        formula.textContent = `2d4+${Number(c.boost)||0}`;
+
+        const val = document.createElement("div");
+        val.className = "bagValue";
+        val.innerHTML = valueLineForConcentrate(c);
+
+        lines.appendChild(kind);
+        lines.appendChild(of);
+        lines.appendChild(rar);
+        lines.appendChild(formula);
+        lines.appendChild(val);
+      } else {
+        const p = it.data;
+        const tier = potionRarityTier(p);
+        const rarityCls = rarityCssClass(tier);
+
+        const kind = document.createElement("div");
+        kind.className = "bagKind";
+        kind.textContent = "Concoction";
+
+        const of = document.createElement("div");
+        of.className = "bagOf";
+        of.textContent = `of ${potionDisplayName(p)}`;
+
+        const rar = document.createElement("div");
+        rar.className = "bagRarity " + rarityCls;
+        rar.textContent = capTier(tier);
+
+        const formula = document.createElement("div");
+        formula.className = "bagFormula";
+        formula.textContent = potionFormulaLine(p);
+
+        const val = document.createElement("div");
+        val.className = "bagValue";
+        val.innerHTML = valueLineForPotion(p);
+
+        lines.appendChild(kind);
+        lines.appendChild(of);
+        lines.appendChild(rar);
+        lines.appendChild(formula);
+        lines.appendChild(val);
+      }
+
+      const qtyRow = document.createElement("div");
+      qtyRow.className = "qtyRow";
+
+      const minus = document.createElement("button");
+      minus.type = "button";
+      minus.className = "qtyBtn";
+      minus.textContent = "−";
+
+      const count = document.createElement("div");
+      count.className = "count";
+
+      const plus = document.createElement("button");
+      plus.type = "button";
+      plus.className = "qtyBtn";
+      plus.textContent = "+";
+
+      if (it.type === "conc") {
+        const c = it.data;
+        const qty = Number(c.qty) || 0;
+        count.textContent = String(qty);
+
+        minus.addEventListener("click", () => {
+          c.qty = Math.max(0, qty - 1);
+          if (c.qty === 0) delete CONCS[c.key];
+          saveLocal();
+          renderBag();
+          renderConcentratesIndex();
+          fillMixChoices();
+        });
+        plus.addEventListener("click", () => {
+          c.qty = qty + 1;
+          saveLocal();
+          renderBag();
+          renderConcentratesIndex();
+          fillMixChoices();
+        });
+      } else {
+        const p = it.data;
+        const qty = Number(p.qty) || 0;
+        count.textContent = String(qty);
+
+        minus.addEventListener("click", () => {
+          p.qty = Math.max(0, qty - 1);
+          saveLocal();
+          renderBag();
+          fillMixChoices();
+        });
+        plus.addEventListener("click", () => {
+          p.qty = qty + 1;
+          saveLocal();
+          renderBag();
+          fillMixChoices();
+        });
+      }
+
+      qtyRow.appendChild(minus);
+      qtyRow.appendChild(count);
+      qtyRow.appendChild(plus);
+
+      top.appendChild(icon);
+      card.appendChild(top);
+      card.appendChild(lines);
+      card.appendChild(qtyRow);
+      grid.appendChild(card);
+    });
+  }
+
+  function valueLineForConcentrate(c) {
+    const v = c.value || { gp:0, sp:0, cp:0 };
+    return formatCoins(v);
+  }
+
+  // Mixing
+  function potionOptionLabel(p) {
+    // Distinguish by formula and effect list
+    const name = potionDisplayName(p);
+    const formula = potionFormulaLine(p);
+    return `Potion of ${name} (${formula})`;
+  }
+
+  function concentrateOptionLabel(c) {
+    return `Concentrate of ${c.effect} (2d4+${Number(c.boost)||0})`;
+  }
+
+  function mixChoiceItems() {
+    const list = [];
+
+    // Potions with qty > 0
+    for (const p of (POTIONS || [])) {
+      const qty = Number(p.qty)||0;
+      if (qty > 0) list.push({ kind: "potion", key: p.key, ref: p });
+    }
+
+    // Concentrates with qty > 0
+    for (const k of Object.keys(CONCS || {})) {
+      const c = CONCS[k];
+      const qty = Number(c?.qty)||0;
+      if (c && qty > 0) list.push({ kind: "conc", key: c.key, ref: c });
+    }
+
+    list.sort((a,b) => {
+      const al = a.kind === "potion" ? potionOptionLabel(a.ref) : concentrateOptionLabel(a.ref);
+      const bl = b.kind === "potion" ? potionOptionLabel(b.ref) : concentrateOptionLabel(b.ref);
+      return al.localeCompare(bl);
+    });
+
+    return list;
+  }
+
+  function fillMixChoices() {
+    const a = el("mixItemA");
+    const b = el("mixItemB");
+    const items = mixChoiceItems();
+
+    if (items.length < 2) {
+      a.innerHTML = `<option value="">(Need at least 2 items)</option>`;
+      b.innerHTML = `<option value="">(Need at least 2 items)</option>`;
+      el("mixItemADetail").innerHTML = `<div class="muted">Add potions or concentrates first.</div>`;
+      el("mixItemBDetail").innerHTML = `<div class="muted">Add potions or concentrates first.</div>`;
+      el("mixDcLine").textContent = "DC: —";
+      return;
+    }
+
+    const opts = items.map(it => {
+      const label = it.kind === "potion" ? potionOptionLabel(it.ref) : concentrateOptionLabel(it.ref);
+      return `<option value="${escapeHtml(it.kind + "::" + it.key)}">${escapeHtml(label)}</option>`;
+    }).join("");
+
+    const prevA = a.value;
+    const prevB = b.value;
+
+    a.innerHTML = opts;
+    b.innerHTML = opts;
+
+    const values = items.map(it => it.kind + "::" + it.key);
+    a.value = values.includes(prevA) ? prevA : values[0];
+
+    const bCandidate = values.includes(prevB) ? prevB : values.find(v => v !== a.value);
+    b.value = (bCandidate && bCandidate !== a.value) ? bCandidate : (values.find(v => v !== a.value) || values[0]);
+
+    enforceDistinctMixItems();
+    renderMixDetails();
+    updateMixDcLine();
+  }
+
+  function enforceDistinctMixItems() {
+    const a = el("mixItemA");
+    const b = el("mixItemB");
+    const values = Array.from(a.options).map(o => o.value).filter(Boolean);
+    if (a.value && b.value && a.value === b.value) {
+      const next = values.find(v => v !== a.value);
+      if (next) b.value = next;
+    }
+  }
+
+  function parseMixValue(v) {
+    const s = String(v || "");
+    const [kind, ...rest] = s.split("::");
+    const key = rest.join("::");
+    if (kind !== "potion" && kind !== "conc") return null;
+    if (!key) return null;
+    return { kind, key };
+  }
+
+  function getMixRef(selValue) {
+    const parsed = parseMixValue(selValue);
+    if (!parsed) return null;
+    if (parsed.kind === "potion") {
+      const p = (POTIONS || []).find(x => x.key === parsed.key);
+      if (!p || (Number(p.qty)||0) <= 0) return null;
+      return { kind: "potion", ref: p };
+    }
+    const c = CONCS?.[parsed.key];
+    if (!c || (Number(c.qty)||0) <= 0) return null;
+    return { kind: "conc", ref: c };
+  }
+
+  function renderMixDetails() {
+    const aRef = getMixRef(el("mixItemA").value);
+    const bRef = getMixRef(el("mixItemB").value);
+
+    el("mixItemADetail").innerHTML = mixDetailHtml(aRef);
+    el("mixItemBDetail").innerHTML = mixDetailHtml(bRef);
+  }
+
+  function mixDetailHtml(it) {
+    if (!it) return `<div class="muted">—</div>`;
+    if (it.kind === "conc") {
+      const c = it.ref;
+      return `
+        <div style="font-weight:1000;">Concentrate of ${escapeHtml(c.effect)}</div>
+        <div class="muted" style="margin-top:6px;">${escapeHtml(capTier(c.tier))} | 2d4+${Number(c.boost)||0} | Value ${formatCoins(c.value)}</div>
+      `;
+    }
+    const p = it.ref;
+    const tier = potionRarityTier(p);
+    return `
+      <div style="font-weight:1000;">Potion of ${escapeHtml(potionDisplayName(p))}</div>
+      <div class="muted" style="margin-top:6px;">${escapeHtml(capTier(tier))} | ${escapeHtml(potionFormulaLine(p))} | Value ${formatCoins(p.value)}</div>
+      <div class="muted" style="margin-top:6px;">${p.isMixed ? "Mixed potion (cannot be mixed again)." : "Base potion (can be mixed)."} </div>
     `;
+  }
 
-    closeBrewOverlay();
-    toast("Added to bag.", "good");
+  function highestTierAmongItems(items) {
+    let tier = "common";
+    for (const it of items) {
+      if (!it) continue;
+      if (it.kind === "conc") tier = bestTier(tier, String(it.ref.tier || "common"));
+      else tier = bestTier(tier, potionRarityTier(it.ref));
+    }
+    return tier;
+  }
+
+  function updateMixDcLine() {
+    const aRef = getMixRef(el("mixItemA").value);
+    const bRef = getMixRef(el("mixItemB").value);
+
+    if (!aRef || !bRef) {
+      el("mixDcLine").textContent = "DC: —";
+      return;
+    }
+
+    const tier = highestTierAmongItems([aRef, bRef]);
+    const dc = rarityDcBase(tier) + 2; // potion+potion +2, potion+conc +2 (your rule)
+    el("mixDcLine").textContent = `DC: ${dc}`;
+  }
+
+  function mixAction() {
+    const aRef = getMixRef(el("mixItemA").value);
+    const bRef = getMixRef(el("mixItemB").value);
+
+    if (!aRef || !bRef) {
+      toast("Choose two items.", "bad");
+      return;
+    }
+
+    // Determine allowed combos
+    const isPotionA = aRef.kind === "potion";
+    const isPotionB = bRef.kind === "potion";
+    const isConcA = aRef.kind === "conc";
+    const isConcB = bRef.kind === "conc";
+
+    if (isConcA && isConcB) {
+      toast("Mixing two concentrates is not supported.", "bad");
+      el("mixOut").innerHTML = `<div style="color:var(--warn); font-weight:950;">Choose at least one potion.</div>`;
+      return;
+    }
+
+    // Identify potion side and concentrate side (if any)
+    const potion = isPotionA ? aRef.ref : (isPotionB ? bRef.ref : null);
+    const otherPotion = (isPotionA && isPotionB) ? bRef.ref : (isPotionB && isPotionA ? aRef.ref : null);
+    const conc = isConcA ? aRef.ref : (isConcB ? bRef.ref : null);
+
+    // Restriction: cannot mix potions that have already been mixed (no chaining)
+    if (potion && potion.isMixed) {
+      toast("Mixed potions cannot be mixed again.", "bad");
+      el("mixOut").innerHTML = `<div style="color:var(--warn); font-weight:950;">Mixed potions cannot be mixed again.</div>`;
+      return;
+    }
+    if (otherPotion && otherPotion.isMixed) {
+      toast("Mixed potions cannot be mixed again.", "bad");
+      el("mixOut").innerHTML = `<div style="color:var(--warn); font-weight:950;">Mixed potions cannot be mixed again.</div>`;
+      return;
+    }
+
+    // Build resulting effects
+    const effects = [];
+    const pushOrUpgrade = (e) => {
+      const name = String(e.name || "").trim();
+      if (!name) return;
+      const tier = String(e.tier || "common");
+      const bonus = Number(e.bonus) || 0;
+
+      const existing = effects.find(x => x.name.toLowerCase() === name.toLowerCase());
+      if (!existing) {
+        effects.push({ name, tier, base: "2d4", bonus });
+        return;
+      }
+      // If duplicate effect, keep the higher tier, and keep the higher bonus
+      existing.tier = bestTier(existing.tier, tier);
+      existing.bonus = Math.max(Number(existing.bonus)||0, bonus);
+    };
+
+    if (potion) (potion.effects || []).forEach(pushOrUpgrade);
+    if (otherPotion) (otherPotion.effects || []).forEach(pushOrUpgrade);
+
+    if (conc) {
+      // Applying a concentrate adds its effect with its boost as the bonus
+      pushOrUpgrade({ name: conc.effect, tier: conc.tier, bonus: Number(conc.boost)||0 });
+    }
+
+    // Cap final potion at 3 effects
+    if (effects.length > 3) {
+      toast("Final potion is capped at 3 effects.", "bad");
+      el("mixOut").innerHTML = `<div style="color:var(--warn); font-weight:950;">Final potion capped at 3 effects.</div><div class="muted" style="margin-top:6px;">Choose different items.</div>`;
+      return;
+    }
+
+    // DC
+    const tier = highestTierAmongItems([aRef, bRef]);
+    const dc = rarityDcBase(tier) + 2;
+
+    // Prompt: Success or Failure, consume either way
+    const nodes = [];
+    const note = document.createElement("div");
+    note.className = "muted";
+    note.style.lineHeight = "1.25";
+    note.innerHTML = `DC: <b>${dc}</b>. On failure, items are still consumed.`;
+    nodes.push(note);
+
+    const preview = document.createElement("div");
+    preview.className = "resultBox";
+    preview.style.marginTop = "6px";
+    preview.innerHTML = `
+      <div>
+        <div style="font-weight:1000;">Result: Potion of ${escapeHtml(effects.map(e => e.name).join(" + "))}</div>
+        <div class="muted" style="margin-top:6px;">${escapeHtml(effects.map(e => `2d4+${Number(e.bonus)||0}`).join(" | "))}</div>
+      </div>
+    `;
+    nodes.push(preview);
+
+    const btnSuccess = document.createElement("button");
+    btnSuccess.className = "btn-primary";
+    btnSuccess.type = "button";
+    btnSuccess.textContent = "Success, create mixed potion";
+    btnSuccess.addEventListener("click", () => {
+      // Consume
+      if (potion) potion.qty = Math.max(0, (Number(potion.qty)||0) - 1);
+      if (otherPotion) otherPotion.qty = Math.max(0, (Number(otherPotion.qty)||0) - 1);
+      if (conc) {
+        conc.qty = Math.max(0, (Number(conc.qty)||0) - 1);
+        if (conc.qty === 0) delete CONCS[conc.key];
+      }
+
+      const outTier = tier; // rarity of the mixed potion for display and DC purposes
+      const val = potionValue(effects);
+      const key = makePotionKey({ kind: "concoction", effects, isMixed: true });
+
+      const existing = POTIONS.find(p => p.key === key);
+      if (existing) {
+        existing.qty = (Number(existing.qty)||0) + 1;
+      } else {
+        POTIONS.push({
+          key,
+          kind: "concoction",
+          isMixed: true,
+          effects,
+          tier: outTier,
+          value: val,
+          qty: 1,
+          at: Date.now()
+        });
+      }
+
+      saveLocal();
+      renderBag();
+      renderConcentratesIndex();
+      fillMixChoices();
+      updateMixDcLine();
+
+      playSfx("sfxSuccess");
+      el("mixOut").innerHTML = `<div style="color:rgba(120,255,170,0.95); font-weight:1000;">Mixed potion recorded.</div><div class="muted" style="margin-top:6px;">Open Bag to adjust counts.</div>`;
+      toast("Mixed potion recorded.", "good");
+      modalHide();
+    });
+
+    const btnFail = document.createElement("button");
+    btnFail.type = "button";
+    btnFail.textContent = "Failure (consume, no potion)";
+    btnFail.addEventListener("click", () => {
+      if (potion) potion.qty = Math.max(0, (Number(potion.qty)||0) - 1);
+      if (otherPotion) otherPotion.qty = Math.max(0, (Number(otherPotion.qty)||0) - 1);
+      if (conc) {
+        conc.qty = Math.max(0, (Number(conc.qty)||0) - 1);
+        if (conc.qty === 0) delete CONCS[conc.key];
+      }
+
+      saveLocal();
+      renderBag();
+      renderConcentratesIndex();
+      fillMixChoices();
+      updateMixDcLine();
+
+      el("mixOut").innerHTML = `<div style="color:var(--warn); font-weight:950;">Failed mix.</div><div class="muted" style="margin-top:6px;">Items consumed.</div>`;
+      toast("Failed mix recorded.", "bad");
+      modalHide();
+    });
+
+    const btnCancel = document.createElement("button");
+    btnCancel.type = "button";
+    btnCancel.textContent = "Cancel";
+    btnCancel.addEventListener("click", modalHide);
+
+    modalShow({
+      title: "Record Mixing Result",
+      bodyNodes: nodes,
+      buttons: [btnCancel, btnFail, btnSuccess]
+    });
   }
 
   function exportNotes() {
-    el("saveBox").value = JSON.stringify(
-      { reveals: REVEALS, index: INDEX, recipes: RECIPES, concentrates: CONCENTRATES, potions: POTIONS },
-      null,
-      2
-    );
+    el("saveBox").value = JSON.stringify({
+      reveals: REVEALS,
+      index: INDEX,
+      recipes: RECIPES,
+      potions: POTIONS,
+      concentrates: CONCS
+    }, null, 2);
     toast("Copied to the box.", "good");
   }
 
@@ -2811,8 +3119,8 @@
     try {
       const parsed = JSON.parse(el("saveBox").value);
       if (!parsed || typeof parsed !== "object") throw new Error("bad");
-      REVEALS = (parsed.reveals && typeof parsed.reveals === "object") ? parsed.reveals : {};
 
+      REVEALS = (parsed.reveals && typeof parsed.reveals === "object") ? parsed.reveals : {};
       const idx = (parsed.index && typeof parsed.index === "object") ? parsed.index : {};
       const clean = {};
       for (const [k,v] of Object.entries(idx)) {
@@ -2822,32 +3130,21 @@
       INDEX = clean;
 
       RECIPES = Array.isArray(parsed.recipes) ? parsed.recipes : [];
-
-      const concs = (parsed.concentrates && typeof parsed.concentrates === "object") ? parsed.concentrates : {};
-      const cleanConcs = {};
-      for (const [k,v] of Object.entries(concs)) {
-        const n = Number(v);
-        if (Number.isFinite(n) && n >= 0) cleanConcs[String(k)] = Math.floor(n);
-      }
-      CONCENTRATES = cleanConcs;
-
-      const pots = (parsed.potions && typeof parsed.potions === "object") ? parsed.potions : {};
-      const cleanPots = {};
-      for (const [k,v] of Object.entries(pots)) {
-        const n = Number(v);
-        if (Number.isFinite(n) && n >= 0) cleanPots[String(k)] = Math.floor(n);
-      }
-      POTIONS = cleanPots;
+      POTIONS = Array.isArray(parsed.potions) ? parsed.potions : [];
+      CONCS = (parsed.concentrates && typeof parsed.concentrates === "object") ? parsed.concentrates : {};
 
       saveLocal();
       renderIndex();
+      renderConcentratesIndex();
       fillBrewChoices();
       enforceDistinctMixing();
       renderBrewDiscovered();
-      renderConcentratesInventory();
       fillConcentrateCraftChoices();
+      updateBrewDcLine();
       renderBag();
-      updateBrewDcDisplay();
+      fillMixChoices();
+      updateMixDcLine();
+
       toast("Restored.", "good");
     } catch {
       toast("Those notes do not make sense.", "bad");
@@ -2859,22 +3156,23 @@
     REVEALS = {};
     INDEX = {};
     RECIPES = [];
-    CONCENTRATES = {};
-    POTIONS = {};
+    POTIONS = [];
+    CONCS = {};
     saveLocal();
     renderIndex();
+    renderConcentratesIndex();
     fillBrewChoices();
     enforceDistinctMixing();
-    renderBrewDiscovered();
-    renderConcentratesInventory();
     fillConcentrateCraftChoices();
+    updateBrewDcLine();
     renderBag();
-    updateBrewDcDisplay();
+    fillMixChoices();
+    updateMixDcLine();
     showOnly("main");
     toast("Ashes and silence.", "bad");
   }
 
-  /* Events */
+  // Wiring
   el("refreshBtn").addEventListener("click", fetchAllIngredients);
 
   el("openBookBtn").addEventListener("click", () => {
@@ -2882,16 +3180,22 @@
     showOnly("book");
     showBookSpread("index");
     renderIndex();
-    renderConcentratesInventory();
+    renderConcentratesIndex();
   });
 
   el("openBrewBtn").addEventListener("click", () => {
     showOnly("brew");
     fillBrewChoices();
     enforceDistinctMixing();
-    renderBrewDiscovered();
     fillConcentrateCraftChoices();
-    updateBrewDcDisplay();
+    updateBrewDcLine();
+  });
+
+  el("openMixBtn").addEventListener("click", () => {
+    showOnly("mix");
+    fillMixChoices();
+    renderMixDetails();
+    updateMixDcLine();
   });
 
   el("openBagBtn").addEventListener("click", () => {
@@ -2909,10 +3213,14 @@
     currentIngredientId = null;
     showBookSpread("index");
     renderIndex();
-    renderConcentratesInventory();
+    renderConcentratesIndex();
   });
 
   el("backFromBrewBtn").addEventListener("click", () => {
+    showOnly("main");
+  });
+
+  el("backFromMixBtn").addEventListener("click", () => {
     showOnly("main");
   });
 
@@ -2937,71 +3245,71 @@
     el("thirdSlot").classList.toggle("hidden", !on);
     fillBrewChoices();
     enforceDistinctMixing();
-    updateBrewDcDisplay();
+    updateBrewDcLine();
   });
 
-  el("mixA").addEventListener("change", () => { enforceDistinctMixing(); fillBrewChoices(); });
-  el("mixB").addEventListener("change", () => { enforceDistinctMixing(); fillBrewChoices(); });
-  el("mixC").addEventListener("change", () => { enforceDistinctMixing(); fillBrewChoices(); });
+  el("mixA").addEventListener("change", () => { enforceDistinctMixing(); updateBrewDcLine(); });
+  el("mixB").addEventListener("change", () => { enforceDistinctMixing(); updateBrewDcLine(); });
+  el("mixC").addEventListener("change", () => { enforceDistinctMixing(); updateBrewDcLine(); });
+  el("brewBtn").addEventListener("click", brew);
 
-  el("brewSuccessBtn").addEventListener("click", brewSuccess);
-  el("brewFailBtn").addEventListener("click", brewFailure);
+  el("concFromIng").addEventListener("change", fillConcentrateEffectsForSelected);
+  el("concEffect").addEventListener("change", fillConcentrateEffectsForSelected);
+  el("makeConcBtn").addEventListener("click", makeConcentrate);
+
+  el("mixItemA").addEventListener("change", () => { enforceDistinctMixItems(); renderMixDetails(); updateMixDcLine(); });
+  el("mixItemB").addEventListener("change", () => { enforceDistinctMixItems(); renderMixDetails(); updateMixDcLine(); });
+  el("mixBtn").addEventListener("click", mixAction);
 
   el("exportBtn").addEventListener("click", exportNotes);
   el("importBtn").addEventListener("click", importNotes);
   el("wipeBtn").addEventListener("click", burnAll);
 
-  el("concBaseSelect").addEventListener("change", fillConcentrateCraftChoices);
-  el("concEffectSelect").addEventListener("change", fillConcentrateCraftChoices);
-  el("concCraftBtn").addEventListener("click", craftConcentrate);
-
-  el("overlayCancelBtn").addEventListener("click", () => {
-    closeBrewOverlay();
-    toast("Canceled recording.", "bad");
-  });
-  el("overlaySaveBtn").addEventListener("click", saveOverlayToBag);
-
-  el("brewOverlay").addEventListener("click", (e) => {
-    if (e.target === el("brewOverlay")) closeBrewOverlay();
-  });
-
+  // Init
   setTheme("wilderness");
   showOnly("main");
-
-  /* =========================================================
-     POTION EFFECT CONFIG (EDIT ME)
-     ========================================================= */
-
-  const EFFECTS_CONFIG = (() => {
-    const cfg = {
-      "Restore Health": {
-        bonusDiceByRarity: {
-          common: "1d6",
-          uncommon: "1d8",
-          rare: "1d12",
-          legendary: "2d20"
-        },
-        baseNoteByRarity: {
-          common: "2d4",
-          uncommon: "2d4",
-          rare: "2d4",
-          legendary: "2d4"
-        },
-        valueByRarity: {
-          common:    { gp: 0, sp: 5,  cp: 0 },
-          uncommon:  { gp: 1, sp: 0,  cp: 0 },
-          rare:      { gp: 5, sp: 0,  cp: 0 },
-          legendary: { gp: 25, sp: 0, cp: 0 }
-        }
-      }
-    };
-
-    const out = {};
-    for (const [k,v] of Object.entries(cfg)) out[normKey(k)] = v;
-    return out;
-  })();
-
   fetchAllIngredients();
+
+  /*
+    ─────────────────────────────────────────────────────────────────────────────
+    POTION EFFECT CONFIG (Edit here)
+    - Keys are lowercase effect names.
+    - numeric: true/false (for future use, currently not shown to players)
+    - value is by rarity tier and supports gp/sp/cp.
+
+    Example:
+
+    "restore health": {
+      numeric: true,
+      value: {
+        common:    { gp: 0, sp: 5,  cp: 0 },
+        uncommon:  { gp: 1, sp: 0,  cp: 0 },
+        rare:      { gp: 5, sp: 0,  cp: 0 },
+        legendary: { gp: 25, sp: 0, cp: 0 }
+      }
+    }
+    ─────────────────────────────────────────────────────────────────────────────
+  */
+  const POTION_EFFECTS = {
+    "restore health": {
+      numeric: true,
+      value: {
+        common:    { gp: 0,  sp: 5,  cp: 0 },
+        uncommon:  { gp: 1,  sp: 0,  cp: 0 },
+        rare:      { gp: 5,  sp: 0,  cp: 0 },
+        legendary: { gp: 25, sp: 0,  cp: 0 }
+      }
+    },
+    "resist shock": {
+      numeric: false,
+      value: {
+        common:    { gp: 0, sp: 4,  cp: 0 },
+        uncommon:  { gp: 1, sp: 0,  cp: 0 },
+        rare:      { gp: 4, sp: 0,  cp: 0 },
+        legendary: { gp: 20, sp: 0, cp: 0 }
+      }
+    }
+  };
 </script>
 </body>
 </html>

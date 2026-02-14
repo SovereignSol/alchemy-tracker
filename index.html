@@ -189,23 +189,6 @@
     }
     @keyframes pulse{ 0%,100%{ opacity:0.8; } 50%{ opacity:1; } }
 
-    /* Admin override box (disguised unlock) */
-    .adminRow{
-      margin-top: 12px;
-      display:flex;
-      justify-content:flex-end;
-      align-items:center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .adminRow input{
-      width: min(320px, 100%);
-      background: rgba(255,255,255,0.70);
-    }
-    .adminRow .muted{
-      opacity: 0.85;
-    }
-
     /* Scene wrapper */
     .scene{
       border-radius: 18px;
@@ -735,34 +718,21 @@
       border: 1px solid rgba(255,255,255,0.18);
       background: rgba(10,12,18,0.55);
       color: #f2f6ff;
-      z-index: 3;
     }
     .bagBadgeLeft{ left: 8px; }
     .bagBadgeRight{ right: 8px; border-color: rgba(255,200,120,0.35); color: rgba(255,220,150,0.98); }
 
-    /* Hagcraft hex mark on bag tiles */
-    .bagHexMark{
+    /* Hex sigil overlay (moved down a little bit) */
+    .hexSigil{
       position:absolute;
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
+      right: 8px;
+      top: 34px;
       width: 22px;
       height: 22px;
-      border-radius: 999px;
-      background: rgba(10,12,18,0.55);
-      border: 1px solid rgba(255,255,255,0.18);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.30);
-      padding: 3px;
-      cursor: pointer;
-      z-index: 4;
-      user-select: none;
-    }
-    .bagHexMark img{
-      width: 100%;
-      height: 100%;
       object-fit: contain;
-      display:block;
+      cursor: pointer;
       filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35));
+      opacity: 0.98;
     }
 
     .bagIconRow{
@@ -1016,6 +986,19 @@
       flex-wrap: wrap;
     }
 
+    /* Small main menu "admin override" row */
+    .adminRow{
+      margin-top: 12px;
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+    .adminRow input{
+      width: min(340px, 100%);
+    }
+
     @media (max-width: 480px){
       .title{ flex-direction: column; align-items: flex-start; }
       :root{ --bag-grid-cols: 3; --bag-tile: 126px; }
@@ -1067,23 +1050,19 @@
           </button>
         </div>
 
-        <!-- Hidden Hagcraft tile (revealed by admin override password) -->
-        <div class="panel hidden" id="hagTile" title="Hagcraft">
+        <!-- Hidden until admin override password is entered -->
+        <div class="panel hidden" id="hagPanel" title="Hagcraft">
           <button class="overlayBtn" id="openHagBtn" aria-label="Open Hagcraft">
-            <img class="coverArt" src="assets/ui/Hagcraft.webp" alt="Hagcraft" />
+            <img class="coverArt" src="assets/ui/hagcraft_mat.webp" alt="Hagcraft" />
             <div class="hint">Hagcraft</div>
           </button>
         </div>
       </div>
 
-      <!-- Disguised unlock -->
       <div class="adminRow">
-        <div class="muted">Admin override</div>
-        <input id="adminOverride" placeholder="Admin override" aria-label="Admin override" autocomplete="off" />
-      </div>
-
-      <div class="muted" style="margin-top:12px;">
-        Your discoveries stay on this device.
+        <input id="adminOverrideInput" placeholder="Admin override" aria-label="Admin override" autocomplete="off" />
+        <button id="adminOverrideBtn" type="button">Apply</button>
+        <div class="muted" style="flex:1 1 220px;">Your discoveries stay on this device.</div>
       </div>
     </section>
 
@@ -1381,7 +1360,7 @@
           <img src="assets/icons/arrow_back.webp" alt="" />
           Back
         </button>
-        <div class="muted" id="hagStatus">Quiet craft.</div>
+        <div class="muted" id="hagStatus">Keep your hands clean.</div>
       </div>
 
       <div class="brewPage">
@@ -1390,16 +1369,10 @@
         </div>
 
         <div class="brewControls">
-          <div class="brewTopRow">
-            <div class="muted" style="font-weight:1000;">Hagcraft, bind a hex to a potion (DM-approved).</div>
-          </div>
-
           <div class="slotBox">
-            <div class="slotTitle">Instructions</div>
-            <div class="muted" style="line-height:1.25;">
-              You may attempt a check to hex a potion in your Bag.
-              The hex effect must be approved by the DM. Write the approved effect below.
-              When a potion is hexed, it shows a sigil in the Bag. Clicking the sigil reveals the hex effect.
+            <div class="slotTitle">Hagcraft</div>
+            <div class="muted" style="margin-top:6px; line-height:1.25;">
+              You may attempt a check to hex a potion in your Bag. The hex effect must be approved by the DM. Write the approved effect below. When a potion is hexed, it shows a sigil in the Bag. Clicking the sigil reveals the hex effect. Tell the DM which NPC (or PC) you plan to use it on. The DM at all times will help you conceal your Hag identity it is up the to PC's to figure it out.
             </div>
           </div>
 
@@ -1414,38 +1387,22 @@
             </div>
 
             <div class="slotBox">
-              <div class="slotTitle">Hex DC</div>
-              <div class="resultBox" id="hagDcBox" style="margin-top:0;">
-                <div class="muted">Select a potion to see DC.</div>
-              </div>
-
-              <div class="muted" style="margin-top:8px;">
-                Note: This screen does not roll. You decide success or failure based on your table's check.
-              </div>
+              <div class="slotTitle">Hex effect (DM approved)</div>
+              <textarea id="hagHexText" rows="6" style="width:100%;" placeholder="Write the DM-approved hex effect here."></textarea>
 
               <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-                <button class="btn-primary" id="hagSuccessBtn" type="button" style="flex:1 1 140px;">Hex (Success)</button>
-                <button id="hagFailBtn" type="button" style="flex:1 1 140px;">Fail</button>
+                <button class="btn-primary" id="hagHexSuccessBtn" type="button" style="flex:1 1 140px;">Hex (Success)</button>
+                <button id="hagHexFailBtn" type="button" style="flex:1 1 140px;">Fail</button>
               </div>
 
               <div class="resultBox" id="hagResult" style="margin-top:10px;">
-                <div class="muted">No binding yet.</div>
+                <div class="muted">No hex yet.</div>
               </div>
-            </div>
-          </div>
-
-          <div class="slotBox" style="margin-top:10px;">
-            <div class="slotTitle">Hex effect (DM-approved)</div>
-            <div class="muted">Write the exact side effect here, as approved by the DM.</div>
-            <textarea id="hagHexText" rows="4" style="width:100%; margin-top:8px;" placeholder="Example: The drinker sees whispering ravens for 1 minute, disadvantage on Perception checks."></textarea>
-
-            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-              <button id="hagClearHexBtn" type="button">Remove Hex</button>
             </div>
           </div>
 
           <div class="muted" style="margin-top:12px;">
-            Hexes are stored locally on this device, inside your Bag data.
+            Note: already hexed potions are hidden from this list.
           </div>
         </div>
       </div>
@@ -1481,6 +1438,7 @@
 
   <div class="toast" id="toast"></div>
 
+  <!-- Roll overlay -->
   <div class="overlay" id="rollOverlay" role="dialog" aria-modal="true" aria-label="Roll overlay">
     <div class="overlayCard">
       <div class="overlayHead">
@@ -1497,7 +1455,7 @@
     </div>
   </div>
 
-  <!-- Hex overlay -->
+  <!-- Hex overlay (read hex text) -->
   <div class="overlay" id="hexOverlay" role="dialog" aria-modal="true" aria-label="Hex overlay">
     <div class="overlayCard">
       <div class="overlayHead">
@@ -1505,10 +1463,11 @@
         <button class="btn-quiet" id="hexCloseBtn" type="button">Close</button>
       </div>
       <div class="overlayBody">
-        <div class="muted" id="hexBody"></div>
+        <div class="muted" style="font-weight:1000; margin-bottom:8px;">Hex effect</div>
+        <div id="hexBody" class="noteBox" style="max-height: 320px; background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.16); color:#f2f6ff !important; -webkit-text-fill-color:#f2f6ff !important;"></div>
       </div>
       <div class="overlayFoot">
-        <button class="btn-primary" id="hexOkBtn" type="button">Understood</button>
+        <button class="btn-primary" id="hexOkBtn" type="button">OK</button>
       </div>
     </div>
   </div>
@@ -1530,21 +1489,12 @@
   const PUBLIC_STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/`;
 
   const LOCAL_KEY = "field_notes_v2";
-
-  // Hagcraft unlock (local-only, disguised as admin override)
-  const HAGCRAFT_PASSWORD = "deepvalleywood";
-  const HAGCRAFT_UNLOCK_KEY = "hagcraft_unlocked_v1";
-
-  // Paths you will replace later
-  const HAGCRAFT_MAIN_ICON_PATH = "assets/ui/Hagcraft.webp";
-  const HAGCRAFT_UI_BG_PATH = "assets/ui/Hagcraft.webp";
-  const HAGCRAFT_HEX_SYMBOL_PATH = "assets/ui/Hexed.webp";
-
   let LOCAL = loadLocal();
   let REVEALS = LOCAL.reveals;
   let INDEX = LOCAL.index;
   let RECIPES = LOCAL.recipes;
   let BAG = LOCAL.bag;
+  let META = LOCAL.meta;
 
   let ING_BY_ID = {};
   let currentIngredientId = null;
@@ -1566,24 +1516,32 @@
   const GENERIC_POTION_ICON = "assets/icons/Generic_Potion.webp";
   const GENERIC_CONC_ICON = "assets/icons/Generic_Concentrate.webp";
 
+  /* Hagcraft asset paths (user-provided, corrected) */
+  const HAG_TILE_ICON = "assets/ui/hagcraft_mat.webp";
+  const HAG_UI_BG = "assets/ui/hagcraft_mat.webp";
+  const HEX_SIGIL_ICON = "assets/ui/Hexed.webp";
+
+  const HAG_PASSWORD = "deepvalleywood";
+
   function headers() {
     return { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
   }
 
   function saveLocal() {
-    LOCAL = { reveals: REVEALS, index: INDEX, recipes: RECIPES, bag: BAG };
+    LOCAL = { reveals: REVEALS, index: INDEX, recipes: RECIPES, bag: BAG, meta: META };
     localStorage.setItem(LOCAL_KEY, JSON.stringify(LOCAL));
   }
 
   function loadLocal() {
     const raw = localStorage.getItem(LOCAL_KEY);
-    if (!raw) return { reveals: {}, index: {}, recipes: [], bag: {} };
+    if (!raw) return { reveals: {}, index: {}, recipes: [], bag: {}, meta: { hagUnlocked: false } };
     try {
       const parsed = JSON.parse(raw);
       const reveals = (parsed && typeof parsed.reveals === "object" && parsed.reveals) ? parsed.reveals : {};
       const index = (parsed && typeof parsed.index === "object" && parsed.index) ? parsed.index : {};
       const recipes = Array.isArray(parsed?.recipes) ? parsed.recipes : [];
       const bag = (parsed && typeof parsed.bag === "object" && parsed.bag) ? parsed.bag : {};
+      const meta = (parsed && typeof parsed.meta === "object" && parsed.meta) ? parsed.meta : {};
       const cleanIndex = {};
       for (const [k,v] of Object.entries(index)) {
         const n = Number(v);
@@ -1594,16 +1552,14 @@
         if (!v || typeof v !== "object") continue;
         const qty = Math.max(0, Math.floor(Number(v.qty) || 0));
         if (qty <= 0) continue;
-
-        // Clean hex fields if present
-        const hexText = typeof v.hexText === "string" ? v.hexText : "";
-        const hexed = Boolean(v.hexed) && !!hexText;
-
-        cleanBag[String(k)] = { ...v, qty, hexed, hexText };
+        const cleaned = { ...v, qty };
+        if (typeof cleaned.hexed !== "boolean") cleaned.hexed = !!cleaned.hexed;
+        if (typeof cleaned.hexText !== "string") cleaned.hexText = cleaned.hexText ? String(cleaned.hexText) : "";
+        cleanBag[String(k)] = cleaned;
       }
-      return { reveals, index: cleanIndex, recipes, bag: cleanBag };
+      return { reveals, index: cleanIndex, recipes, bag: cleanBag, meta: { hagUnlocked: !!meta.hagUnlocked } };
     } catch {
-      return { reveals: {}, index: {}, recipes: [], bag: {} };
+      return { reveals: {}, index: {}, recipes: [], bag: {}, meta: { hagUnlocked: false } };
     }
   }
 
@@ -1826,12 +1782,16 @@
         if (item.diceByEffect[e]) dicePairs.push(`${e}=${item.diceByEffect[e]}`);
       }
     }
+    const hexFlag = item.hexed ? "hexed" : "unhexed";
+    const hexTextKey = item.hexed ? (String(item.hexText || "").trim()) : "";
     return [
       kind,
       rarityKey,
       effs.join("|"),
       dicePairs.join("|"),
-      item.mixed ? "mixed" : "pure"
+      item.mixed ? "mixed" : "pure",
+      hexFlag,
+      hexTextKey
     ].join("::");
   }
 
@@ -1856,8 +1816,16 @@
     if (BAG[key]){
       BAG[key].qty = Math.max(0, Math.floor((Number(BAG[key].qty)||0) + (Number(qtyAdd)||0)));
       BAG[key].value = normalizeCoins(BAG[key].value || normalizedValue);
+      if (typeof BAG[key].hexed !== "boolean") BAG[key].hexed = !!item.hexed;
+      if (typeof BAG[key].hexText !== "string") BAG[key].hexText = item.hexText ? String(item.hexText) : "";
     } else {
-      BAG[key] = { ...item, value: normalizedValue, qty: Math.max(0, Math.floor(Number(qtyAdd)||0)) };
+      BAG[key] = {
+        ...item,
+        value: normalizedValue,
+        qty: Math.max(0, Math.floor(Number(qtyAdd)||0)),
+        hexed: !!item.hexed,
+        hexText: item.hexText ? String(item.hexText) : ""
+      };
     }
     if (BAG[key].qty <= 0) delete BAG[key];
     saveLocal();
@@ -1886,6 +1854,8 @@
       if (r !== 0) return r;
       const ta = (A?.kind||"").localeCompare(B?.kind||"");
       if (ta !== 0) return ta;
+      const hx = (A?.hexed ? 1 : 0) - (B?.hexed ? 1 : 0);
+      if (hx !== 0) return hx;
       const ea = (A?.effects||[]).join("|");
       const eb = (B?.effects||[]).join("|");
       return ea.localeCompare(eb);
@@ -1893,17 +1863,12 @@
     return keys;
   }
 
-  // ---------------------------
-  // Hex overlay
-  // ---------------------------
-  const hexOverlay = el("hexOverlay");
-  function openHexOverlay(title, body){
-    el("hexTitle").textContent = title || "Hex";
-    el("hexBody").textContent = body || "No details.";
-    hexOverlay.style.display = "flex";
+  function openHexOverlay(hexText){
+    el("hexBody").textContent = hexText || "No hex effect recorded.";
+    el("hexOverlay").style.display = "flex";
   }
   function closeHexOverlay(){
-    hexOverlay.style.display = "none";
+    el("hexOverlay").style.display = "none";
   }
   el("hexCloseBtn").addEventListener("click", closeHexOverlay);
   el("hexOkBtn").addEventListener("click", closeHexOverlay);
@@ -1947,22 +1912,18 @@
         tile.appendChild(badgeRight);
       }
 
-      // Hagcraft sigil (only for hexed potions)
-      if (kind === "potion" && it.hexed && String(it.hexText || "").trim()){
-        const mark = document.createElement("div");
-        mark.className = "bagHexMark";
-        const img = document.createElement("img");
-        img.src = HAGCRAFT_HEX_SYMBOL_PATH + "?t=" + Date.now();
-        img.alt = "Hex";
-        img.onerror = () => { img.src = GENERIC_POTION_ICON + "?t=" + Date.now(); };
-        mark.appendChild(img);
-
-        mark.addEventListener("click", (ev) => {
+      if (it.kind === "potion" && it.hexed){
+        const sig = document.createElement("img");
+        sig.className = "hexSigil";
+        sig.src = HEX_SIGIL_ICON + "?t=" + Date.now();
+        sig.alt = "Hexed";
+        sig.title = "Hexed (click to view)";
+        sig.addEventListener("click", (ev) => {
           ev.stopPropagation();
-          openHexOverlay("Hex Effect", String(it.hexText || "").trim());
+          openHexOverlay(it.hexText || "");
         });
-
-        tile.appendChild(mark);
+        sig.onerror = () => { sig.style.display = "none"; };
+        tile.appendChild(sig);
       }
 
       const iconRow = document.createElement("div");
@@ -2932,7 +2893,9 @@
           diceByEffect,
           value,
           iconPath,
-          mixed: false
+          mixed: false,
+          hexed: false,
+          hexText: ""
         }, 1);
 
         playSfx("sfxSuccess");
@@ -3103,6 +3066,7 @@
     renderConcentratesRightPage();
     fillMixChoices();
     enforceDistinctMixItems();
+    fillHagChoices();
 
     el("mixCombineResult").innerHTML = `
       <div style="color:rgba(120,255,170,0.95); font-weight:1000;">Mixture recorded.</div>
@@ -3157,6 +3121,7 @@
       renderConcentratesRightPage();
       fillMixChoices();
       enforceDistinctMixItems();
+      fillHagChoices();
       el("mixCombineResult").innerHTML = `
         <div style="color:var(--warn); font-weight:950;">The mix fails.</div>
         <div class="muted" style="margin-top:6px;">Items were still consumed.</div>
@@ -3237,69 +3202,37 @@
     finalizeMixedPotion(union, maxR, diceByEffect, value);
   }
 
-  // ---------------------------
-  // Hagcraft
-  // ---------------------------
-  function isHagUnlocked(){
-    return localStorage.getItem(HAGCRAFT_UNLOCK_KEY) === "1";
-  }
-
-  function setHagUnlocked(){
-    localStorage.setItem(HAGCRAFT_UNLOCK_KEY, "1");
-    updateHagVisibility();
-  }
-
-  function updateHagVisibility(){
-    const tile = el("hagTile");
-    tile.classList.toggle("hidden", !isHagUnlocked());
-
-    // Also keep the paths consistent in case you replace them later
-    const hagCover = tile.querySelector("img.coverArt");
-    if (hagCover) hagCover.src = HAGCRAFT_MAIN_ICON_PATH;
-
-    el("hagBg").src = HAGCRAFT_UI_BG_PATH;
-  }
-
-  function hagPotionKeys(){
+  /* Hagcraft */
+  function hagEligiblePotionKeys(){
     return listBagKeys().filter(k => {
       const it = BAG[k];
       if (!it) return false;
       if ((Number(it.qty)||0) <= 0) return false;
-      return it.kind === "potion";
+      if (it.kind !== "potion") return false;
+      if (it.hexed) return false; // hide already hexed potions
+      return true;
     });
-  }
-
-  function hagPotionLabel(k){
-    const it = BAG[k];
-    if (!it) return "Unknown";
-    const rk = it.rarityKey || "common";
-    const effs = Array.isArray(it.effects) ? it.effects : [];
-    const first = effs[0] || "Unknown";
-    const qty = Number(it.qty)||0;
-    const diceBy = it.diceByEffect || {};
-    const dice = diceBy[first] || "—";
-    const hx = (it.hexed && String(it.hexText||"").trim()) ? " [HEX]" : "";
-    return `Concoction of ${first} ${dice} (${rarityDisplay(rk)}) [${qty}]${hx}`;
   }
 
   function fillHagChoices(){
     const sel = el("hagPotionSel");
-    const keys = hagPotionKeys();
+    if (!sel) return;
 
+    el("hagBg").src = HAG_UI_BG + "?t=" + Date.now();
+
+    const keys = hagEligiblePotionKeys();
     if (!keys.length){
-      sel.innerHTML = `<option value="">(No potions in Bag)</option>`;
-      el("hagPotionDetail").innerHTML = `<div class="muted">Add a potion to your Bag.</div>`;
-      el("hagDcBox").innerHTML = `<div class="muted">Select a potion to see DC.</div>`;
+      sel.innerHTML = `<option value="">(No eligible potions)</option>`;
+      el("hagPotionDetail").innerHTML = `<div class="muted">No unhexed potions are available.</div>`;
       return;
     }
 
-    const opts = keys.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(hagPotionLabel(k))}</option>`).join("");
+    const opts = keys.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(bagOptionLabel(k))}</option>`).join("");
     const prev = sel.value;
     sel.innerHTML = opts;
     sel.value = keys.includes(prev) ? prev : keys[0];
 
     renderHagPotionDetail();
-    updateHagDcDisplay();
   }
 
   function renderHagPotionDetail(){
@@ -3310,107 +3243,91 @@
       box.innerHTML = `<div class="muted">Select a potion.</div>`;
       return;
     }
-
     const rk = it.rarityKey || "common";
     const effs = Array.isArray(it.effects) ? it.effects : [];
     const diceBy = (it.diceByEffect && typeof it.diceByEffect === "object") ? it.diceByEffect : {};
     const lines = effs.map(e => `${escapeHtml(e)} ${escapeHtml(diceBy[e] || "—")}`).join(", ");
-    const hx = (it.hexed && String(it.hexText||"").trim()) ? escapeHtml(String(it.hexText||"").trim()) : "";
 
     box.innerHTML = `
       <div style="font-weight:1000;">Concoction</div>
       <div class="muted" style="margin-top:6px;">Rarity: <span class="${rarityCssClass(rk)}" style="font-weight:1000;">${escapeHtml(rarityDisplay(rk))}</span></div>
       <div class="muted" style="margin-top:6px;">Effects: ${lines || "Unknown"}</div>
       <div class="muted" style="margin-top:6px;">Value: ${fmtCoins(it.value || {gp:0,sp:0,cp:0})}</div>
-      ${hx ? `<div class="muted" style="margin-top:8px; font-weight:1000;">Current Hex:</div><div class="muted" style="margin-top:6px;">${hx}</div>` : `<div class="muted" style="margin-top:8px;">No hex on this potion.</div>`}
     `;
-
-    // Prefill textarea with current hex if present
-    el("hagHexText").value = hx ? String(it.hexText||"").trim() : "";
   }
 
-  function updateHagDcDisplay(){
+  function hagHexAttempt(isSuccess){
     const key = el("hagPotionSel").value;
     const it = BAG[key];
-    if (!it){
-      el("hagDcBox").innerHTML = `<div class="muted">Select a potion to see DC.</div>`;
+    if (!key || !it){
+      toast("Select a potion.", "bad");
       return;
     }
-    // Simple rule: base DC by potion rarity, plus +2 for hagcraft ritual
-    const base = dcForRarity(it.rarityKey || "common");
-    const dc = base + 2;
-    el("hagDcBox").innerHTML = `
-      <div style="font-weight:1000;">DC ${dc}</div>
-      <div class="muted" style="margin-top:6px;">Base: ${base} (${escapeHtml(rarityDisplay(it.rarityKey || "common"))}) +2 (hagcraft)</div>
-    `;
-  }
-
-  function hagAttempt(isSuccess){
-    const key = el("hagPotionSel").value;
-    const it = BAG[key];
-    if (!it || it.kind !== "potion"){
-      toast("Pick a potion.", "bad");
+    if (it.hexed){
+      toast("That potion is already hexed.", "bad");
       return;
     }
 
     if (!isSuccess){
       el("hagResult").innerHTML = `
-        <div style="color:var(--warn); font-weight:950;">The hex fails.</div>
-        <div class="muted" style="margin-top:6px;">Nothing binds.</div>
+        <div style="color:var(--warn); font-weight:950;">The hex attempt fails.</div>
+        <div class="muted" style="margin-top:6px;">Nothing is recorded.</div>
       `;
       toast("Failed.", "bad");
       return;
     }
 
-    const text = String(el("hagHexText").value || "").trim();
-    if (!text){
+    const txt = String(el("hagHexText").value || "").trim();
+    if (!txt){
       toast("Write the DM-approved hex effect.", "bad");
       return;
     }
 
+    // Mark this bag entry as hexed.
+    // Note: this applies to the stack for this entry key.
     it.hexed = true;
-    it.hexText = text;
-    it.hexAt = Date.now();
-    saveLocal();
+    it.hexText = txt;
 
+    // Re-key the bag item so hexed state is preserved as distinct.
+    const oldQty = Number(it.qty)||0;
+    const old = { ...it, qty: oldQty };
+    delete BAG[key];
+
+    const newKey = bagKeyFor(old);
+    if (BAG[newKey]){
+      BAG[newKey].qty = Math.max(0, Math.floor((Number(BAG[newKey].qty)||0) + oldQty));
+    } else {
+      BAG[newKey] = old;
+    }
+
+    saveLocal();
     renderBag();
     fillMixChoices();
     fillHagChoices();
 
     el("hagResult").innerHTML = `
-      <div style="color:rgba(120,255,170,0.95); font-weight:1000;">Hex bound.</div>
-      <div class="muted" style="margin-top:6px;">A sigil now marks the potion in your Bag.</div>
+      <div style="color:rgba(120,255,170,0.95); font-weight:1000;">Hex recorded.</div>
+      <div class="muted" style="margin-top:6px;">The sigil appears in the Bag. Click it to reveal the hex effect.</div>
     `;
     toast("Hexed.", "good");
   }
 
-  function hagRemoveHex(){
-    const key = el("hagPotionSel").value;
-    const it = BAG[key];
-    if (!it || it.kind !== "potion"){
-      toast("Pick a potion.", "bad");
-      return;
-    }
-
-    if (!it.hexed && !String(it.hexText||"").trim()){
-      toast("No hex to remove.", "bad");
-      return;
-    }
-
-    it.hexed = false;
-    it.hexText = "";
-    it.hexAt = 0;
+  function setHagUnlocked(on){
+    META.hagUnlocked = !!on;
     saveLocal();
+    el("hagPanel").classList.toggle("hidden", !META.hagUnlocked);
+  }
 
-    renderBag();
-    fillMixChoices();
-    fillHagChoices();
-
-    el("hagResult").innerHTML = `
-      <div style="color:rgba(255,220,150,0.95); font-weight:1000;">Hex removed.</div>
-      <div class="muted" style="margin-top:6px;">The sigil is gone.</div>
-    `;
-    toast("Removed.", "good");
+  function tryAdminOverride(){
+    const raw = String(el("adminOverrideInput").value || "");
+    const val = raw.trim();
+    if (val === HAG_PASSWORD){
+      setHagUnlocked(true);
+      el("adminOverrideInput").value = "";
+      toast("Override accepted.", "good");
+    } else {
+      toast("Override refused.", "bad");
+    }
   }
 
   // Wire up UI
@@ -3446,12 +3363,14 @@
   });
 
   el("openHagBtn").addEventListener("click", () => {
-    // No sound requested
     showOnly("hag");
-    el("hagBg").src = HAGCRAFT_UI_BG_PATH + "?t=" + Date.now();
+    el("hagBg").src = HAG_UI_BG + "?t=" + Date.now();
     fillHagChoices();
-    el("hagResult").innerHTML = `<div class="muted">No binding yet.</div>`;
-    el("hagStatus").textContent = "Quiet craft.";
+    el("hagResult").innerHTML = `<div class="muted">No hex yet.</div>`;
+  });
+
+  el("backFromHagBtn").addEventListener("click", () => {
+    showOnly("main");
   });
 
   el("closeBookBtn").addEventListener("click", () => {
@@ -3476,10 +3395,6 @@
   });
 
   el("backFromMixBtn").addEventListener("click", () => {
-    showOnly("main");
-  });
-
-  el("backFromHagBtn").addEventListener("click", () => {
     showOnly("main");
   });
 
@@ -3517,31 +3432,8 @@
   el("mixSuccessBtn").addEventListener("click", () => mixAttempt(true));
   el("mixFailBtn").addEventListener("click", () => mixAttempt(false));
 
-  // Hagcraft UI
-  el("hagPotionSel").addEventListener("change", () => {
-    renderHagPotionDetail();
-    updateHagDcDisplay();
-  });
-  el("hagSuccessBtn").addEventListener("click", () => hagAttempt(true));
-  el("hagFailBtn").addEventListener("click", () => hagAttempt(false));
-  el("hagClearHexBtn").addEventListener("click", hagRemoveHex);
-
-  // Disguised unlock input
-  function tryUnlockFromAdminBox(){
-    const v = String(el("adminOverride").value || "");
-    if (v === HAGCRAFT_PASSWORD){
-      setHagUnlocked();
-      el("adminOverride").value = "";
-      toast("Override accepted.", "good");
-    }
-  }
-  el("adminOverride").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") tryUnlockFromAdminBox();
-  });
-  el("adminOverride").addEventListener("blur", tryUnlockFromAdminBox);
-
   el("exportBtn").addEventListener("click", () => {
-    el("saveBox").value = JSON.stringify({ reveals: REVEALS, index: INDEX, recipes: RECIPES, bag: BAG }, null, 2);
+    el("saveBox").value = JSON.stringify({ reveals: REVEALS, index: INDEX, recipes: RECIPES, bag: BAG, meta: META }, null, 2);
     toast("Copied to the box.", "good");
   });
 
@@ -3559,7 +3451,12 @@
       INDEX = clean;
       RECIPES = Array.isArray(parsed.recipes) ? parsed.recipes : [];
       BAG = (parsed.bag && typeof parsed.bag === "object") ? parsed.bag : {};
+      META = (parsed.meta && typeof parsed.meta === "object") ? parsed.meta : { hagUnlocked: false };
+      if (typeof META.hagUnlocked !== "boolean") META.hagUnlocked = !!META.hagUnlocked;
+
       saveLocal();
+      setHagUnlocked(!!META.hagUnlocked);
+
       renderIndex();
       fillBrewChoices();
       enforceDistinctMixing();
@@ -3583,7 +3480,9 @@
     INDEX = {};
     RECIPES = [];
     BAG = {};
+    META = { hagUnlocked: false };
     saveLocal();
+    setHagUnlocked(false);
     renderIndex();
     fillBrewChoices();
     enforceDistinctMixing();
@@ -3597,16 +3496,24 @@
     toast("Ashes and silence.", "bad");
   });
 
-  // Initialize
+  el("adminOverrideBtn").addEventListener("click", tryAdminOverride);
+  el("adminOverrideInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") tryAdminOverride();
+  });
+
+  el("hagPotionSel").addEventListener("change", renderHagPotionDetail);
+  el("hagHexSuccessBtn").addEventListener("click", () => hagHexAttempt(true));
+  el("hagHexFailBtn").addEventListener("click", () => hagHexAttempt(false));
+
+  // Initialize Hagcraft assets into DOM now (so your paths work immediately)
+  el("hagBg").src = HAG_UI_BG + "?t=" + Date.now();
+
+  // Initial state
+  el("openHagBtn").querySelector("img.coverArt").src = HAG_TILE_ICON;
   setTheme("wilderness");
   showOnly("main");
+  setHagUnlocked(!!META?.hagUnlocked);
 
-  // Apply Hagcraft placeholder paths now (so you can replace files later)
-  const hagTileImg = el("hagTile").querySelector("img.coverArt");
-  if (hagTileImg) hagTileImg.src = HAGCRAFT_MAIN_ICON_PATH;
-  el("hagBg").src = HAGCRAFT_UI_BG_PATH;
-
-  updateHagVisibility();
   fetchAllIngredients();
 
   // -----------------------------

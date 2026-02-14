@@ -180,10 +180,7 @@
       align-items: stretch;
     }
     @media (min-width: 860px){
-      .main-grid{ grid-template-columns: 1fr 1fr; }
-    }
-    .panel-below{
-      margin-top: 12px;
+      .main-grid{ grid-template-columns: repeat(3, 1fr); }
     }
 
     .panel{
@@ -345,7 +342,6 @@
         --right-box-width: 98%;
         --right-page-shift: 0px;
         --right-notebox-width: 96%;
-
         --bag-top-offset: 40px;
       }
       .bookWrap{
@@ -1064,14 +1060,13 @@
             <div class="hint">Brewing</div>
           </button>
         </div>
-      </div>
 
-      <!-- Bag panel below -->
-      <div class="panel panel-below" title="Bag">
-        <button class="overlayBtn" id="openBagBtn" aria-label="Open bag">
-          <img class="coverArt" src="assets/ui/Backpack.webp" alt="Backpack" />
-          <div class="hint">Bag</div>
-        </button>
+        <div class="panel" title="Bag">
+          <button class="overlayBtn" id="openBagBtn" aria-label="Open bag">
+            <img class="coverArt" src="assets/ui/Backpack.webp" alt="Backpack" />
+            <div class="hint">Bag</div>
+          </button>
+        </div>
       </div>
 
       <div class="muted" style="margin-top:12px;">
@@ -1220,6 +1215,7 @@
         <div class="brewControls">
           <div class="brewTopRow">
             <button class="themeBtn" id="themeToggleBtn" type="button" aria-label="Switch theme">
+              <!-- Placeholder icons, replace later -->
               <img id="themeIcon" src="assets/icons/theme_wilderness.webp" alt="" />
               <span id="themeLabel">Wilderness</span>
             </button>
@@ -1316,9 +1312,9 @@
   <!-- Success overlay -->
   <div class="overlay" id="brewOverlay" role="dialog" aria-modal="true" aria-label="Record potion results">
     <div class="overlayCard">
-      <div class="overlayTitle">Record Your Concoction</div>
+      <div class="overlayTitle">Record Your Potion</div>
       <div class="overlaySub" id="overlaySub">
-        Enter the bonus roll for each shared property. The base dice are shown as a reminder.
+        Enter the bonus roll for each shared effect.
       </div>
 
       <div class="overlayGrid" id="overlayGrid"></div>
@@ -1350,14 +1346,14 @@
   let INDEX = LOCAL.index;
   let RECIPES = LOCAL.recipes;
   let CONCENTRATES = LOCAL.concentrates;
-  let POTIONS = LOCAL.potions; // Bag inventory
+  let POTIONS = LOCAL.potions;
 
   let ING_BY_ID = {};
   let currentIngredientId = null;
   let theme = "wilderness";
   let isFetching = false;
 
-  let pendingBrew = null; // used for overlay save
+  let pendingBrew = null;
 
   const viewMain = document.getElementById("viewMain");
   const viewBook = document.getElementById("viewBook");
@@ -1550,6 +1546,28 @@
     if (gp < 0) gp = 0;
 
     return { gp, sp, cp };
+  }
+
+  /* FIX: stable stringify without dropping nested keys */
+  function stableStringifyDeep(value) {
+    const seen = new WeakSet();
+
+    function sortify(v) {
+      if (v === null || v === undefined) return v;
+      if (typeof v !== "object") return v;
+
+      if (seen.has(v)) return null;
+      seen.add(v);
+
+      if (Array.isArray(v)) return v.map(sortify);
+
+      const out = {};
+      const keys = Object.keys(v).sort();
+      for (const k of keys) out[k] = sortify(v[k]);
+      return out;
+    }
+
+    return JSON.stringify(sortify(value));
   }
 
   async function fetchAllIngredients() {
@@ -1793,7 +1811,7 @@
     const idStr = String(baseSel.value || "");
     const effect = String(effSel.value || "").trim();
     if (!idStr || !effect) {
-      toast("Choose an ingredient and a property.", "bad");
+      toast("Choose an ingredient and an effect.", "bad");
       return;
     }
 
@@ -1811,7 +1829,7 @@
 
     const revealed = revealedEffectsForIngredient(idStr);
     if (!revealed.includes(effect)) {
-      toast("That property is not revealed.", "bad");
+      toast("That effect is not revealed.", "bad");
       fillConcentrateCraftChoices();
       return;
     }
@@ -1825,11 +1843,13 @@
 
     saveLocal();
 
-    // Add to bag (minimal)
+    playSfx("sfxSuccess");
+
+    // Add to bag (simple entry)
     addPotion({
       type: "concentrate",
       rarity: rarityTier(ING_BY_ID[idStr]?.rarity),
-      effects: [{ name: effect, kind: "numeric", bonus: null, baseNote: null, bonusDice: null }],
+      effects: [{ name: effect, bonus: null, baseNote: null, bonusDice: null }],
       price: { gp: 0, sp: 0, cp: 0 }
     }, 1);
 
@@ -1846,10 +1866,6 @@
   /* =========================
      Bag inventory (potions)
      ========================= */
-  function stableStringify(obj) {
-    return JSON.stringify(obj, Object.keys(obj).sort());
-  }
-
   function potionKeyFromMeta(meta) {
     const type = normKey(meta?.type || "");
     const rarity = normKey(meta?.rarity || "");
@@ -1865,8 +1881,7 @@
 
     const packed = effects.map(e => ({
       name: String(e?.name || ""),
-      kind: String(e?.kind || ""),
-      bonus: (e?.bonus === null || e?.bonus === undefined) ? null : Number(e?.bonus),
+      bonus: (e?.bonus === null || e?.bonus === undefined || !Number.isFinite(Number(e?.bonus))) ? null : Number(e?.bonus),
       baseNote: e?.baseNote ? String(e.baseNote) : null,
       bonusDice: e?.bonusDice ? String(e.bonusDice) : null
     }));
@@ -1878,7 +1893,7 @@
       p: normalizeCoins(meta?.price || { gp:0, sp:0, cp:0 })
     };
 
-    return "p:" + encodeURIComponent(stableStringify(keyObj));
+    return "p:" + encodeURIComponent(stableStringifyDeep(keyObj));
   }
 
   function parsePotionKey(key) {
@@ -1918,16 +1933,11 @@
       const bonusDice = e?.bonusDice ? String(e.bonusDice) : "";
       const bonus = (e?.bonus === null || e?.bonus === undefined || !Number.isFinite(Number(e.bonus))) ? null : Number(e.bonus);
 
-      if (bonus !== null) {
-        const parts = [];
-        if (baseNote) parts.push(`Base ${baseNote}`);
-        if (bonusDice) parts.push(`Bonus ${bonusDice}`);
-        const hint = parts.length ? ` (${parts.join(", ")})` : "";
-        lines.push(`${name}: +${bonus}${hint}`);
-      } else {
-        const hint = baseNote || bonusDice ? ` (Base ${baseNote || "?"}, Bonus ${bonusDice || "?"})` : "";
-        lines.push(`${name}${hint}`);
-      }
+      const baseTxt = baseNote ? `Base ${baseNote}` : "Base 2d4";
+      const bonusTxt = bonusDice ? `Bonus ${bonusDice}` : "Bonus";
+      const rolled = (bonus !== null) ? `, Rolled ${bonus}` : "";
+
+      lines.push(`${name}: ${baseTxt}, ${bonusTxt}${rolled}`);
     }
 
     const price = normalizeCoins(obj?.p || { gp:0, sp:0, cp:0 });
@@ -2283,15 +2293,22 @@
 
   function setTheme(next) {
     theme = next;
+
+    // Backgrounds (you already have these)
     if (theme === "wilderness") {
       el("brewBg").src = "assets/themes/wilderness_bg.webp?t=" + Date.now();
-      el("themeIcon").src = "assets/icons/theme_wilderness.webp?t=" + Date.now();
       el("themeLabel").textContent = "Wilderness";
+      el("themeIcon").src = "assets/icons/theme_wilderness.webp?t=" + Date.now();
     } else {
       el("brewBg").src = "assets/themes/town_bg.webp?t=" + Date.now();
-      el("themeIcon").src = "assets/icons/theme_town.webp?t=" + Date.now();
       el("themeLabel").textContent = "Town";
+      el("themeIcon").src = "assets/icons/theme_town.webp?t=" + Date.now();
     }
+
+    // Placeholder if icon files are missing, you can replace later
+    el("themeIcon").onerror = () => {
+      el("themeIcon").src = placeholderImageDataUri(theme === "wilderness" ? "W" : "T");
+    };
   }
 
   function availableForBrewIds() {
@@ -2517,7 +2534,6 @@
     const direct = EFFECTS_CONFIG[key];
     if (direct) return direct;
 
-    // Try exact raw key fallback (in case user stores original capitalization)
     for (const [k,v] of Object.entries(EFFECTS_CONFIG)) {
       if (normKey(k) === key) return v;
     }
@@ -2535,7 +2551,7 @@
   function baseNoteForEffectAtRarity(effectName, rarityTierStr) {
     const cfg = effectConfigForName(effectName);
     const tier = normKey(rarityTierStr);
-    return cfg?.baseNoteByRarity?.[tier] || "";
+    return cfg?.baseNoteByRarity?.[tier] || "2d4";
   }
 
   function bonusDiceForEffectAtRarity(effectName, rarityTierStr) {
@@ -2544,21 +2560,13 @@
     return cfg?.bonusDiceByRarity?.[tier] || "";
   }
 
-  function kindForEffect(effectName) {
-    const cfg = effectConfigForName(effectName);
-    const t = normKey(cfg?.type || "numeric");
-    return (t === "non_numeric") ? "non_numeric" : "numeric";
-  }
-
   function openBrewOverlay(payload) {
     pendingBrew = payload;
     const overlay = el("brewOverlay");
     const grid = el("overlayGrid");
 
-    const rarityText = payload.rarity.charAt(0).toUpperCase() + payload.rarity.slice(1);
     const coinText = formatCoins(payload.price);
-    el("overlaySub").textContent =
-      `Quality: ${rarityText}. Value (rarity-only): ${coinText}. Enter the BONUS roll for each shared property.`;
+    el("overlaySub").textContent = `Value: ${coinText}. Enter the bonus roll result for each effect.`;
 
     grid.innerHTML = "";
 
@@ -2579,19 +2587,14 @@
       pills.style.gap = "6px";
       pills.style.flexWrap = "wrap";
 
-      const kindP = document.createElement("div");
-      kindP.className = "pillMini";
-      kindP.textContent = (eff.kind === "non_numeric") ? "Non-numeric" : "Numeric";
-
       const baseP = document.createElement("div");
       baseP.className = "pillMini";
-      baseP.textContent = eff.baseNote ? `Base ${eff.baseNote}` : "Base (none)";
+      baseP.textContent = `Base ${eff.baseNote || "2d4"}`;
 
       const bonusP = document.createElement("div");
       bonusP.className = "pillMini";
-      bonusP.textContent = eff.bonusDice ? `Bonus ${eff.bonusDice}` : "Bonus (none)";
+      bonusP.textContent = eff.bonusDice ? `Bonus ${eff.bonusDice}` : "Bonus";
 
-      pills.appendChild(kindP);
       pills.appendChild(baseP);
       pills.appendChild(bonusP);
 
@@ -2600,9 +2603,7 @@
 
       const right = document.createElement("div");
       right.className = "overlayHint";
-      right.textContent = (eff.kind === "non_numeric")
-        ? "Later: non-numeric. For now, you may leave blank."
-        : "Enter the bonus result you rolled.";
+      right.textContent = "Enter the bonus result you rolled.";
 
       top.appendChild(left);
       top.appendChild(right);
@@ -2612,7 +2613,7 @@
 
       const input = document.createElement("input");
       input.inputMode = "numeric";
-      input.placeholder = (eff.kind === "non_numeric") ? "Bonus (optional)" : "Bonus roll result";
+      input.placeholder = "Bonus roll result";
       input.dataset.effectKey = eff.key;
       inputRow.appendChild(input);
 
@@ -2689,7 +2690,6 @@
       return;
     }
 
-    // UI already prevents duplicates, keep guards
     if (ids.length >= 2 && ids[0] === ids[1]) {
       toast("Choose two different ingredients.", "bad");
       el("mixResult").innerHTML = `<div style="color:var(--warn); font-weight:950;">Choose two different ingredients.</div>`;
@@ -2717,7 +2717,6 @@
     const shared = computeShared(ids);
     const rarity = brewRarityTierFromIds(ids);
 
-    // Consume ingredients on success press
     spend(ids);
     renderIndex();
     fillBrewChoices();
@@ -2735,36 +2734,27 @@
       return;
     }
 
-    // Learn the shared properties (reveals)
     revealSharedAutomatically(ids, shared);
     recordRecipe(ids, shared);
 
-    // Build overlay payload
     const effects = shared.map(name => {
-      const kind = kindForEffect(name);
       const baseNote = baseNoteForEffectAtRarity(name, rarity);
       const bonusDice = bonusDiceForEffectAtRarity(name, rarity);
       const key = normKey(name);
-      return { name, key, kind, baseNote, bonusDice };
+      return { name, key, baseNote, bonusDice };
     });
 
-    // Price is sum of effect values at potion rarity
     let price = { gp:0, sp:0, cp:0 };
     for (const name of shared) {
       price = addCoins(price, valueForEffectAtRarity(name, rarity));
     }
     price = normalizeCoins(price);
 
-    pendingBrew = {
-      type: "concoction",
-      rarity,
-      effects,
-      price
-    };
+    pendingBrew = { type: "concoction", rarity, effects, price };
 
     el("mixResult").innerHTML = `
-      <div style="color:rgba(120,255,170,0.95); font-weight:1000;">Concoction possible.</div>
-      <div class="muted" style="margin-top:6px;">Record your bonus rolls to store it in the bag.</div>
+      <div style="color:rgba(120,255,170,0.95); font-weight:1000;">Potion possible.</div>
+      <div class="muted" style="margin-top:6px;">Enter your bonus rolls to store it in the bag.</div>
     `;
     toast("Success, record the result.", "good");
 
@@ -2783,10 +2773,9 @@
       const bonus = inputs[e.key];
       return {
         name: e.name,
-        kind: e.kind,
-        bonus: (e.kind === "numeric") ? bonus : bonus, // placeholder, non-numeric later
-        baseNote: e.baseNote || null,
-        bonusDice: e.bonusDice || null
+        bonus: bonus,
+        baseNote: e.baseNote || "2d4",
+        bonusDice: e.bonusDice || ""
       };
     });
 
@@ -2966,14 +2955,12 @@
   el("concEffectSelect").addEventListener("change", fillConcentrateCraftChoices);
   el("concCraftBtn").addEventListener("click", craftConcentrate);
 
-  // Overlay buttons
   el("overlayCancelBtn").addEventListener("click", () => {
     closeBrewOverlay();
     toast("Canceled recording.", "bad");
   });
   el("overlaySaveBtn").addEventListener("click", saveOverlayToBag);
 
-  // Clicking outside closes overlay
   el("brewOverlay").addEventListener("click", (e) => {
     if (e.target === el("brewOverlay")) closeBrewOverlay();
   });
@@ -2983,41 +2970,11 @@
 
   /* =========================================================
      POTION EFFECT CONFIG (EDIT ME)
-     - Add new effects by copying the template below.
-     - Keys are normalized internally (trim, collapse spaces,
-       lowercase), so "restore health" matches "Restore Health".
      ========================================================= */
-
-  /*
-  TEMPLATE:
-
-  "Effect Name Here": {
-    type: "numeric", // "numeric" | "non_numeric"
-    bonusDiceByRarity: {
-      common: "1d6",
-      uncommon: "1d8",
-      rare: "1d12",
-      legendary: "2d20"
-    },
-    baseNoteByRarity: {           // shown as reminder text only
-      common: "2d4",
-      uncommon: "4d4",
-      rare: "8d4",
-      legendary: "10d4"
-    },
-    valueByRarity: {              // rarity-only value for this effect
-      common:    { gp: 0, sp: 5,  cp: 0 },
-      uncommon:  { gp: 1, sp: 0,  cp: 0 },
-      rare:      { gp: 5, sp: 0,  cp: 0 },
-      legendary: { gp: 25, sp: 0, cp: 0 }
-    }
-  },
-  */
 
   const EFFECTS_CONFIG = (() => {
     const cfg = {
       "Restore Health": {
-        type: "numeric",
         bonusDiceByRarity: {
           common: "1d6",
           uncommon: "1d8",
@@ -3026,9 +2983,9 @@
         },
         baseNoteByRarity: {
           common: "2d4",
-          uncommon: "4d4",
-          rare: "8d4",
-          legendary: "10d4"
+          uncommon: "2d4",
+          rare: "2d4",
+          legendary: "2d4"
         },
         valueByRarity: {
           common:    { gp: 0, sp: 5,  cp: 0 },
@@ -3039,13 +2996,11 @@
       }
     };
 
-    // Normalize keys into a lookup table
     const out = {};
     for (const [k,v] of Object.entries(cfg)) out[normKey(k)] = v;
     return out;
   })();
 
-  // Start after config is ready
   fetchAllIngredients();
 </script>
 </body>

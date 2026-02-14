@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Field Notes</title>
+  <title>Alchemy Tracker</title>
 
   <style>
     * { box-sizing: border-box; }
@@ -703,6 +703,7 @@
       display:flex;
       flex-direction: column;
       gap: 6px;
+      position: relative;
     }
     .bagIconRow{
       display:flex;
@@ -757,6 +758,44 @@
       justify-content:center;
       gap: 6px;
       flex-wrap: wrap;
+    }
+
+    .bagBadge{
+      position:absolute;
+      top: 8px;
+      right: 8px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.20);
+      background: rgba(20,22,30,0.78);
+      color: #f2f6ff;
+      font-weight: 1000;
+      font-size: 10px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.28);
+      pointer-events: none;
+    }
+
+    .bagEffectsList{
+      margin-top: 2px;
+      display:flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .bagEffectRow{
+      font-size: 11px;
+      font-weight: 950;
+      opacity: 0.95;
+      line-height: 1.1;
+      text-align: center;
+      word-break: break-word;
+    }
+    .bagEffectName{ font-weight: 1000; }
+    .bagEffectDice{
+      opacity: 0.95;
+      font-weight: 950;
+      margin-left: 6px;
     }
 
     .bagQtyRow{
@@ -953,8 +992,8 @@
   <div class="wrap">
     <div class="title">
       <div>
-        <h1>Field Notes</h1>
-        <div class="sub">A travel-worn record of leaves, powders, and quiet discoveries.</div>
+        <h1>Alchemy Tracker</h1>
+        <div class="sub"></div>
       </div>
       <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
         <button class="btn-quiet" id="refreshBtn" title="Pulls in any prepared ingredients.">
@@ -1332,6 +1371,9 @@
 
   <audio id="sfxPage" src="assets/sfx/page_turn.mp3" preload="auto"></audio>
   <audio id="sfxSuccess" src="assets/sfx/brew_success.mp3" preload="auto"></audio>
+  <audio id="sfxWindUp" src="assets/sfx/Wind_up.mp3" preload="auto"></audio>
+  <audio id="sfxBagOpen" src="assets/sfx/Bag_Open.mp3" preload="auto"></audio>
+  <audio id="sfxBookClose" src="assets/sfx/Book_Close.mp3" preload="auto"></audio>
 
 <script>
   const SUPABASE_URL = "https://yjelzojkirlzdnwftupz.supabase.co";
@@ -1521,8 +1563,27 @@
     return rk === "legendary" ? "Legendary" : rk === "rare" ? "Rare" : rk === "uncommon" ? "Uncommon" : "Common";
   }
 
+  function normalizeCoins(v){
+    let gp = Math.max(0, Math.floor(Number(v?.gp) || 0));
+    let sp = Math.max(0, Math.floor(Number(v?.sp) || 0));
+    let cp = Math.max(0, Math.floor(Number(v?.cp) || 0));
+
+    if (cp >= 100){
+      const addSp = Math.floor(cp / 100);
+      sp += addSp;
+      cp = cp % 100;
+    }
+    if (sp >= 100){
+      const addGp = Math.floor(sp / 100);
+      gp += addGp;
+      sp = sp % 100;
+    }
+    return { gp, sp, cp };
+  }
+
   function fmtCoins(v){
-    const gp = Number(v?.gp)||0, sp = Number(v?.sp)||0, cp = Number(v?.cp)||0;
+    const n = normalizeCoins(v);
+    const gp = Number(n?.gp)||0, sp = Number(n?.sp)||0, cp = Number(n?.cp)||0;
     const parts = [];
     if (gp) parts.push(`<span class="gp">${gp}gp</span>`);
     if (sp) parts.push(`<span class="sp">${sp}sp</span>`);
@@ -1531,11 +1592,11 @@
   }
 
   function addCoins(a,b){
-    return {
+    return normalizeCoins({
       gp: (Number(a?.gp)||0) + (Number(b?.gp)||0),
       sp: (Number(a?.sp)||0) + (Number(b?.sp)||0),
       cp: (Number(a?.cp)||0) + (Number(b?.cp)||0),
-    };
+    });
   }
 
   function effectCfg(effectName){
@@ -1594,7 +1655,6 @@
   }
 
   function bagKeyFor(item){
-    // stable key for stacking by exact roll string and effects ordering
     const kind = item.kind;
     const rarityKey = item.rarityKey || "common";
     const effs = (item.effects || []).map(String);
@@ -1684,7 +1744,7 @@
 
     for (const key of keys){
       const it = BAG[key];
-      const kind = it.kind; // "potion" or "concentrate"
+      const kind = it.kind;
       const rarityKey = it.rarityKey || "common";
       const effs = Array.isArray(it.effects) ? it.effects : [];
       const qty = Number(it.qty)||0;
@@ -1694,6 +1754,13 @@
 
       const tile = document.createElement("div");
       tile.className = "bagTile";
+
+      if (kind === "potion" && it.mixed){
+        const badge = document.createElement("div");
+        badge.className = "bagBadge";
+        badge.textContent = "Mixed";
+        tile.appendChild(badge);
+      }
 
       const iconRow = document.createElement("div");
       iconRow.className = "bagIconRow";
@@ -1713,21 +1780,34 @@
 
       const lineEffect = document.createElement("div");
       lineEffect.className = "bagLineEffect";
-      lineEffect.textContent = effs.length ? firstEffect : "Unknown";
+      lineEffect.textContent = (kind === "concentrate")
+        ? `Concentrate of ${effs[0] || "Unknown"}`
+        : "Concoction";
 
       const lineRarity = document.createElement("div");
       lineRarity.className = "bagLineRarity " + rarityCssClass(rarityKey);
       lineRarity.textContent = rarityDisplay(rarityKey);
 
-      const lineDice = document.createElement("div");
-      lineDice.className = "bagLineDice";
-      if (kind === "concentrate"){
-        lineDice.textContent = "—";
-      } else {
-        const diceBy = it.diceByEffect && typeof it.diceByEffect === "object" ? it.diceByEffect : {};
-        const diceStr = diceBy[firstEffect] || "—";
-        lineDice.textContent = diceStr;
-      }
+      const effectsList = document.createElement("div");
+      effectsList.className = "bagEffectsList";
+
+      const diceBy = (it.diceByEffect && typeof it.diceByEffect === "object") ? it.diceByEffect : {};
+      (effs.length ? effs : ["Unknown"]).forEach((effName) => {
+        const row = document.createElement("div");
+        row.className = "bagEffectRow";
+
+        const nm = document.createElement("span");
+        nm.className = "bagEffectName";
+        nm.textContent = effName;
+
+        const dc = document.createElement("span");
+        dc.className = "bagEffectDice";
+        dc.textContent = diceBy[effName] || "—";
+
+        row.appendChild(nm);
+        row.appendChild(dc);
+        effectsList.appendChild(row);
+      });
 
       const lineValue = document.createElement("div");
       lineValue.className = "bagLineValue";
@@ -1736,7 +1816,7 @@
       text.appendChild(lineType);
       text.appendChild(lineEffect);
       text.appendChild(lineRarity);
-      text.appendChild(lineDice);
+      text.appendChild(effectsList);
       text.appendChild(lineValue);
 
       const qtyRow = document.createElement("div");
@@ -1788,8 +1868,6 @@
       return;
     }
 
-    // Render as rows in the note box so it stays sized and doesn't affect layout
-    // We will render lightweight HTML as plain text-style block using innerHTML.
     const lines = concKeys.map((k) => {
       const it = BAG[k];
       const eff = (it.effects && it.effects[0]) ? it.effects[0] : "Unknown";
@@ -1798,7 +1876,6 @@
       return { k, eff, rk, qty };
     });
 
-    // Build DOM for +/- inside noteBox (still within current layout)
     box.innerHTML = "";
     for (const row of lines){
       const line = document.createElement("div");
@@ -2367,7 +2444,6 @@
   let overlayState = null;
 
   function openRollOverlay({ title, subtitle, effects, rarityKey, kind, onConfirm }){
-    // effects: array of { name, mode: "new" | "enhance", existingDice?: "2d4+5" }
     overlayState = { title, subtitle, effects, rarityKey, kind, onConfirm };
     el("rollTitle").textContent = title;
     el("rollSubtitle").textContent = subtitle;
@@ -2507,7 +2583,6 @@
 
     const shared = computeShared(ids);
 
-    // Always spend on success or fail attempts
     spend(ids);
     renderIndex();
     fillBrewChoices();
@@ -2532,17 +2607,14 @@
       return;
     }
 
-    // Concoction rarity = rarest ingredient used (highest rank)
     const maxR = maxRarityKey(ids.map(id => rarityKeyFromIngredient(ING_BY_ID[id]?.rarity)));
     const effects = shared.slice(0,3);
 
-    // compute values (sum of each effect value by rarity)
     let value = { gp:0, sp:0, cp:0 };
     for (const eff of effects){
       value = addCoins(value, getEffectValue(eff, maxR, "potion"));
     }
 
-    // Overlay: ask for bonus results per effect
     openRollOverlay({
       title: "Record Bonus Rolls",
       subtitle: "Roll the bonus dice for each effect, then enter the bonus result. It will be recorded as base+bonus.",
@@ -2633,7 +2705,6 @@
       return;
     }
 
-    // spend 4
     setQty(id, have - 4);
     renderIndex();
     fillBrewChoices();
@@ -2641,25 +2712,36 @@
     fillConcentrateChoices();
     updateDcDisplay();
 
-    // rarity from ingredient
     const rk = rarityKeyFromIngredient(ING_BY_ID[id]?.rarity);
-
-    // concentrate value: use concentrateValueByRarity if present, otherwise force fallback to valueByRarity
     const value = getEffectValue(eff, rk, "concentrate");
-
     const iconPath = getIconPath(eff, "concentrate");
-    bagAdd({
-      kind: "concentrate",
-      effects: [eff],
-      rarityKey: rk,
-      diceByEffect: {},
-      value,
-      iconPath,
-      mixed: false
-    }, 1);
 
-    playSfx("sfxSuccess");
-    toast("Concentrate made.", "good");
+    openRollOverlay({
+      title: "Record Concentrate Bonus Roll",
+      subtitle: "Roll the concentrate bonus dice, enter the bonus result. It will be recorded as base+bonus.",
+      effects: [{ name: eff, mode: "new" }],
+      rarityKey: rk,
+      kind: "concentrate",
+      onConfirm: (bonusNums) => {
+        const bonus = bonusNums[0];
+        const base = getBaseNote(eff, rk, "concentrate");
+        const diceByEffect = {};
+        diceByEffect[eff] = `${base}+${bonus}`;
+
+        bagAdd({
+          kind: "concentrate",
+          effects: [eff],
+          rarityKey: rk,
+          diceByEffect,
+          value,
+          iconPath,
+          mixed: false
+        }, 1);
+
+        playSfx("sfxSuccess");
+        toast("Concentrate made.", "good");
+      }
+    });
   }
 
   // Mixing
@@ -2673,10 +2755,14 @@
     const qty = Number(it.qty)||0;
 
     if (kind === "concentrate"){
-      return `Concentrate of ${first} (${rarityDisplay(rk)}) [${qty}]`;
+      const dice = (it.diceByEffect && it.diceByEffect[first]) ? it.diceByEffect[first] : "—";
+      return `Concentrate of ${first} ${dice} (${rarityDisplay(rk)}) [${qty}]`;
     }
-    const dice = (it.diceByEffect && it.diceByEffect[first]) ? it.diceByEffect[first] : "—";
-    return `Concoction of ${first} ${dice} (${rarityDisplay(rk)}) [${qty}]`;
+
+    const diceBy = (it.diceByEffect && typeof it.diceByEffect === "object") ? it.diceByEffect : {};
+    const pieces = (effs.length ? effs : ["Unknown"]).map(e => `${e} ${diceBy[e] || "—"}`);
+    const mixedTag = it.mixed ? " (Mixed)" : "";
+    return `Concoction${mixedTag}: ${pieces.join(" | ")} (${rarityDisplay(rk)}) [${qty}]`;
   }
 
   function fillMixChoices(){
@@ -2725,7 +2811,8 @@
       const dice = (it.diceByEffect && it.diceByEffect[first]) ? it.diceByEffect[first] : "—";
       diceLine = `<div class="muted" style="margin-top:6px;">${escapeHtml(dice)}</div>`;
     } else {
-      diceLine = `<div class="muted" style="margin-top:6px;">No roll recorded.</div>`;
+      const dice = (it.diceByEffect && it.diceByEffect[first]) ? it.diceByEffect[first] : "—";
+      diceLine = `<div class="muted" style="margin-top:6px;">${escapeHtml(dice)}</div>`;
     }
 
     box.innerHTML = `
@@ -2792,18 +2879,15 @@
       return;
     }
 
-    // Rule: concentrates cannot be mixed with each other
     if (A.kind === "concentrate" && B.kind === "concentrate"){
       toast("Concentrate + concentrate is not allowed.", "bad");
       el("mixCombineResult").innerHTML = `<div style="color:var(--warn); font-weight:950;">Concentrate + concentrate is not allowed.</div>`;
       return;
     }
 
-    // Rule: cannot mix potions that are already mixed
     if (A.kind === "potion" && A.mixed){ toast("That potion is already mixed.", "bad"); return; }
     if (B.kind === "potion" && B.mixed){ toast("That potion is already mixed.", "bad"); return; }
 
-    // Rule: do not allow mixing two potions of the same exact effects
     if (A.kind === "potion" && B.kind === "potion"){
       if (sameEffectSet(A.effects, B.effects)){
         toast("Cannot mix identical potions.", "bad");
@@ -2812,7 +2896,6 @@
       }
     }
 
-    // Always spend on success or fail
     if (!bagSpendKey(aKey) || !bagSpendKey(bKey)){
       toast("Not enough quantity.", "bad");
       return;
@@ -2832,12 +2915,10 @@
       return;
     }
 
-    // Determine resulting potion
     const potion = (A.kind === "potion") ? A : B;
     const other = (A.kind === "potion") ? B : A;
 
     if (!potion || potion.kind !== "potion"){
-      // If neither is a potion (should be impossible due to conc+conc check), treat as blocked
       toast("Need at least one potion.", "bad");
       return;
     }
@@ -2845,7 +2926,6 @@
     const baseEffects = Array.isArray(potion.effects) ? potion.effects.slice() : [];
     const otherEffects = Array.isArray(other.effects) ? other.effects.slice() : [];
 
-    // Union, cap 3
     const union = [];
     const seen = new Set();
     for (const e of baseEffects){ const k = normKey(e); if (!k) continue; if (!seen.has(k)){ seen.add(k); union.push(e); } }
@@ -2854,78 +2934,58 @@
     if (union.length > 3){
       toast("Cap is 3 effects.", "bad");
       el("mixCombineResult").innerHTML = `<div style="color:var(--warn); font-weight:950;">Result would exceed 3 effects.</div>`;
-      // Refund spends? honor system, but better to refund automatically:
-      // Add back 1 to each item key by re-adding spent items if possible.
-      // We can't restore exact keys if removed, but we can re-add minimal using cached data.
       bagAdd(A, 1);
       bagAdd(B, 1);
       return;
     }
 
-    // Rarity: max of the two
     const maxR = maxRarityKey([potion.rarityKey||"common", other.rarityKey||"common"]);
 
-    // Start with potion's dice and value
     const diceByEffect = { ...(potion.diceByEffect || {}) };
     let value = { ...(potion.value || {gp:0,sp:0,cp:0}) };
     value = addCoins(value, other.value || {gp:0,sp:0,cp:0});
 
-    // If other is potion: carry over its dice for its effects
-    // If other is concentrate: prompt roll overlay for new effect OR enhance if effect already exists
     if (other.kind === "potion"){
       const od = other.diceByEffect || {};
       for (const e of other.effects || []){
         if (!diceByEffect[e] && od[e]) diceByEffect[e] = od[e];
       }
-      // New mixed potion created, mark mixed = true
       finalizeMixedPotion(union, maxR, diceByEffect, value, false);
       return;
     }
 
-    // other is concentrate
+    // other is concentrate (NO POPUP, concentrate already has its roll)
     const concEff = (other.effects && other.effects[0]) ? other.effects[0] : "";
     if (!concEff){
       finalizeMixedPotion(union, maxR, diceByEffect, value, false);
       return;
     }
 
+    const effName = findCanonicalEffectName(union, concEff);
+    const concDice = (other.diceByEffect && other.diceByEffect[concEff]) ? other.diceByEffect[concEff] : "";
     const alreadyHas = baseEffects.some(e => normKey(e) === normKey(concEff));
-    const effectsNeedingInput = [];
 
     if (alreadyHas){
-      effectsNeedingInput.push({ name: findCanonicalEffectName(baseEffects, concEff), mode: "enhance", existingDice: diceByEffect[findCanonicalEffectName(baseEffects, concEff)] || "" });
+      const cur = diceByEffect[effName] || "";
+      const parsedCur = parseDicePlus(cur);
+      const parsedConc = parseDicePlus(concDice);
+
+      const baseKeep = parsedCur.base || parsedConc.base || getBaseNote(effName, maxR, "potion");
+      const addBonus = parsedConc.bonus || 0;
+      const newBonus = (parsedCur.bonus || 0) + addBonus;
+
+      diceByEffect[effName] = `${baseKeep}+${newBonus}`;
     } else {
-      effectsNeedingInput.push({ name: concEff, mode: "new" });
+      if (concDice){
+        diceByEffect[effName] = concDice;
+      } else {
+        const base = getBaseNote(effName, maxR, "concentrate");
+        diceByEffect[effName] = `${base}+0`;
+      }
     }
 
-    openRollOverlay({
-      title: "Record Bonus Roll",
-      subtitle: "Roll the concentrate bonus dice, enter the bonus result. It will be recorded as base+bonus (or added to the existing bonus).",
-      effects: effectsNeedingInput,
-      rarityKey: maxR,
-      kind: "concentrate",
-      onConfirm: (nums) => {
-        const bonus = nums[0];
-
-        const effName = effectsNeedingInput[0].name;
-        const base = getBaseNote(effName, maxR, "concentrate");
-        const addValue = getEffectValue(effName, maxR, "concentrate");
-        value = addCoins(value, addValue);
-
-        if (alreadyHas){
-          // enhance existing dice string by adding to bonus number
-          const cur = diceByEffect[effName] || `${base}+0`;
-          const parsed = parseDicePlus(cur);
-          const newBonus = (parsed.bonus || 0) + bonus;
-          diceByEffect[effName] = `${parsed.base || base}+${newBonus}`;
-        } else {
-          diceByEffect[effName] = `${base}+${bonus}`;
-        }
-
-        playSfx("sfxSuccess");
-        finalizeMixedPotion(union, maxR, diceByEffect, value, true);
-      }
-    });
+    playSfx("sfxSuccess");
+    finalizeMixedPotion(union, maxR, diceByEffect, value, true);
   }
 
   function parseDicePlus(s){
@@ -2988,18 +3048,20 @@
   });
 
   el("openBagBtn").addEventListener("click", () => {
+    playSfx("sfxBagOpen");
     showOnly("bag");
     renderBag();
   });
 
   el("openMixBtn").addEventListener("click", () => {
+    playSfx("sfxWindUp");
     showOnly("mix");
     fillMixChoices();
     enforceDistinctMixItems();
   });
 
   el("closeBookBtn").addEventListener("click", () => {
-    playSfx("sfxPage");
+    playSfx("sfxBookClose");
     showOnly("main");
   });
 
@@ -3097,7 +3159,7 @@
     if (!confirm("Burn all notes on this device?")) return;
     REVEALS = {};
     INDEX = {};
-    RECIPES = {};
+    RECIPES = [];
     BAG = {};
     saveLocal();
     renderIndex();

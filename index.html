@@ -364,7 +364,7 @@
     .pageInner::-webkit-scrollbar-track{ background: transparent; }
     .pageInner::-webkit-scrollbar-thumb{ background: rgba(0,0,0,0.2); border-radius: 2px; }
 
-    /* Right page: shift left (ONLY affects How-To + Known Recipes pages) */
+    /* Right page: shift left (ONLY affects right pages) */
     .pageRight{
       justify-content: center;
       align-items: flex-start;
@@ -379,27 +379,14 @@
       transform: translateX(calc(-1 * var(--right-page-shift)));
     }
 
-    /* Make right-page content stack vertically, then let the note box grow down */
-.pageRight .pageInner{
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
+    /* Make right-page content stack vertically */
+    .pageRight .pageInner{
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
 
-/* Let right-page note boxes extend downward instead of being capped */
-.pageRight .noteBox{
-  flex: 1 1 auto;
-  max-height: none;           /* overrides the global 200px cap */
-  min-height: 360px;          /* tweak this if you want */
-}
-
-/* Override the inline max-height on the Known Recipes box */
-.pageRight #recipesList.noteBox{
-  max-height: none !important;
-}
-
-
-    /* NEW: shrink ONLY the right-page text boxes (How-To + Known Recipes) */
+    /* NEW: shrink ONLY the right-page note boxes */
     .pageRight .noteBox{
       width: var(--right-notebox-width);
       margin-left: 0;
@@ -606,6 +593,40 @@
       box-shadow:none;
       border: 1px solid rgba(0,0,0,0.22);
       white-space: nowrap;
+    }
+
+    /* Concentrates UI (right page of Index spread) */
+    .concControls{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .concControls select{
+      flex: 1 1 160px;
+      min-width: 140px;
+    }
+    .concControls button{
+      flex: 0 0 auto;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+    .concRow{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items:center;
+      padding: 7px 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.22);
+      background: rgba(255,255,255,0.00);
+      margin: 0 0 6px 0;
+    }
+    .concLabel{
+      font-weight: 950;
+      font-size: 12.5px;
+      opacity: 0.9;
     }
 
     /* Brewing UI */
@@ -893,19 +914,26 @@
 
           <div class="page pageRight">
             <div class="pageInner">
-              <h2>How to Make Concoctions</h2>
-              <div class="noteBox">
-Brewing
+              <h2>Concentrates</h2>
+              <div class="muted">Spend 3 of an ingredient to bottle a revealed property.</div>
+              <div class="hr" style="width:100%;"></div>
 
-Choose two ingredients (or three, if your method allows). If they share a nature, a concoction is born.
+              <div class="noteBox" style="max-height: 320px;">
+                <div style="font-weight:950; margin-bottom:6px;">Craft</div>
+                <div class="concControls">
+                  <select id="concBaseSelect" aria-label="Choose ingredient"></select>
+                  <select id="concEffectSelect" aria-label="Choose property"></select>
+                  <button class="btn-primary" id="concCraftBtn" type="button">Concentrate (Spend 3)</button>
+                </div>
 
-Checks
+                <div class="hr" style="width:100%; margin: 10px 0;"></div>
 
-Use the rules your table follows. Write the DC here as a quick reminder.
+                <div style="font-weight:950; margin-bottom:6px;">Inventory</div>
+                <div id="concList"></div>
+              </div>
 
-• Roll your check.
-• If you succeed, compare properties and note what you learn.
-• If you fail, the mixture may still consume ingredients.
+              <div class="muted" style="margin-top:8px;">
+                Concentrates are tracked here for now. Brewing support can be added later.
               </div>
             </div>
           </div>
@@ -1040,6 +1068,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
   let REVEALS = LOCAL.reveals;
   let INDEX = LOCAL.index;
   let RECIPES = LOCAL.recipes;
+  let CONCENTRATES = LOCAL.concentrates;
 
   let ING_BY_ID = {};
   let currentIngredientId = null;
@@ -1059,26 +1088,35 @@ Use the rules your table follows. Write the DC here as a quick reminder.
   }
 
   function saveLocal() {
-    LOCAL = { reveals: REVEALS, index: INDEX, recipes: RECIPES };
+    LOCAL = { reveals: REVEALS, index: INDEX, recipes: RECIPES, concentrates: CONCENTRATES };
     localStorage.setItem(LOCAL_KEY, JSON.stringify(LOCAL));
   }
 
   function loadLocal() {
     const raw = localStorage.getItem(LOCAL_KEY);
-    if (!raw) return { reveals: {}, index: {}, recipes: [] };
+    if (!raw) return { reveals: {}, index: {}, recipes: [], concentrates: {} };
     try {
       const parsed = JSON.parse(raw);
       const reveals = (parsed && typeof parsed.reveals === "object" && parsed.reveals) ? parsed.reveals : {};
       const index = (parsed && typeof parsed.index === "object" && parsed.index) ? parsed.index : {};
       const recipes = Array.isArray(parsed?.recipes) ? parsed.recipes : [];
+      const concentrates = (parsed && typeof parsed.concentrates === "object" && parsed.concentrates) ? parsed.concentrates : {};
+
       const cleanIndex = {};
       for (const [k,v] of Object.entries(index)) {
         const n = Number(v);
         if (Number.isFinite(n) && n >= 0) cleanIndex[String(k)] = Math.floor(n);
       }
-      return { reveals, index: cleanIndex, recipes };
+
+      const cleanConcs = {};
+      for (const [k,v] of Object.entries(concentrates)) {
+        const n = Number(v);
+        if (Number.isFinite(n) && n >= 0) cleanConcs[String(k)] = Math.floor(n);
+      }
+
+      return { reveals, index: cleanIndex, recipes, concentrates: cleanConcs };
     } catch {
-      return { reveals: {}, index: {}, recipes: [] };
+      return { reveals: {}, index: {}, recipes: [], concentrates: {} };
     }
   }
 
@@ -1184,6 +1222,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
       renderIndex();
       fillBrewChoices();
       renderBrewDiscovered();
+      renderConcentratesPanel();
       el("bookStatus").textContent = "Ready.";
       el("brewStatus").textContent = "Choose your ingredients.";
       toast("Notes updated.", "good");
@@ -1218,6 +1257,209 @@ Use the rules your table follows. Write the DC here as a quick reminder.
     saveLocal();
   }
 
+  /* Concentrates */
+  function concKey(idStr, effectText) {
+    const cleanId = String(idStr);
+    const eff = String(effectText || "").trim();
+    return `c:${cleanId}:${encodeURIComponent(eff)}`;
+  }
+
+  function parseConcKey(key) {
+    const s = String(key || "");
+    if (!s.startsWith("c:")) return null;
+    const parts = s.split(":");
+    if (parts.length < 3) return null;
+    const idStr = parts[1];
+    const effEnc = parts.slice(2).join(":");
+    const effect = decodeURIComponent(effEnc || "");
+    return { idStr, effect };
+  }
+
+  function setConcQty(key, qty) {
+    const q = Math.max(0, Math.floor(Number(qty) || 0));
+    if (q <= 0) {
+      delete CONCENTRATES[String(key)];
+    } else {
+      CONCENTRATES[String(key)] = q;
+    }
+    saveLocal();
+  }
+
+  function revealedEffectsForIngredient(idStr) {
+    const row = ING_BY_ID[idStr];
+    if (!row) return [];
+    const effs = [row.effect_1,row.effect_2,row.effect_3,row.effect_4].map(v => (v ? String(v).trim() : ""));
+    const revealed = REVEALS[idStr] || [false,false,false,false];
+    const out = [];
+    for (let i = 0; i < 4; i++) {
+      if (revealed[i] && effs[i]) out.push(effs[i]);
+    }
+    return out;
+  }
+
+  function craftableIngredientIds() {
+    const ids = Object.keys(INDEX).filter(id => ING_BY_ID[id] && (Number(INDEX[id]) || 0) >= 3);
+    const craftable = [];
+    for (const idStr of ids) {
+      const effects = revealedEffectsForIngredient(idStr);
+      if (effects.length) craftable.push(String(idStr));
+    }
+    craftable.sort((a,b) => Number(a) - Number(b));
+    return craftable;
+  }
+
+  function fillConcentrateCraftChoices() {
+    const baseSel = el("concBaseSelect");
+    const effSel = el("concEffectSelect");
+    const craftBtn = el("concCraftBtn");
+    if (!baseSel || !effSel || !craftBtn) return;
+
+    const craftable = craftableIngredientIds();
+
+    if (!craftable.length) {
+      baseSel.innerHTML = `<option value="">No craftable ingredients</option>`;
+      effSel.innerHTML = `<option value="">No revealed properties</option>`;
+      craftBtn.disabled = true;
+      return;
+    }
+
+    const prevBase = baseSel.value;
+    baseSel.innerHTML = craftable.map(idStr => {
+      const name = ING_BY_ID[idStr]?.name || "Unknown";
+      const qty = Number(INDEX[idStr]) || 0;
+      return `<option value="${escapeHtml(idStr)}">${escapeHtml(name)} (${qty})</option>`;
+    }).join("");
+
+    baseSel.value = craftable.includes(prevBase) ? prevBase : craftable[0];
+
+    const effects = revealedEffectsForIngredient(baseSel.value);
+    const prevEff = effSel.value;
+
+    if (!effects.length) {
+      effSel.innerHTML = `<option value="">No revealed properties</option>`;
+      craftBtn.disabled = true;
+      return;
+    }
+
+    effSel.innerHTML = effects.map(e => `<option value="${escapeHtml(e)}">${escapeHtml(e)}</option>`).join("");
+    effSel.value = effects.includes(prevEff) ? prevEff : effects[0];
+
+    craftBtn.disabled = false;
+  }
+
+  function renderConcentratesPanel() {
+    const list = el("concList");
+    if (!list) return;
+
+    fillConcentrateCraftChoices();
+
+    const entries = Object.entries(CONCENTRATES || {})
+      .map(([k,v]) => ({ key: k, qty: Number(v) || 0, meta: parseConcKey(k) }))
+      .filter(x => x.qty > 0 && x.meta && x.meta.effect);
+
+    if (!entries.length) {
+      list.innerHTML = `<div class="muted">No concentrates yet.</div>`;
+      return;
+    }
+
+    entries.sort((a,b) => {
+      const ea = a.meta.effect.toLowerCase();
+      const eb = b.meta.effect.toLowerCase();
+      if (ea < eb) return -1;
+      if (ea > eb) return 1;
+      return Number(a.meta.idStr) - Number(b.meta.idStr);
+    });
+
+    list.innerHTML = "";
+    for (const e of entries) {
+      const row = document.createElement("div");
+      row.className = "concRow";
+
+      const label = document.createElement("div");
+      label.className = "concLabel";
+      label.textContent = `Concentrate of ${e.meta.effect}`;
+
+      const right = document.createElement("div");
+      right.className = "inventoryBox";
+
+      const minus = document.createElement("button");
+      minus.type = "button";
+      minus.className = "qtyBtn";
+      minus.textContent = "−";
+      minus.addEventListener("click", () => {
+        setConcQty(e.key, e.qty - 1);
+        renderConcentratesPanel();
+      });
+
+      const count = document.createElement("div");
+      count.className = "count";
+      count.textContent = String(e.qty);
+
+      const plus = document.createElement("button");
+      plus.type = "button";
+      plus.className = "qtyBtn";
+      plus.textContent = "+";
+      plus.addEventListener("click", () => {
+        setConcQty(e.key, e.qty + 1);
+        renderConcentratesPanel();
+      });
+
+      right.appendChild(minus);
+      right.appendChild(count);
+      right.appendChild(plus);
+
+      row.appendChild(label);
+      row.appendChild(right);
+      list.appendChild(row);
+    }
+  }
+
+  function craftConcentrate() {
+    const baseSel = el("concBaseSelect");
+    const effSel = el("concEffectSelect");
+    if (!baseSel || !effSel) return;
+
+    const idStr = String(baseSel.value || "");
+    const effect = String(effSel.value || "").trim();
+    if (!idStr || !effect) {
+      toast("Choose an ingredient and a property.", "bad");
+      return;
+    }
+
+    const qty = Number(INDEX[idStr]) || 0;
+    if (qty < 3) {
+      toast("Not enough of that ingredient.", "bad");
+      fillConcentrateCraftChoices();
+      renderIndex();
+      fillBrewChoices();
+      renderBrewDiscovered();
+      renderConcentratesPanel();
+      return;
+    }
+
+    const revealed = revealedEffectsForIngredient(idStr);
+    if (!revealed.includes(effect)) {
+      toast("That property is not revealed.", "bad");
+      fillConcentrateCraftChoices();
+      return;
+    }
+
+    setQty(idStr, qty - 3);
+
+    const key = concKey(idStr, effect);
+    const haveConc = Number(CONCENTRATES[key]) || 0;
+    CONCENTRATES[key] = haveConc + 1;
+
+    saveLocal();
+
+    renderIndex();
+    fillBrewChoices();
+    renderBrewDiscovered();
+    renderConcentratesPanel();
+
+    toast("Concentrate bottled.", "good");
+  }
+
   function renderIndex() {
     const wrap = el("indexList");
     wrap.innerHTML = "";
@@ -1228,6 +1470,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
       d.className = "muted";
       d.textContent = "No entries yet.";
       wrap.appendChild(d);
+      renderConcentratesPanel();
       return;
     }
 
@@ -1262,6 +1505,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
         renderIndex();
         fillBrewChoices();
         renderBrewDiscovered();
+        renderConcentratesPanel();
       });
 
       const count = document.createElement("div");
@@ -1277,6 +1521,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
         renderIndex();
         fillBrewChoices();
         renderBrewDiscovered();
+        renderConcentratesPanel();
       });
 
       right.appendChild(minus);
@@ -1287,6 +1532,8 @@ Use the rules your table follows. Write the DC here as a quick reminder.
       line.appendChild(right);
       wrap.appendChild(line);
     }
+
+    renderConcentratesPanel();
   }
 
   async function recordIngredientFromMark(mark) {
@@ -1302,6 +1549,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
       renderIndex();
       fillBrewChoices();
       renderBrewDiscovered();
+      renderConcentratesPanel();
       toast("Recorded.", "good");
       el("markInput").value = "";
       return;
@@ -1322,6 +1570,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
       renderIndex();
       fillBrewChoices();
       renderBrewDiscovered();
+      renderConcentratesPanel();
       toast("Recorded.", "good");
       el("markInput").value = "";
       el("recordBtn").disabled = false;
@@ -1385,6 +1634,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
         REVEALS[idStr][idx] = true;
         saveLocal();
         renderIngredient(idStr);
+        renderConcentratesPanel();
         toast("Noted.", "good");
       });
 
@@ -1405,6 +1655,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
       REVEALS[idStr][pick] = true;
       saveLocal();
       renderIngredient(idStr);
+      renderConcentratesPanel();
       toast("Noted.", "good");
     };
 
@@ -1412,6 +1663,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
       REVEALS[idStr] = [false,false,false,false];
       saveLocal();
       renderIngredient(idStr);
+      renderConcentratesPanel();
       toast("Forgotten.", "bad");
     };
 
@@ -1660,6 +1912,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
     renderIndex();
     fillBrewChoices();
     enforceDistinctMixing();
+    renderConcentratesPanel();
 
     if (shared.length === 0) {
       el("mixResult").innerHTML = `
@@ -1684,7 +1937,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
   }
 
   function exportNotes() {
-    el("saveBox").value = JSON.stringify({ reveals: REVEALS, index: INDEX, recipes: RECIPES }, null, 2);
+    el("saveBox").value = JSON.stringify({ reveals: REVEALS, index: INDEX, recipes: RECIPES, concentrates: CONCENTRATES }, null, 2);
     toast("Copied to the box.", "good");
   }
 
@@ -1701,10 +1954,20 @@ Use the rules your table follows. Write the DC here as a quick reminder.
       }
       INDEX = clean;
       RECIPES = Array.isArray(parsed.recipes) ? parsed.recipes : [];
+
+      const concs = (parsed.concentrates && typeof parsed.concentrates === "object") ? parsed.concentrates : {};
+      const cleanConcs = {};
+      for (const [k,v] of Object.entries(concs)) {
+        const n = Number(v);
+        if (Number.isFinite(n) && n >= 0) cleanConcs[String(k)] = Math.floor(n);
+      }
+      CONCENTRATES = cleanConcs;
+
       saveLocal();
       renderIndex();
       fillBrewChoices();
       enforceDistinctMixing();
+      renderConcentratesPanel();
       toast("Restored.", "good");
     } catch {
       toast("Those notes do not make sense.", "bad");
@@ -1716,10 +1979,12 @@ Use the rules your table follows. Write the DC here as a quick reminder.
     REVEALS = {};
     INDEX = {};
     RECIPES = [];
+    CONCENTRATES = {};
     saveLocal();
     renderIndex();
     fillBrewChoices();
     enforceDistinctMixing();
+    renderConcentratesPanel();
     showOnly("main");
     toast("Ashes and silence.", "bad");
   }
@@ -1731,6 +1996,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
     showOnly("book");
     showBookSpread("index");
     renderIndex();
+    renderConcentratesPanel();
   });
 
   el("openBrewBtn").addEventListener("click", () => {
@@ -1749,6 +2015,7 @@ Use the rules your table follows. Write the DC here as a quick reminder.
     currentIngredientId = null;
     showBookSpread("index");
     renderIndex();
+    renderConcentratesPanel();
   });
 
   el("backFromBrewBtn").addEventListener("click", () => {
@@ -1782,6 +2049,15 @@ Use the rules your table follows. Write the DC here as a quick reminder.
   el("exportBtn").addEventListener("click", exportNotes);
   el("importBtn").addEventListener("click", importNotes);
   el("wipeBtn").addEventListener("click", burnAll);
+
+  /* Concentrates events */
+  el("concBaseSelect").addEventListener("change", () => {
+    fillConcentrateCraftChoices();
+  });
+  el("concEffectSelect").addEventListener("change", () => {
+    fillConcentrateCraftChoices();
+  });
+  el("concCraftBtn").addEventListener("click", craftConcentrate);
 
   setTheme("wilderness");
   showOnly("main");

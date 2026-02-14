@@ -53,6 +53,13 @@
       --right-notebox-width: 84%;
 
       --brew-maxw: 1000px;
+
+      /* Bag UI */
+      --bag-maxw: 1040px;
+
+      /* Trim/padding inside Backpack_UI.webp before placing tiles (tweak if needed) */
+      --bag-trim: 34px;
+      --bag-trim-mobile: 18px;
     }
 
     html, body {
@@ -163,6 +170,9 @@
     }
     @media (min-width: 860px){
       .main-grid{ grid-template-columns: 1fr 1fr; }
+    }
+    .panel-below{
+      margin-top: 12px;
     }
 
     .panel{
@@ -589,24 +599,6 @@
       white-space: nowrap;
     }
 
-    /* Concentrates inventory rows */
-    .concRow{
-      display:grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      align-items:center;
-      padding: 7px 8px;
-      border-radius: 12px;
-      border: 1px solid rgba(0,0,0,0.22);
-      background: rgba(255,255,255,0.00);
-      margin: 0 0 6px 0;
-    }
-    .concLabel{
-      font-weight: 950;
-      font-size: 12.5px;
-      opacity: 0.9;
-    }
-
     /* Brewing UI */
     .brewPage{
       max-width: var(--brew-maxw);
@@ -796,6 +788,112 @@
     @media (max-width: 480px){
       .title{ flex-direction: column; align-items: flex-start; }
     }
+
+    /* Bag view */
+    .bagPage{
+      max-width: var(--bag-maxw);
+      margin: 0 auto;
+      padding: 12px;
+      display:flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .bagFrame{
+      border-radius: 18px;
+      overflow:hidden;
+      border: 1px solid var(--scene-border);
+      background: rgba(0,0,0,0.15);
+      box-shadow: var(--shadow2);
+      position: relative;
+    }
+    .bagBgImg{
+      width:100%;
+      height: min(72vh, 740px);
+      min-height: 520px;
+      object-fit: contain;
+      display:block;
+      background: rgba(0,0,0,0.10);
+      user-select: none;
+      pointer-events: none;
+    }
+    .bagOverlay{
+      position:absolute;
+      inset: 0;
+      padding: var(--bag-trim);
+      display:flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+    @media (max-width: 760px){
+      .bagOverlay{
+        padding: var(--bag-trim-mobile);
+      }
+    }
+    .bagSlots{
+      width: 100%;
+      height: 100%;
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+      align-content: start;
+      overflow: auto;
+      padding: 8px;
+    }
+    .bagTile{
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,0.25);
+      background: rgba(255,255,255,0.10);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.18);
+      padding: 10px;
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+      backdrop-filter: blur(2px);
+    }
+    .bagTileTop{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height: 86px;
+    }
+    .bagIcon{
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));
+      user-select: none;
+      pointer-events: none;
+    }
+    .bagLabel{
+      font-weight: 950;
+      color: rgba(245,248,255,0.95);
+      text-shadow: 0 1px 0 rgba(0,0,0,0.45);
+      font-size: 12px;
+      line-height: 1.15;
+      text-align:center;
+      word-break: break-word;
+      min-height: 32px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .bagQtyRow{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 6px;
+      flex-wrap: nowrap;
+    }
+    .bagQtyRow .count{
+      border-color: rgba(255,255,255,0.18);
+      color: #f2f6ff;
+      background: rgba(0,0,0,0.12);
+    }
+    .bagQtyRow .qtyBtn{
+      border-color: rgba(255,255,255,0.18);
+      color: #f2f6ff;
+      background: rgba(0,0,0,0.14);
+    }
   </style>
 </head>
 
@@ -830,6 +928,15 @@
           </button>
         </div>
       </div>
+
+      <!-- Bag panel below -->
+      <div class="panel panel-below" title="Bag">
+        <button class="overlayBtn" id="openBagBtn" aria-label="Open bag">
+          <img class="coverArt" src="assets/ui/Backpack.webp" alt="Backpack" />
+          <div class="hint">Bag</div>
+        </button>
+      </div>
+
       <div class="muted" style="margin-top:12px;">
         Your discoveries stay on this device.
       </div>
@@ -907,9 +1014,7 @@
               <h2>Concentrates</h2>
               <div class="muted">Your bottled effects, tracked here.</div>
               <div class="hr" style="width:100%;"></div>
-
               <div id="concList" class="noteBox" style="max-height: 320px;"></div>
-
               <div class="muted" style="margin-top:8px;">
                 Brew concentrates from the Brewing screen.
               </div>
@@ -1026,13 +1131,37 @@
                 <select id="concEffectSelect" aria-label="Choose property"></select>
                 <button class="btn-primary" id="concCraftBtn" type="button">Concentrate (Spend 3)</button>
               </div>
-              <div class="muted" style="margin-top:8px;">Result appears in the Field Notes concentrates inventory.</div>
+              <div class="muted" style="margin-top:8px;">Result appears in the Field Notes concentrates inventory, and in the Bag.</div>
             </div>
           </div>
 
           <div class="muted" style="margin-top:10px;">
             Brewing draws from your Inventory. If you lack an ingredient, the attempt is refused.
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BAG -->
+    <section id="viewBag" class="scene hidden">
+      <div class="sceneTopBar">
+        <button class="backBtn" id="backFromBagBtn" type="button" aria-label="Back to main">
+          <img src="assets/icons/arrow_back.webp" alt="" />
+          Back
+        </button>
+        <div class="muted" id="bagStatus">Your bag.</div>
+      </div>
+
+      <div class="bagPage">
+        <div class="bagFrame">
+          <img class="bagBgImg" src="assets/ui/Backpack_UI.webp" alt="Bag UI" />
+          <div class="bagOverlay" aria-label="Bag slots overlay">
+            <div class="bagSlots" id="bagSlots"></div>
+          </div>
+        </div>
+
+        <div class="muted">
+          Honor system: adjust counts freely.
         </div>
       </div>
     </section>
@@ -1058,6 +1187,7 @@
   let INDEX = LOCAL.index;
   let RECIPES = LOCAL.recipes;
   let CONCENTRATES = LOCAL.concentrates;
+  let POTIONS = LOCAL.potions; // Bag inventory
 
   let ING_BY_ID = {};
   let currentIngredientId = null;
@@ -1067,6 +1197,7 @@
   const viewMain = document.getElementById("viewMain");
   const viewBook = document.getElementById("viewBook");
   const viewBrew = document.getElementById("viewBrew");
+  const viewBag = document.getElementById("viewBag");
   const spreadIndex = document.getElementById("spreadIndex");
   const spreadIngredient = document.getElementById("spreadIngredient");
 
@@ -1077,19 +1208,20 @@
   }
 
   function saveLocal() {
-    LOCAL = { reveals: REVEALS, index: INDEX, recipes: RECIPES, concentrates: CONCENTRATES };
+    LOCAL = { reveals: REVEALS, index: INDEX, recipes: RECIPES, concentrates: CONCENTRATES, potions: POTIONS };
     localStorage.setItem(LOCAL_KEY, JSON.stringify(LOCAL));
   }
 
   function loadLocal() {
     const raw = localStorage.getItem(LOCAL_KEY);
-    if (!raw) return { reveals: {}, index: {}, recipes: [], concentrates: {} };
+    if (!raw) return { reveals: {}, index: {}, recipes: [], concentrates: {}, potions: {} };
     try {
       const parsed = JSON.parse(raw);
       const reveals = (parsed && typeof parsed.reveals === "object" && parsed.reveals) ? parsed.reveals : {};
       const index = (parsed && typeof parsed.index === "object" && parsed.index) ? parsed.index : {};
       const recipes = Array.isArray(parsed?.recipes) ? parsed.recipes : [];
       const concentrates = (parsed && typeof parsed.concentrates === "object" && parsed.concentrates) ? parsed.concentrates : {};
+      const potions = (parsed && typeof parsed.potions === "object" && parsed.potions) ? parsed.potions : {};
 
       const cleanIndex = {};
       for (const [k,v] of Object.entries(index)) {
@@ -1103,9 +1235,15 @@
         if (Number.isFinite(n) && n >= 0) cleanConcs[String(k)] = Math.floor(n);
       }
 
-      return { reveals, index: cleanIndex, recipes, concentrates: cleanConcs };
+      const cleanPotions = {};
+      for (const [k,v] of Object.entries(potions)) {
+        const n = Number(v);
+        if (Number.isFinite(n) && n >= 0) cleanPotions[String(k)] = Math.floor(n);
+      }
+
+      return { reveals, index: cleanIndex, recipes, concentrates: cleanConcs, potions: cleanPotions };
     } catch {
-      return { reveals: {}, index: {}, recipes: [], concentrates: {} };
+      return { reveals: {}, index: {}, recipes: [], concentrates: {}, potions: {} };
     }
   }
 
@@ -1131,9 +1269,12 @@
     viewMain.classList.add("hidden");
     viewBook.classList.add("hidden");
     viewBrew.classList.add("hidden");
+    viewBag.classList.add("hidden");
+
     if (which === "main") viewMain.classList.remove("hidden");
     if (which === "book") viewBook.classList.remove("hidden");
     if (which === "brew") viewBrew.classList.remove("hidden");
+    if (which === "bag") viewBag.classList.remove("hidden");
   }
 
   function showBookSpread(which) {
@@ -1190,6 +1331,7 @@
 
     el("bookStatus").textContent = "Turning pages...";
     el("brewStatus").textContent = "Stirring embers...";
+    el("bagStatus").textContent = "Packing...";
 
     try {
       const res = await fetch(INGREDIENTS_ENDPOINT, { headers: headers() });
@@ -1213,13 +1355,16 @@
       renderBrewDiscovered();
       renderConcentratesInventory();
       fillConcentrateCraftChoices();
+      renderBag();
 
       el("bookStatus").textContent = "Ready.";
       el("brewStatus").textContent = "Choose your ingredients.";
+      el("bagStatus").textContent = "Your bag.";
       toast("Notes updated.", "good");
     } catch (e) {
       el("bookStatus").textContent = "Could not update.";
       el("brewStatus").textContent = "Could not update.";
+      el("bagStatus").textContent = "Could not update.";
       toast("The ink smudged. Try again.", "bad");
       console.error(e);
     } finally {
@@ -1248,7 +1393,9 @@
     saveLocal();
   }
 
-  /* Concentrates */
+  /* =========================
+     Concentrates inventory (book right page)
+     ========================= */
   function concKey(idStr, effectText) {
     const cleanId = String(idStr);
     const eff = String(effectText || "").trim();
@@ -1362,10 +1509,13 @@
     list.innerHTML = "";
     for (const e of entries) {
       const row = document.createElement("div");
-      row.className = "concRow";
+      row.className = "indexRow";
+      row.style.width = "100%";
 
       const label = document.createElement("div");
-      label.className = "concLabel";
+      label.style.fontWeight = "950";
+      label.style.fontSize = "12.5px";
+      label.style.opacity = "0.9";
       label.textContent = `Concentrate of ${e.meta.effect}`;
 
       const right = document.createElement("div");
@@ -1403,6 +1553,147 @@
     }
   }
 
+  /* =========================
+     Bag inventory (potions)
+     ========================= */
+  function potionKey(type, effectsArr) {
+    const t = String(type || "").trim().toLowerCase();
+    const effects = (Array.isArray(effectsArr) ? effectsArr : [])
+      .map(x => String(x || "").trim())
+      .filter(Boolean)
+      .sort((a,b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+    return `p:${encodeURIComponent(t)}:${encodeURIComponent(effects.join("|"))}`;
+  }
+
+  function parsePotionKey(key) {
+    const s = String(key || "");
+    if (!s.startsWith("p:")) return null;
+    const parts = s.split(":");
+    if (parts.length < 3) return null;
+    const type = decodeURIComponent(parts[1] || "");
+    const effectsJoined = decodeURIComponent(parts.slice(2).join(":") || "");
+    const effects = effectsJoined ? effectsJoined.split("|").filter(Boolean) : [];
+    return { type, effects };
+  }
+
+  function potionLabel(meta) {
+    const type = (meta?.type || "").toLowerCase();
+    const effects = Array.isArray(meta?.effects) ? meta.effects : [];
+    const effText = effects.length ? effects.join(", ") : "Unknown";
+    if (type === "concentrate") return `Concentrate of ${effText}`;
+    return `Concoction of ${effText}`;
+  }
+
+  function potionIconPath(meta) {
+    const type = (meta?.type || "").toLowerCase();
+    if (type === "concentrate") return "assets/icons/Generic_Concentrate.webp";
+    return "assets/icons/Generic_Potion.webp";
+  }
+
+  function setPotionQty(key, qty) {
+    const q = Math.max(0, Math.floor(Number(qty) || 0));
+    if (q <= 0) {
+      delete POTIONS[String(key)];
+    } else {
+      POTIONS[String(key)] = q;
+    }
+    saveLocal();
+  }
+
+  function addPotion(type, effectsArr, amount = 1) {
+    const key = potionKey(type, effectsArr);
+    const have = Number(POTIONS[key]) || 0;
+    POTIONS[key] = Math.max(0, have + (Number(amount) || 0));
+    saveLocal();
+    renderBag();
+  }
+
+  function renderBag() {
+    const wrap = el("bagSlots");
+    if (!wrap) return;
+
+    const entries = Object.entries(POTIONS || {})
+      .map(([k,v]) => ({ key: k, qty: Number(v) || 0, meta: parsePotionKey(k) }))
+      .filter(x => x.qty > 0 && x.meta);
+
+    if (!entries.length) {
+      wrap.innerHTML = `
+        <div class="muted" style="grid-column: 1 / -1; padding: 10px;">
+          Your bag is empty.
+        </div>
+      `;
+      return;
+    }
+
+    // Sort: concoctions first, then concentrates, then by label
+    const typeRank = (t) => (String(t || "").toLowerCase() === "concentrate" ? 1 : 0);
+    entries.sort((a,b) => {
+      const ra = typeRank(a.meta.type), rb = typeRank(b.meta.type);
+      if (ra !== rb) return ra - rb;
+      const la = potionLabel(a.meta).toLowerCase();
+      const lb = potionLabel(b.meta).toLowerCase();
+      if (la < lb) return -1;
+      if (la > lb) return 1;
+      return 0;
+    });
+
+    wrap.innerHTML = "";
+    for (const e of entries) {
+      const tile = document.createElement("div");
+      tile.className = "bagTile";
+
+      const top = document.createElement("div");
+      top.className = "bagTileTop";
+
+      const img = document.createElement("img");
+      img.className = "bagIcon";
+      img.src = potionIconPath(e.meta) + "?t=" + Date.now();
+      img.alt = "Potion";
+      img.onerror = () => { img.src = placeholderImageDataUri("Potion"); };
+
+      top.appendChild(img);
+
+      const label = document.createElement("div");
+      label.className = "bagLabel";
+      label.textContent = potionLabel(e.meta);
+
+      const qtyRow = document.createElement("div");
+      qtyRow.className = "bagQtyRow";
+
+      const minus = document.createElement("button");
+      minus.type = "button";
+      minus.className = "qtyBtn";
+      minus.textContent = "−";
+      minus.addEventListener("click", () => {
+        setPotionQty(e.key, e.qty - 1);
+        renderBag();
+      });
+
+      const count = document.createElement("div");
+      count.className = "count";
+      count.textContent = String(e.qty);
+
+      const plus = document.createElement("button");
+      plus.type = "button";
+      plus.className = "qtyBtn";
+      plus.textContent = "+";
+      plus.addEventListener("click", () => {
+        setPotionQty(e.key, e.qty + 1);
+        renderBag();
+      });
+
+      qtyRow.appendChild(minus);
+      qtyRow.appendChild(count);
+      qtyRow.appendChild(plus);
+
+      tile.appendChild(top);
+      tile.appendChild(label);
+      tile.appendChild(qtyRow);
+
+      wrap.appendChild(tile);
+    }
+  }
+
   function craftConcentrate() {
     const baseSel = el("concBaseSelect");
     const effSel = el("concEffectSelect");
@@ -1433,6 +1724,7 @@
       return;
     }
 
+    // Spend 3, gain 1 concentrate
     setQty(idStr, qty - 3);
 
     const key = concKey(idStr, effect);
@@ -1440,6 +1732,9 @@
     CONCENTRATES[key] = haveConc + 1;
 
     saveLocal();
+
+    // Add to bag
+    addPotion("concentrate", [effect], 1);
 
     renderIndex();
     fillBrewChoices();
@@ -1919,6 +2214,9 @@
     revealSharedAutomatically(ids, shared);
     recordRecipe(ids, shared);
 
+    // Add to bag: 1 concoction per successful brew
+    addPotion("concoction", shared, 1);
+
     playSfx("sfxSuccess");
 
     const effectText = shared.join(", ");
@@ -1930,7 +2228,11 @@
   }
 
   function exportNotes() {
-    el("saveBox").value = JSON.stringify({ reveals: REVEALS, index: INDEX, recipes: RECIPES, concentrates: CONCENTRATES }, null, 2);
+    el("saveBox").value = JSON.stringify(
+      { reveals: REVEALS, index: INDEX, recipes: RECIPES, concentrates: CONCENTRATES, potions: POTIONS },
+      null,
+      2
+    );
     toast("Copied to the box.", "good");
   }
 
@@ -1939,6 +2241,7 @@
       const parsed = JSON.parse(el("saveBox").value);
       if (!parsed || typeof parsed !== "object") throw new Error("bad");
       REVEALS = (parsed.reveals && typeof parsed.reveals === "object") ? parsed.reveals : {};
+
       const idx = (parsed.index && typeof parsed.index === "object") ? parsed.index : {};
       const clean = {};
       for (const [k,v] of Object.entries(idx)) {
@@ -1946,6 +2249,7 @@
         if (Number.isFinite(n) && n >= 0) clean[String(k)] = Math.floor(n);
       }
       INDEX = clean;
+
       RECIPES = Array.isArray(parsed.recipes) ? parsed.recipes : [];
 
       const concs = (parsed.concentrates && typeof parsed.concentrates === "object") ? parsed.concentrates : {};
@@ -1956,12 +2260,21 @@
       }
       CONCENTRATES = cleanConcs;
 
+      const pots = (parsed.potions && typeof parsed.potions === "object") ? parsed.potions : {};
+      const cleanPots = {};
+      for (const [k,v] of Object.entries(pots)) {
+        const n = Number(v);
+        if (Number.isFinite(n) && n >= 0) cleanPots[String(k)] = Math.floor(n);
+      }
+      POTIONS = cleanPots;
+
       saveLocal();
       renderIndex();
       fillBrewChoices();
       enforceDistinctMixing();
       renderConcentratesInventory();
       fillConcentrateCraftChoices();
+      renderBag();
       toast("Restored.", "good");
     } catch {
       toast("Those notes do not make sense.", "bad");
@@ -1974,16 +2287,19 @@
     INDEX = {};
     RECIPES = [];
     CONCENTRATES = {};
+    POTIONS = {};
     saveLocal();
     renderIndex();
     fillBrewChoices();
     enforceDistinctMixing();
     renderConcentratesInventory();
     fillConcentrateCraftChoices();
+    renderBag();
     showOnly("main");
     toast("Ashes and silence.", "bad");
   }
 
+  /* Events */
   el("refreshBtn").addEventListener("click", fetchAllIngredients);
 
   el("openBookBtn").addEventListener("click", () => {
@@ -2001,6 +2317,11 @@
     fillConcentrateCraftChoices();
   });
 
+  el("openBagBtn").addEventListener("click", () => {
+    showOnly("bag");
+    renderBag();
+  });
+
   el("closeBookBtn").addEventListener("click", () => {
     playSfx("sfxPage");
     showOnly("main");
@@ -2015,6 +2336,10 @@
   });
 
   el("backFromBrewBtn").addEventListener("click", () => {
+    showOnly("main");
+  });
+
+  el("backFromBagBtn").addEventListener("click", () => {
     showOnly("main");
   });
 
@@ -2046,7 +2371,6 @@
   el("importBtn").addEventListener("click", importNotes);
   el("wipeBtn").addEventListener("click", burnAll);
 
-  /* Concentrate crafting events (Brewing page) */
   el("concBaseSelect").addEventListener("change", fillConcentrateCraftChoices);
   el("concEffectSelect").addEventListener("change", fillConcentrateCraftChoices);
   el("concCraftBtn").addEventListener("click", craftConcentrate);

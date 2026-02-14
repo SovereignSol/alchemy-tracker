@@ -3116,51 +3116,24 @@
   showOnly("main");
   fetchAllIngredients();
 
-  // -----------------------------
+   // -----------------------------
   // EFFECT CONFIG (edit me)
-  // - Add new effects by copying the "Restore Health" block.
-  // - Keys are normalized with normKey(), so "Restore Health" and "restore health" match.
-  // - If an effect has no entry here (or a path is missing), the UI falls back to the generic icons.
   //
-  // Required paths you already have:
-  //   assets/icons/Generic_Potion.webp
-  //   assets/icons/Generic_Concentrate.webp
+  // ✅ ADD NEW EFFECT ENTRIES ONLY INSIDE THE `cfg = { ... }` OBJECT BELOW.
+  //    Copy an existing entry (like "Restore Health") and paste it as another sibling key.
   //
-  // IMPORTANT: concentrateValueByRarity is OPTIONAL.
-  // If it is missing, concentrates will use valueByRarity automatically.
+  // ❌ DO NOT add anything after the "DO NOT ADD BELOW THIS LINE" marker.
+  //    If you add entries below that point, the script can break and the whole app stops working.
   // -----------------------------
   const EFFECTS_CONFIG = (() => {
     const cfg = {
       "Restore Health": {
-        // Used when crafting a CONCOCTION for this effect
-        bonusDiceByRarity: {
-          common: "1d6",
-          uncommon: "1d8",
-          rare: "1d12",
-          legendary: "2d20"
-        },
-        baseNoteByRarity: {
-          common: "2d4",
-          uncommon: "2d4",
-          rare: "2d4",
-          legendary: "2d4"
-        },
+        bonusDiceByRarity: { common: "1d6", uncommon: "1d8", rare: "1d12", legendary: "2d20" },
+        baseNoteByRarity: { common: "2d4", uncommon: "2d4", rare: "2d4", legendary: "2d4" },
 
-        // Used when mixing in a CONCENTRATE for this effect
-        concentrateBonusDiceByRarity: {
-          common: "1d6",
-          uncommon: "1d8",
-          rare: "1d12",
-          legendary: "2d20"
-        },
-        concentrateBaseNoteByRarity: {
-          common: "2d4",
-          uncommon: "2d4",
-          rare: "2d4",
-          legendary: "2d4"
-        },
+        concentrateBonusDiceByRarity: { common: "2d6", uncommon: "2d8", rare: "2d12", legendary: "4d20" },
+        concentrateBaseNoteByRarity: { common: "4d4", uncommon: "4d4", rare: "4d4", legendary: "4d4" },
 
-        // Value for a CONCOCTION of this effect
         valueByRarity: {
           common:    { gp: 0, sp: 5,  cp: 0 },
           uncommon:  { gp: 1, sp: 0,  cp: 0 },
@@ -3168,61 +3141,40 @@
           legendary: { gp: 25, sp: 0, cp: 0 }
         },
 
-        // Optional: value for a CONCENTRATE of this effect.
-        // If omitted, concentrates will use valueByRarity automatically.
-        // concentrateValueByRarity: {
-        //   common:    { gp: 0, sp: 8,  cp: 0 },
-        //   uncommon:  { gp: 1, sp: 5,  cp: 0 },
-        //   rare:      { gp: 7, sp: 5,  cp: 0 },
-        //   legendary: { gp: 35, sp: 0,  cp: 0 }
-        // },
-
-        // Icon paths for bag entries
         potionIconPath: "assets/icons/Red_Potion.webp",
         concentrateIconPath: "assets/icons/Red_Concentrate.webp"
+      },
+
+      "Resist Shock": {
+        bonusDiceByRarity: { common: "1d6", uncommon: "1d8", rare: "1d12", legendary: "2d20" },
+        baseNoteByRarity: { common: "2d4", uncommon: "4d4", rare: "8d4", legendary: "10d4" },
+
+        concentrateBonusDiceByRarity: { common: "2d6", uncommon: "2d8", rare: "2d12", legendary: "4d20" },
+        concentrateBaseNoteByRarity: { common: "4d4", uncommon: "8d4", rare: "16d4", legendary: "20d4" },
+
+        valueByRarity: {
+          common:    { gp: 0, sp: 5,  cp: 0 },
+          uncommon:  { gp: 1, sp: 50, cp: 0 },
+          rare:      { gp: 5, sp: 0,  cp: 0 },
+          legendary: { gp: 50, sp: 0, cp: 0 }
+        },
+
+        potionIconPath: "assets/icons/Yellow_Resistance.webp",
+        concentrateIconPath: "assets/icons/Yellow_Concentrate.webp"
       }
+
+      // 👉 ADD NEW EFFECT ENTRIES ABOVE THIS LINE (inside cfg)
     };
 
-    "Resist Shock": {
-bonusDiceByRarity: {
-common: "1d6",
-uncommon: "1d8",
-rare: "1d12",
-legendary: "2d20"
-},
-baseNoteByRarity: {
-common: "2d4",
-uncommon: "4d4",
-rare: "8d4",
-legendary: "10d4"
-},
-concentrateBonusDiceByRarity: {
-common: "2d6",
-uncommon: "2d8",
-rare: "2d12",
-legendary: "4d20"
-},
-concentrateBaseNoteByRarity: {
-common: "4d4",
-uncommon: "8d4",
-rare: "16d4",
-legendary: "20d4"
-},
-valueByRarity: {
-common: { gp: 0, sp: 5, cp: 0 },
-uncommon: { gp: 1, sp: 50, cp: 0 },
-rare: { gp: 5, sp: 0, cp: 0 },
-legendary: { gp: 50, sp: 0, cp: 0 }
-},
-potionIconPath: "assets/icons/Yellow_Resistance.webp",
-concentrateIconPath: "assets/icons/Yellow_Concentrate.webp"
-},
-
-
+    // ============================
+    // ❌ DO NOT ADD ENTRIES BELOW THIS LINE
+    // Only code belongs down here, never new effect blocks.
+    // ============================
     const out = {};
-    for (const [k,v] of Object.entries(cfg)) out[normKey(k)] = v;
+    for (const [k, v] of Object.entries(cfg)) out[normKey(k)] = v;
     return out;
   })();
+
 </script>
 </body>
 </html>

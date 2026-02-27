@@ -3868,6 +3868,26 @@
 
         potionIconPath: "assets/icons/Yellow_Resistance.webp",
         concentrateIconPath: "assets/icons/Yellow_Concentrate.webp"
+      },
+
+      "Featherfall": {
+        // Suggested D&D use: For the duration, you fall slowly (as feather fall, self only).
+        // Duration = (Base + Bonus) minutes.
+        bonusDiceByRarity: { common: "1d6", uncommon: "1d8", rare: "1d12", legendary: "2d20" },
+        baseNoteByRarity:  { common: "2d4", uncommon: "4d4", rare: "6d4", legendary: "8d4" },
+
+        concentrateBonusDiceByRarity: { common: "2d6", uncommon: "2d8", rare: "2d12", legendary: "4d20" },
+        concentrateBaseNoteByRarity:  { common: "4d4", uncommon: "8d4", rare: "12d4", legendary: "16d4" },
+
+        valueByRarity: {
+          common:    { gp: 0, sp: 5,  cp: 0 },
+          uncommon:  { gp: 3, sp: 0,  cp: 0 },
+          rare:      { gp: 15, sp: 0, cp: 0 },
+          legendary: { gp: 75, sp: 0, cp: 0 }
+        },
+
+        potionIconPath: "assets/icons/Tan_Potion.webp",
+        concentrateIconPath: "assets/icons/Generic_Concentrate.webp"
       }
 
       // 👉 ADD NEW EFFECT ENTRIES ABOVE THIS LINE (inside cfg)
@@ -3885,4 +3905,3 @@
 </body>
 </html>
 """
-

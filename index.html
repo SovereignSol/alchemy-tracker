@@ -528,6 +528,15 @@
       line-height: 1.15;
       word-break: break-word;
     }
+    .effect-openable{
+      cursor: pointer;
+      border-style: solid;
+      border-color: rgba(0,0,0,0.34);
+      background: rgba(255,255,255,0.30);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .effect-openable:hover{ background: rgba(255,255,255,0.38); }
     .effect-hidden{
       color: transparent !important;
       -webkit-text-fill-color: transparent !important;
@@ -1130,6 +1139,11 @@
             <img src="assets/icons/arrow_back.webp" alt="" />
             Index
           </button>
+
+          <button class="backBtn hidden" id="backToIngredientTopBtn" type="button" aria-label="Back to Ingredient">
+            <img src="assets/icons/arrow_back.webp" alt="" />
+            Ingredient
+          </button>
         </div>
 
         <div class="muted" id="bookStatus">Ready.</div>
@@ -1244,6 +1258,28 @@
               <div class="muted">Field notes and observations.</div>
               <div class="hr" style="width:100%;"></div>
               <div id="ingNotes" class="noteBox" style="max-height: 520px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOOK: EFFECT SPREAD -->
+        <div class="bookPages hidden" id="spreadEffect">
+          <div class="page">
+            <div class="pageInner">
+              <div style="width:var(--line-width); margin: 0 auto;">
+                <h2 id="effectNameHeading" style="margin:0;">Effect</h2>
+              </div>
+              <div class="hr"></div>
+              <div class="leftCentered muted" style="text-align:center;">This note appears for revealed properties only.</div>
+            </div>
+          </div>
+
+          <div class="page pageRight">
+            <div class="pageInner">
+              <h2>Definition</h2>
+              <div class="muted">Effect behavior and ruling note.</div>
+              <div class="hr" style="width:100%;"></div>
+              <div id="effectRulesText" class="noteBox" style="max-height: 520px;"></div>
             </div>
           </div>
         </div>
@@ -1564,6 +1600,7 @@
 
   let ING_BY_ID = {};
   let currentIngredientId = null;
+  let currentEffectName = "";
   let theme = "wilderness";
   let isFetching = false;
 
@@ -1576,6 +1613,7 @@
 
   const spreadIndex = document.getElementById("spreadIndex");
   const spreadIngredient = document.getElementById("spreadIngredient");
+  const spreadEffect = document.getElementById("spreadEffect");
 
   const el = (id) => document.getElementById(id);
 
@@ -1693,9 +1731,12 @@
   function showBookSpread(which) {
     spreadIndex.classList.add("hidden");
     spreadIngredient.classList.add("hidden");
+    spreadEffect.classList.add("hidden");
     el("backToIndexTopBtn").classList.toggle("hidden", which !== "ingredient");
+    el("backToIngredientTopBtn").classList.toggle("hidden", which !== "effect");
     if (which === "index") spreadIndex.classList.remove("hidden");
     if (which === "ingredient") spreadIngredient.classList.remove("hidden");
+    if (which === "effect") spreadEffect.classList.remove("hidden");
   }
 
   // Stable public URLs (no timestamp query, so browser caching works)
@@ -1864,6 +1905,12 @@
     }
     const p = (kind === "concentrate") ? cfg.concentrateIconPath : cfg.potionIconPath;
     return p || (kind === "concentrate" ? GENERIC_CONC_ICON : GENERIC_POTION_ICON);
+  }
+
+  function getEffectDescription(effectName){
+    const cfg = effectCfg(effectName);
+    const txt = cfg && typeof cfg.description === "string" ? cfg.description.trim() : "";
+    return txt || "No effect notes written yet.";
   }
 
   // Bag key includes hex info so hexed and unhexed are distinct items
@@ -2414,8 +2461,23 @@
 
   function openIngredient(idStr) {
     currentIngredientId = idStr;
+    currentEffectName = "";
     showBookSpread("ingredient");
     renderIngredient(idStr);
+  }
+
+  function openEffectPage(effectName, fromIngredientId){
+    if (fromIngredientId) currentIngredientId = fromIngredientId;
+    currentEffectName = String(effectName || "").trim();
+    if (!currentEffectName) return;
+    showBookSpread("effect");
+    renderEffectPage(currentEffectName);
+  }
+
+  function renderEffectPage(effectName){
+    const name = String(effectName || "").trim() || "Unknown Effect";
+    el("effectNameHeading").textContent = name;
+    el("effectRulesText").textContent = getEffectDescription(name);
   }
 
   function renderIngredient(idStr) {
@@ -2458,6 +2520,19 @@
       text.className = "effect-text";
       text.textContent = eff || "(blank)";
       if (!revealed[idx]) text.classList.add("effect-hidden");
+      if (revealed[idx] && eff) {
+        text.classList.add("effect-openable");
+        text.title = "Open effect note";
+        text.setAttribute("role", "button");
+        text.tabIndex = 0;
+        text.addEventListener("click", () => openEffectPage(eff, idStr));
+        text.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            openEffectPage(eff, idStr);
+          }
+        });
+      }
 
       const btn = document.createElement("button");
       btn.className = "smallBtn";
@@ -3683,9 +3758,20 @@
   el("backToIndexTopBtn").addEventListener("click", () => {
     playSfx("sfxPage");
     currentIngredientId = null;
+    currentEffectName = "";
     showBookSpread("index");
     renderIndex();
     renderConcentratesRightPage();
+  });
+
+  el("backToIngredientTopBtn").addEventListener("click", () => {
+    playSfx("sfxPage");
+    if (!currentIngredientId) {
+      showBookSpread("index");
+      return;
+    }
+    showBookSpread("ingredient");
+    renderIngredient(currentIngredientId);
   });
 
   el("backFromBrewBtn").addEventListener("click", () => { showOnly("main"); });
@@ -3835,6 +3921,7 @@
   const EFFECTS_CONFIG = (() => {
     const cfg = {
       "Restore Health": {
+        description: "Restores health for the listed duration and dice expression.",
         bonusDiceByRarity: { common: "1d6", uncommon: "1d8", rare: "1d12", legendary: "2d20" },
         baseNoteByRarity: { common: "2d4", uncommon: "2d4", rare: "2d4", legendary: "2d4" },
 
@@ -3853,6 +3940,7 @@
       },
 
       "Resist Shock": {
+        description: "Grants resistance to shock damage for the listed duration and dice expression.",
         bonusDiceByRarity: { common: "1d6", uncommon: "1d8", rare: "1d12", legendary: "2d20" },
         baseNoteByRarity: { common: "2d4", uncommon: "4d4", rare: "8d4", legendary: "10d4" },
 
@@ -3871,8 +3959,7 @@
       },
 
       "Featherfall": {
-        // Suggested D&D use: For the duration, you fall slowly (as feather fall, self only).
-        // Duration = (Base + Bonus) minutes.
+        description: "Makes the user fall slower, taking no fall damage for falls under 80 ft for the duration of the potion.",
         bonusDiceByRarity: { common: "1d6", uncommon: "1d8", rare: "1d12", legendary: "2d20" },
         baseNoteByRarity:  { common: "2d4", uncommon: "4d4", rare: "6d4", legendary: "8d4" },
 
